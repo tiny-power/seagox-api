@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.ShortcutMapper">
+
+    <!--查询全部通过用户id-->
+	<select id="queryListByUserId" resultType="camelKeyMap">
+        SELECT a.menu_id as "id", b.name, b.icon, b.type, b.path, 1 as "isFavorite"
+        	FROM shortcut a
+        	LEFT JOIN sys_menu b ON b.id = a.menu_id
+        <where>
+        	b.company_id = #{companyId}
+        	AND a.user_id = #{userId}
+        </where>
+    </select>
+</mapper>

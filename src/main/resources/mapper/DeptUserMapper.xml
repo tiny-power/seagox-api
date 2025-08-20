@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.DeptUserMapper">
+    
+    <!--查询用户通过部门ids-->
+    <select id="queryByDepartmentIds" resultType="string">
+        SELECT user_id FROM dept_user
+        <where>
+            department_id IN
+            <foreach collection="deptList" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+    
+    <!--查询用户通过公司ids-->
+    <select id="queryByCompanyIds" resultType="string">
+        SELECT user_id FROM dept_user
+        <where>
+            company_id IN
+            <foreach collection="companyList" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+</mapper>

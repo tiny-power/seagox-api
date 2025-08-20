@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.LogMapper">
+
+    <!--查询列表-->
+    <select id="queryList" resultType="camelKeyMap">
+        SELECT
+        	b.account, a.name, a.ip, a.uri, a.method, a.params,
+        	a.ua, a.status, a.cost_time, a.result,
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+            	to_char(a.create_time,'yyyy-MM-dd hh24:mi:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+        FROM sys_log a
+        LEFT JOIN sys_account b ON b.id = a.user_id
+        <where>
+        	<if test="type != null and type != '' and type == 'login'">
+                AND a.company_id = 0
+            </if>
+            <if test="type != null and type != '' and type == 'operate'">
+                AND a.company_id != 0
+            </if>
+            <if test="account != null and account != ''">
+                AND b.account = #{account}
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name = #{name}
+            </if>
+            <if test="uri != null and uri != ''">
+                AND a.uri = #{uri}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+    
+</mapper>

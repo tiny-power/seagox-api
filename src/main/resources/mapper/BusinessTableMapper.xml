@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.seagox.lowcode.mapper.BusinessTableMapper">
+
+	<select id="queryTableByName" resultMap="tableField">
+		SELECT * FROM business_table
+		<where>
+			name = #{tableName}
+		</where>
+	</select>
+	
+	<resultMap id="tableField" type="BusinessTable">
+		<id column="id" property="id" />
+		<collection property="children" column="id"
+			javaType="List" select="selectBusinessFieldByTableId"></collection>
+	</resultMap>
+	
+	<select id="selectBusinessFieldByTableId" resultType="BusinessField">
+		SELECT * FROM business_field
+		<where>
+			business_table_id = #{id}
+		</where> 
+	</select>
+</mapper>

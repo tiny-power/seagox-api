@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.CompanyMapper">
+
+    <!--查询全部通过编码前缀-->
+	<select id="queryByPrefix" resultType="camelKeyMap">
+        SELECT
+        	id,
+        	name,
+        	parent_id as "parentId",
+        	id as value,
+        	name as label,
+        	alias,
+        	logo,
+            code,
+            sort,
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+            	CONVERT(varchar, create_time, 120 ) AS "createTime"
+            </if>
+        FROM company 
+        <where>
+        	<choose>
+	            <when test="_databaseId == 'mysql' and prefix != null and prefix != ''">
+	                AND code LIKE CONCAT(#{prefix}, '%')
+	            </when>
+	            <when test="_databaseId == 'postgresql' and prefix != null and prefix != ''">
+	            	AND code LIKE #{prefix} || '%'
+	            </when>
+                <when test="_databaseId == 'kingbase' and prefix != null and prefix != ''">
+                    AND code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'dm' and prefix != null and prefix != ''">
+                    AND code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'oracle' and prefix != null and prefix != ''">
+                    AND code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'sqlserver' and prefix != null and prefix != ''">
+                    AND code LIKE #{prefix} + '%'
+                </when>
+            </choose>
+        </where>
+        ORDER BY sort
+    </select>
+
+    <!--查询公司-->
+	<select id="queryByIds" resultType="camelKeyMap">
+        SELECT
+            id,
+            name,
+            parent_id as "parentId",
+            id as value,
+            name as label,
+            mark,
+            code,
+            alias,
+            logo,
+            <if test="_databaseId == 'mysql'">
+                DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, create_time, 120 ) AS "createTime"
+            </if>
+        FROM company
+        <where>
+        	id IN
+            <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+			<if test="topLevel">
+            	AND parent_id IS NULL
+            </if>
+			<if test="_databaseId == 'mysql'">
+            	ORDER BY FIND_IN_SET(id,#{ids})
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	ORDER BY cast(#{ids} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(id as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                ORDER BY cast(#{ids} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(id as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm'">
+                ORDER BY position(id in #{ids})
+            </if>
+            <if test="_databaseId == 'oracle'">
+                ORDER BY FIND_IN_SET(id,#{ids})
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CHARINDEX(id, #{ids}) > 0
+            </if>
+        </where>
+    </select>
+
+    <!--查询最大编码通过编码前缀-->
+	<select id="queryMaxCode" resultType="string">
+        SELECT MAX(code) FROM company
+        <where>
+        	<if test="_databaseId == 'mysql'">
+                code LIKE CONCAT(#{prefix}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	code LIKE #{prefix} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                code LIKE #{prefix} || '%'
+            </if>
+            <if test="_databaseId == 'dm'">
+                code LIKE #{prefix} || '%'
+            </if>
+            <if test="_databaseId == 'oracle'">
+                code LIKE #{prefix} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                code LIKE #{prefix} + '%'
+            </if>
+            <if test="_databaseId == 'mysql'">
+                AND LENGTH(code) = #{digit}
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	AND LENGTH(code) = #{digit}
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                AND LENGTH(code) = #{digit}
+            </if>
+            <if test="_databaseId == 'dm'">
+                AND LENGTH(code) = #{digit}
+            </if>
+            <if test="_databaseId == 'oracle'">
+                AND LENGTH(code) = #{digit}
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                AND LENGTH(code) = #{digit}
+            </if>
+        </where>
+    </select>
+
+</mapper>

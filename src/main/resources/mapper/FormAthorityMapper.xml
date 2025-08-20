@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.FormAthorityMapper">
+	
+	<!--查询用户数据-->
+	<select id="queryUserField" resultType="string">
+		SELECT a.field FROM form_athority a 
+			LEFT JOIN sys_role b ON 
+			<if test="_databaseId == 'mysql'">
+                FIND_IN_SET(b.id, a.members) 
+            </if>
+			<if test="_databaseId == 'oracle'">
+                FIND_IN_SET(b.id, a.members) > 0
+            </if>
+           	<if test="_databaseId == 'postgresql'">
+			    cast(a.members as VARCHAR) = ANY(STRING_TO_ARRAY(b.id,','))
+			</if>
+			<if test="_databaseId == 'kingbase'">
+			    cast(a.members as VARCHAR) = ANY(STRING_TO_ARRAY(b.id,','))
+			</if>
+			<if test="_databaseId == 'dm'">
+			    position(b.id in a.members)
+			</if>
+            <if test="_databaseId == 'sqlserver'">
+            	CHARINDEX(b.id, a.members) > 0
+            </if>
+			LEFT JOIN user_role c ON c.role_id = b.id
+		<where>
+			a.form_id = #{formId}
+			AND a.type = #{type}
+			AND b.company_id = #{companyId}
+			AND c.user_id = #{userId}
+		</where>
+	</select>
+	
+	<!--查询用户数据-->
+	<select id="queryUserScope" resultType="string">
+		SELECT a.scope FROM form_athority a 
+			LEFT JOIN sys_role b ON 
+			<if test="_databaseId == 'mysql'">
+                FIND_IN_SET(b.id, a.members) 
+            </if>
+			<if test="_databaseId == 'oracle'">
+                FIND_IN_SET(b.id, a.members) > 0
+            </if>
+           	<if test="_databaseId == 'postgresql'">
+			    cast(a.members as VARCHAR) = ANY(STRING_TO_ARRAY(b.id,','))
+			</if>
+			<if test="_databaseId == 'kingbase'">
+			    cast(a.members as VARCHAR) = ANY(STRING_TO_ARRAY(b.id,','))
+			</if>
+			<if test="_databaseId == 'dm'">
+			    position(b.id in a.members)
+			</if>
+            <if test="_databaseId == 'sqlserver'">
+            	CHARINDEX(b.id, a.members) > 0
+            </if>
+			LEFT JOIN user_role c ON c.role_id = b.id
+		<where>
+			a.form_id = #{formId}
+			AND a.type = 2
+			AND b.company_id = #{companyId}
+			AND c.user_id = #{userId}
+		</where>
+	</select>
+</mapper>

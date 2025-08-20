@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.DicClassifyMapper">
+    <!--查询列表通过名称-->
+    <select id="queryByName" resultType="camelKeyMap">
+        SELECT b.name, b.code
+        FROM dic_classify a 
+        LEFT JOIN dic_detail b ON b.classify_id = a.id
+        <where>
+        	a.name = #{name}
+        </where>
+    </select>
+    
+    <select id="queryLastStageByName" resultType="string">
+        SELECT b.name
+        FROM dic_classify a 
+        LEFT JOIN dic_detail b ON b.classify_id = a.id
+        <where>
+        	a.company_id = #{companyId}
+        	AND a.name = #{name}
+        	AND b.last_stage = 1
+        </where>
+    </select>
+    
+    <select id="queryByNameList" resultMap="tableField">
+		SELECT * FROM dic_classify
+		<where>
+			name IN
+            <foreach collection="nameList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+		</where>
+	</select>
+	
+	<resultMap id="tableField" type="DicClassify">
+		<id column="id" property="id" />
+		<collection property="children" column="id"
+			javaType="List" select="selectDicDetailByClassifyId"></collection>
+	</resultMap>
+	
+	<select id="selectDicDetailByClassifyId" resultType="DicDetail">
+		SELECT * FROM dic_detail
+		<where>
+			classify_id = #{id}
+		</where> 
+	</select>
+
+</mapper>

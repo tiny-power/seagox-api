@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.DicDetailMapper">
+    <!--查询列表通过类型-->
+    <select id="queryMaps" resultType="camelKeyMap">
+        SELECT id, parent_id as "parentId", classify_id as "classifyId", name, code, sort, status, last_stage as "lastStage" FROM dic_detail
+        <where>
+        	classify_id = #{classifyId}
+        </where>
+        ORDER BY sort
+    </select>
+
+</mapper>

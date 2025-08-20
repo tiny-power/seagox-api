@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.AccountMapper">
+	<!--查询全部通过公司id-->
+	<select id="queryByCompanyId" resultType="camelKeyMap">
+        SELECT a.id, a.account, a.name, a.sex, a.sort, a.status, a.type,
+        b.company_id as "companyId" 
+       	FROM sys_account a
+       	LEFT JOIN dept_user b ON b.user_id = a.id
+        <where>
+        	b.company_id = #{companyId}
+        </where>
+    </select>
+    
+    <!--查询全部通过公司id-->
+	<select id="queryByPage" resultType="camelKeyMap">
+        SELECT
+        	a.id, a.account, a.name, a.sex, a.sort, a.status, a.type,
+        	GROUP_CONCAT(f.name) as "roleNames"
+       	FROM sys_account a
+       	LEFT JOIN dept_user b ON b.user_id = a.id
+       	LEFT JOIN company d ON d.id = b.company_id
+       	LEFT JOIN user_role e ON e.user_id = a.id
+       	LEFT JOIN sys_role f ON f.id = e.role_id and f.company_id = b.company_id
+        <where>
+        	<choose>
+	            <when test="_databaseId == 'mysql' and prefix != null and prefix != ''">
+	                AND d.code LIKE CONCAT(#{prefix}, '%')
+	            </when>
+	            <when test="_databaseId == 'postgresql' and prefix != null and prefix != ''">
+	            	AND d.code LIKE #{prefix} || '%'
+	            </when>
+                <when test="_databaseId == 'kingbase' and prefix != null and prefix != ''">
+                    AND d.code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'dm' and prefix != null and prefix != ''">
+                    AND d.code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'oracle' and prefix != null and prefix != ''">
+                    AND d.code LIKE #{prefix} || '%'
+                </when>
+                <when test="_databaseId == 'sqlserver' and prefix != null and prefix != ''">
+                    AND d.code LIKE #{prefix} + '%'
+                </when>
+                <otherwise>
+                	b.company_id = #{searchCompanyId}
+            	</otherwise>
+            </choose>
+            <if test="departmentId != null">
+            	AND b.department_id = #{departmentId}
+            </if>
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND a.name LIKE CONCAT('%', #{name},'%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+            	AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND a.name LIKE '%' + #{name} + '%'
+            </if>
+        </where>
+        GROUP BY a.id
+        ORDER BY a.sort,a.create_time DESC
+    </select>
+
+    <!--通过部门id查询用户-->
+	<select id="queryByDeptId" resultType="camelKeyMap">
+        SELECT a.company_id AS "companyId", b.id, b.name FROM dept_user a
+        	LEFT JOIN sys_account b ON b.id = a.user_id
+        <where>
+            a.department_id = #{deptId}
+        </where>
+        ORDER BY b.create_time DESC
+    </select>
+
+    <!--查询用户根据公司ids以及姓名-->
+    <select id="queryUserByCompanyIds" resultType="camelKeyMap">
+        SELECT
+        a.id, a.account, a.name, a.sex, a.sort, a.status, a.type, 
+        b.company_id as "companyId", b.department_id as "departmentId", 
+        a.id as value, a.name as label,c.name as "departmentName",
+        d.name as "companyName"
+        FROM sys_account a
+        LEFT JOIN dept_user b ON b.user_id = a.id
+        LEFT JOIN department c ON c.id = b.department_id
+        LEFT JOIN company d ON d.id = b.company_id
+        <where>
+            b.company_id in
+            <foreach collection="companyIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+    <!--通过用户串获取用户-->
+	<select id="queryByIds" resultType="camelKeyMap">
+        SELECT id,name FROM sys_account
+        <where>
+        	id IN
+            <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+            and status = 1
+            order by sort
+        </where>
+    </select>
+
+    <!--查询列表-->
+    <select id="queryList" resultType="camelKeyMap">
+        SELECT b.id, b.name,b.avatar, a.company_id as "companyId",
+        b.id as "userId", b.name as "userName", b.sort
+        FROM dept_user a
+        LEFT JOIN sys_account b ON b.id = a.user_id
+        <where>
+            a.company_id = #{companyId}
+            AND b.id != #{userId}
+            <if test="_databaseId == 'mysql' and userName != null and userName != ''">
+                AND b.name LIKE CONCAT('%', #{userName},'%')
+            </if>
+            <if test="_databaseId == 'postgresql' and userName != null and userName != ''">
+            	AND b.name LIKE '%' || #{userName} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and userName != null and userName != ''">
+                AND b.name LIKE '%' || #{userName} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and userName != null and userName != ''">
+                AND b.name LIKE '%' || #{userName} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and userName != null and userName != ''">
+                AND b.name LIKE '%' || #{userName} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and userName != null and userName != ''">
+                AND b.name LIKE '%' + #{userName} + '%'
+            </if>
+        </where>
+        ORDER BY b.create_time DESC
+    </select>
+
+    <!--通过公司id导出-->
+	<select id="exportByCompanyId" resultType="camelKeyMap">
+        SELECT a.account,
+        	   a.name,
+        	   a.sex,
+        	   a.phone,
+        	   a.sort,
+        	   c.name as "companyName",
+        	   d.name AS "departmentName"
+       	FROM sys_account a
+        	LEFT JOIN dept_user b ON b.user_id = a.id
+        	LEFT JOIN company c ON b.company_id = c.id
+        	LEFT JOIN department d ON b.department_id = d.id
+        <where>
+        	b.company_id = #{exportCompanyId}
+            <if test="exportDepartmentId != null">
+                AND b.department_id = #{exportDepartmentId}
+            </if>
+        </where>
+        order by a.sort
+    </select>
+
+</mapper>

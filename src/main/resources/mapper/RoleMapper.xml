@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.RoleMapper">
+	
+    <!--查询列表通过公司id-->
+    <select id="queryByCompanyId" resultType="camelKeyMap">
+        SELECT
+        a.id,
+        a.name,
+        a.id as value,
+        a.name as label,
+        a.company_id as "companyId",
+        b.name as "companyName",
+        "role" as "type",
+        a.path,
+        <if test="_databaseId == 'mysql'">
+            DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+        </if>
+        <if test="_databaseId == 'kingbase'">
+            to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+        </if>
+        <if test="_databaseId == 'dm'">
+            to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+        </if>
+        <if test="_databaseId == 'oracle'">
+            to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+        </if>
+        FROM sys_role a
+        LEFT JOIN company b ON b.id = a.company_id
+        <where>
+            a.company_id = #{companyId}
+        </where>
+    </select>
+
+    <!--查询用户权限-->
+	<select id="queryRoleIds" resultType="string">
+        SELECT id FROM sys_role
+        <where>
+        	company_id = #{companyId}
+            AND name IN
+			<foreach collection="roleStr" item="name" index="index" open="(" close=")" separator=",">
+				#{name}
+			</foreach>
+        </where>
+    </select>
+    
+</mapper>

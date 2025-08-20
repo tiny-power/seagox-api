@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.BusinessFieldMapper">
+
+    <!--查询全部通过表名-->
+	<select id="queryByTableName" resultType="camelKeyMap">
+        SELECT a.id, b.name as "tableName", b.remark as "tableComment", a.name, a.remark, a.type, a.target_table_id as "targetTableId" FROM business_field a
+        	LEFT JOIN business_table b ON b.id = a.business_table_id
+        <where>
+            b.name = #{tableName}
+        </where>
+    </select>
+
+    <!--查询全部通过表ids-->
+	<select id="queryByTableIds" resultType="camelKeyMap">
+        SELECT b.id, a.name as "tableName", a.remark as "tableComment", b.name, b.remark, b.type FROM business_table a
+        	LEFT JOIN business_field b ON a.id = b.business_table_id
+        <where>
+            a.id IN
+            <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+        </where>
+    </select>
+
+    <!--查询必填字段全部表单id-->
+	<select id="queryRequiredByFormId" resultType="camelKeyMap">
+        SELECT
+            a.name as "tableName",
+            b.name,
+            b.remark
+        from business_table a
+        LEFT JOIN business_field b ON b.business_table_id = a.id
+        <where>
+            a.id = #{tableId}
+            AND b.not_null = 1
+        </where>
+    </select>
+    
+    <!--查询外键-->
+	<select id="queryForeignKey" resultType="string">
+        SELECT
+            b.name
+        from business_table a
+        LEFT JOIN business_field b ON b.business_table_id = a.id
+        <where>
+            a.name = #{tableName}
+            AND b.target_table_id = #{targetTableId}
+        </where>
+    </select>
+
+</mapper>

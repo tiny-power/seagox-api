@@ -1,0 +1,45 @@
+{"properties": [{
+  "name": "oss.type",
+  "type": "java.lang.String",
+  "description": "A description for 'oss.type'"
+},{
+  "name": "oss.endpoint",
+  "type": "java.lang.String",
+  "description": "A description for 'oss.endpoint'"
+},{
+  "name": "oss.access-key",
+  "type": "java.lang.String",
+  "description": "A description for 'oss.access-key'"
+},{
+  "name": "oss.secret-key",
+  "type": "java.lang.String",
+  "description": "A description for 'oss.secret-key'"
+},{
+  "name": "oss.url",
+  "type": "java.lang.String",
+  "description": "A description for 'oss.url'"
+},{
+  "name": "oss.accept",
+  "type": "java.util.List",
+  "description": "A description for 'oss.accept'"
+},{
+  "name": "jodconverter.working-dir",
+  "type": "java.lang.String",
+  "description": "A description for 'jodconverter.working-dir'"
+},{
+  "name": "third-party.applets.appid",
+  "type": "java.lang.String",
+  "description": "A description for 'third-party.applets.appid'"
+},{
+  "name": "third-party.applets.sercret",
+  "type": "java.lang.String",
+  "description": "A description for 'third-party.applets.sercret'"
+},{
+  "name": "ignore.token",
+  "type": "java.lang.String",
+  "description": "A description for 'ignore.token'"
+},{
+  "name": "ignore.sign",
+  "type": "java.lang.String",
+  "description": "A description for 'ignore.sign'"
+}]}

@@ -1,0 +1,119 @@
+server:
+  port: 80
+
+spring:
+  jackson:
+    time-zone: GMT+8
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+     add-mappings: false
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 
+    jedis:
+      pool:
+        min-idle: 1
+        max-active: 5000
+        max-idle: 5000
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/assets?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.seagox.lowcode
+  global-config.db-config.id-type: AUTO # oracle 配置INPUT
+  type-handlers-package: com.seagox.lowcode.common
+
+#oracle不加报错
+#  configuration:
+#    jdbc-type-for-null: 'null'
+
+logging:
+  file:
+    path: /usr/logging
+  pattern:
+    console: "%d - %msg%n"
+  level:
+    com:
+      seagox:
+        lowcode: debug
+
+# minio、aliyun、ecloud、aws
+oss:
+  type: minio
+  endpoint: http://127.0.0.1:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  url: http://127.0.0.1:9000
+  accept:
+    - png
+    - jpeg
+    - jpg
+    - tif
+    - tiff
+    - gif
+    - bmp
+    - svg
+    - txt
+    - mp4
+    - doc
+    - docx
+    - xls
+    - xlsx
+    - ppt
+    - pptx
+    - pdf
+    - ofd
+    - zip
+    - rar
+
+jodconverter:
+  working-dir: /Users/X/Downloads
+
+third-party:
+  applets:
+    appid: 123
+    sercret: 123
+
+ignore:
+  token: /auth
+  sign: /auth
+
+#pagehelper:
+#  helperDialect: mysql
+#  reasonable: true
+#  supportMethodsArguments: true
+#  params: count=countSql
+
+#sqlserver
+#url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=localdemo
+#driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+#kingbase8
+#url: jdbc:kingbase8://127.0.0.1:54321/oa?stringtype=unspecified
+#driver-class-name: com.kingbase8.Driver
+
+#postgresql
+#url: jdbc:postgresql://127.0.0.1:5432/oa?stringtype=unspecified
+#driver-class-name: org.postgresql.Driver
+
+#oracle
+#url: jdbc:oracle:thin:@127.0.0.1:1521:ORCL
+#driver-class-name: oracle.jdbc.OracleDriver
+
+#dm
+#url: jdbc:dm://127.0.0.1:5236/oa?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8
+#driver-class-name: dm.jdbc.driver.DmDriver
+
+#mysql
+#url: jdbc:mysql://127.0.0.1:3306/oa?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+#driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.SeaNodeMapper">
+	
+	<!--查询当前节点-->
+	<select id="queryCurrentNodeDetail" resultType="camelKeyMap">
+        SELECT a.id, a.type, a.mark, a.label, a.path,a.precede, b.resources, c.id AS "nodeDetailId"
+        FROM sea_node a
+        LEFT JOIN sea_instance b ON a.def_id = b.id
+        LEFT JOIn sea_node_detail c ON c.node_id = a.id
+        <where>
+            b.id = #{defId}
+            AND a.status = 0
+            AND c.status = 0
+            AND c.assignee = #{assignee}
+        </where>
+        ORDER BY a.create_time desc 
+    </select>
+	
+</mapper>

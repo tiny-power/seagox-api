@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.FormMapper">
+
+    <!--查询公共数据-->
+	<select id="queryPublicList" resultType="camelKeyMap">
+		${sql}
+	</select>
+	
+	<!--更新id为0-->
+	<update id="updateZero">
+		update form
+		<set>
+			id = 0
+		</set>
+		<where>
+			mark = 'matter'
+		</where>
+	</update>
+
+</mapper>

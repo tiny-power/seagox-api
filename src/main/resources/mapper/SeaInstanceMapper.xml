@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.SeaInstanceMapper">
+    <!--查询待办事项-->
+	<select id="queryTodoItem" resultType="camelKeyMap">
+        SELECT
+        	c.id,
+        	c.name,
+        	c.business_type as "businessType",
+        	c.business_key as "businessKey",
+        	c.status,
+        	d.name as "assigneeName",
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+        FROM sea_node_detail a
+        LEFT JOIN sea_node b ON b.id = a.node_id
+        LEFT JOIN sea_instance c ON c.id = b.def_id
+        LEFT JOIN sys_account d ON d.id = c.user_id
+        <where>
+        	a.status = 0
+        	AND b.status = 0
+        	AND b.type = 3
+            AND a.assignee = #{userId}
+            AND c.status IN(0, 3)
+            AND a.company_id = #{companyId}
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND c.name LIKE '%' + #{name} + '%'
+            </if>
+            <if test="_databaseId == 'mysql' and statusStr != null and statusStr != ''">
+                AND FIND_IN_SET(c.status, #{statusStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and statusStr != null and statusStr != ''">
+                AND cast(#{statusStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.status as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and statusStr != null and statusStr != ''">
+                AND cast(#{statusStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.status as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and statusStr != null and statusStr != ''">
+                AND position(c.status in #{statusStr})
+            </if>
+            <if test="_databaseId == 'oracle' and statusStr != null and statusStr != ''">
+                AND FIND_IN_SET(c.status, #{statusStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and statusStr != null and statusStr != ''">
+                AND CHARINDEX(c.status, #{statusStr}) > 0
+            </if>
+            <if test="_databaseId == 'mysql' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and businessTypeStr != null and businessTypeStr != ''">
+                AND position(c.business_type in #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'oracle' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and businessTypeStr != null and businessTypeStr != ''">
+                AND CHARINDEX(c.business_type, #{businessTypeStr}) > 0
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!--查询已办事项-->
+	<select id="queryDoneItem" resultType="camelKeyMap">
+        SELECT
+        	c.id,
+        	c.name,
+        	c.business_type as "businessType",
+        	c.business_key as "businessKey",
+        	d.name as assigneeName,
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime",
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime",
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime",
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime",
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime",
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s') AS "endTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.end_time, 120 ) AS "endTime"
+            </if>
+        FROM sea_node_detail a
+        LEFT JOIN sea_node b ON b.id = a.node_id
+        LEFT JOIN sea_instance c ON c.id = b.def_id
+        LEFT JOIN sys_account d ON d.id = c.user_id
+        <where>
+        	a.status IN (1,2)
+            AND a.assignee = #{userId}
+            AND a.company_id = #{companyId}
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND c.name LIKE '%' + #{name} + '%'
+            </if>
+            <if test="_databaseId == 'mysql' and startTime != null and startTime != ''">
+                AND DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'postgresql' and startTime != null and startTime != ''">
+                AND to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'kingbase' and startTime != null and startTime != ''">
+                AND to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'dm' and startTime != null and startTime != ''">
+                AND to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'oracle' and startTime != null and startTime != ''">
+                AND to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'sqlserver' and startTime != null and startTime != ''">
+                AND CONVERT(varchar, a.end_time, 120 ) between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'mysql' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and businessTypeStr != null and businessTypeStr != ''">
+                AND position(c.business_type in #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'oracle' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and businessTypeStr != null and businessTypeStr != ''">
+                AND CHARINDEX(c.business_type, #{businessTypeStr}) > 0
+            </if>
+        </where>
+        ORDER BY a.end_time DESC
+    </select>
+
+    <!--查询抄送事项-->
+	<select id="queryCopyItem" resultType="camelKeyMap">
+        SELECT
+        	a.id,
+        	c.name,
+        	c.business_type as "businessType",
+        	c.business_key as "businessKey",
+        	d.name as "assigneeName",
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(c.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(c.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(c.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(c.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(c.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, c.create_time, 120 ) AS "createTime"
+            </if>
+        FROM sea_node_detail a
+        LEFT JOIN sea_node b ON b.id = a.node_id
+        LEFT JOIN sea_instance c ON c.id = b.def_id
+        LEFT JOIN sys_account d ON d.id = c.user_id
+        <where>
+        	b.type = 2
+            AND b.status = 1
+            AND a.assignee = #{userId}
+            AND a.company_id = #{companyId}
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND c.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND c.name LIKE '%' + #{name} + '%'
+            </if>
+            <if test="_databaseId == 'mysql' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(c.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and businessTypeStr != null and businessTypeStr != ''">
+                AND position(c.business_type in #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'oracle' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(c.business_type, #{businessTypeStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and businessTypeStr != null and businessTypeStr != ''">
+                AND CHARINDEX(c.business_type, #{businessTypeStr}) > 0
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!--查询我发起的-->
+	<select id="querySelfItem" resultType="camelKeyMap">
+        SELECT
+        	a.id,
+        	a.name,
+        	a.business_type as "businessType",
+        	a.business_key as "businessKey",
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+		FROM sea_instance a
+		LEFT JOIN company b ON b.id = a.company_id
+        <where>
+            a.user_id = #{userId}
+            AND a.company_id = #{companyId}
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND a.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND a.name LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND a.name LIKE '%' + #{name} + '%'
+            </if>
+            <if test="_databaseId == 'mysql' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(a.business_type, #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(a.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(a.business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and businessTypeStr != null and businessTypeStr != ''">
+                AND position(a.business_type in #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'oracle' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(a.business_type, #{businessTypeStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and businessTypeStr != null and businessTypeStr != ''">
+                AND CHARINDEX(a.business_type, #{businessTypeStr}) > 0
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!--查询待发事项-->
+	<select id="queryReadyItem" resultType="camelKeyMap">
+        SELECT
+        	id,
+        	title as name,
+            business_type AS "businessType",
+            business_key AS "businessKey",
+        	<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, create_time, 120 ) AS "createTime"
+            </if>
+		FROM sys_message
+        <where>
+        	type = 1
+        	AND company_id = #{companyId}
+            AND to_user_id = #{userId}
+            <if test="_databaseId == 'mysql' and name != null and name != ''">
+                AND title LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and name != null and name != ''">
+                AND title LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and name != null and name != ''">
+                AND title LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and name != null and name != ''">
+                AND title LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and name != null and name != ''">
+                AND title LIKE '%' || #{name} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and name != null and name != ''">
+                AND title LIKE '%' + #{name} + '%'
+            </if>
+            <if test="_databaseId == 'mysql' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(business_type, #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'postgresql' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'kingbase' and businessTypeStr != null and businessTypeStr != ''">
+                AND cast(#{businessTypeStr} as VARCHAR) = ANY (STRING_TO_ARRAY(cast(business_type as VARCHAR),','))
+            </if>
+            <if test="_databaseId == 'dm' and businessTypeStr != null and businessTypeStr != ''">
+                AND position(business_type in #{businessTypeStr})
+            </if>
+            <if test="_databaseId == 'oracle' and businessTypeStr != null and businessTypeStr != ''">
+                AND FIND_IN_SET(business_type, #{businessTypeStr}) > 0
+            </if>
+            <if test="_databaseId == 'sqlserver' and businessTypeStr != null and businessTypeStr != ''">
+                AND CHARINDEX(business_type, #{businessTypeStr}) > 0
+            </if>
+        </where>
+        ORDER BY create_time DESC, id DESC
+    </select>
+
+    <!--删除流程记录-->
+    <delete id="deleteProcess">
+    	DELETE a,b,c
+		FROM sea_instance AS a
+		LEFT JOIN sea_node AS b ON b.def_id = a.id
+		LEFT JOIN sea_node_detail AS c ON c.node_id = b.id
+		<where>
+			a.business_type = #{businessType}
+            AND a.business_key = #{businessKey}
+		</where>
+    </delete>
+	
+	<!--流程记录-->
+    <select id="queryProcessInfo" resultType="camelKeyMap">
+        SELECT
+            b.label,
+            a.name,
+            b.status AS "nodeStatus",
+            a.status,
+            a.remark,
+            <if test="_databaseId == 'mysql'">
+                DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') AS "startTime",
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.start_time, 120 ) AS "startTime",
+            </if>
+            <if test="_databaseId == 'mysql'">
+                DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s') AS "endTime",
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.end_time, 120 ) AS "endTime",
+            </if>
+            CASE
+                a.end_time
+                WHEN NULL
+                THEN NULL
+                ELSE
+                <choose>
+                    <when test="_databaseId == 'oracle'">
+                        ROUND(TO_NUMBER(a.start_time - a.end_time) * 24 * 60)
+                    </when>
+                    <otherwise>
+                        TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)
+                    </otherwise>
+                </choose>
+                END AS "consuming"
+        FROM sea_node_detail a
+        LEFT JOIN sea_node b ON a.node_id = b.id
+        LEFT JOIN sea_instance c ON c.id= b.def_id
+        <where>
+        	c.business_type = #{businessType} 
+        	AND c.business_key = #{businessKey}
+        </where>
+        ORDER BY a.create_time desc
+    </select>
+</mapper>

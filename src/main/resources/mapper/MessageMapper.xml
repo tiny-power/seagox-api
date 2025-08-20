@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.MessageMapper">
+
+	<!-- 查询所有 -->
+	<select id="queryAll" resultType="camelKeyMap">
+		select 
+			a.id, 
+			a.type, 
+			a.title, 
+			a.status, 
+		    a.business_type AS "businessType",
+		    a.business_key AS "businessKey",
+			b.name, 
+			<if test="_databaseId == 'mysql'">
+            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime" 
+            </if>
+            <if test="_databaseId == 'postgresql'">
+            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+			<if test="_databaseId == 'kingbase'">
+				to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+			</if>
+			<if test="_databaseId == 'dm'">
+				to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+			</if>
+			<if test="_databaseId == 'oracle'">
+				to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+			</if>
+			<if test="_databaseId == 'sqlserver'">
+				CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+			</if>
+		FROM sys_message a
+		LEFT JOIN sys_account b ON b.id = a.from_user_id
+		LEFT JOIN company c ON c.id = a.company_id
+		<where>
+			c.id = #{companyId}
+			<if test="_databaseId == 'mysql' and title != null and title != ''">
+				and a.title LIKE CONCAT('%', #{title}, '%')
+			</if>
+			<if test="_databaseId == 'postgresql' and title != null and title != ''">
+				and a.title LIKE '%' || #{title} || '%'
+			</if>
+			<if test="_databaseId == 'kingbase' and title != null and title != ''">
+				and a.title LIKE '%' || #{title} || '%'
+			</if>
+			<if test="_databaseId == 'dm' and title != null and title != ''">
+				and a.title LIKE '%' || #{title} || '%'
+			</if>
+			<if test="_databaseId == 'oracle' and title != null and title != ''">
+			    and a.title LIKE '%' || #{title} || '%'
+			</if>
+			<if test="_databaseId == 'sqlserver' and title != null and title != ''">
+			    and a.title LIKE '%' + #{title} + '%'
+			</if>
+			<if test="status != null">
+				and a.status = #{status}
+			</if>
+			AND a.to_user_id = #{toUserId}
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+	
+	<!-- 查询未读数量 -->
+	<select id="queryCount" resultType="int">
+		select COUNT(a.id) FROM sys_message a
+		LEFT JOIN sys_account b ON b.id = a.from_user_id
+		LEFT JOIN company c ON c.id = a.company_id
+		<where>
+			a.status = 0
+			AND c.id = #{companyId}
+			AND a.to_user_id = #{toUserId}
+		</where>
+	</select>
+	
+	<!--删除消息记录-->
+    <delete id="deleteMessage">
+    	DELETE FROM sys_message
+		<where>
+			business_type = #{businessType}
+            AND business_key = #{businessKey}
+		</where> 
+    </delete>
+
+</mapper>

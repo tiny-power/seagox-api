@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.assets.mapper.AssetsMapper">
+
+	<!--查询处置单明细 -->
+	<select id="queryDisposeDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, a.num as "dispose_num", b.code, b.unit, b.num, b.name
+		from assets_dispose_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.dispose_id = #{disposeId}
+		</where>
+	</select>
+
+	<!--查询借用单明细 -->
+	<select id="queryBorrowDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, a.reckon_return_date,a.source_position,a.target_position,
+		b.code, b.unit, b.num, b.name
+		from assets_borrow_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.borrow_id = #{borrowId}
+		</where>
+	</select>
+	
+	<!--查询退库单明细 -->
+	<select id="queryReturnStockDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id,
+		b.code, b.unit, b.num, b.name
+		from assets_return_stock_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.return_stock_id = #{returnStockId}
+		</where>
+	</select>
+	
+	<!--查询归还单明细 -->
+	<select id="queryReturnDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id,
+		b.code, b.unit, b.num, b.name
+		from assets_return_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.return_id = #{returnId}
+		</where>
+	</select>
+
+	<!--查询调拨单明细 -->
+	<select id="queryAllocateDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, b.code, b.unit, b.num, b.name
+		from assets_allocate_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.allocate_id = #{allocateId}
+		</where>
+	</select>
+	
+	<!--查询移交单明细 -->
+	<select id="queryTransferDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, b.code, b.unit, b.num, b.name
+		from assets_transfer_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.transfer_id = #{transferId}
+		</where>
+	</select>
+
+	<!--查询变更单明细 -->
+	<select id="queryChangeDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, a.options, b.code, b.unit, b.num, b.name
+		from
+		assets_change_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.change_id = #{changeId}
+		</where>
+	</select>
+	
+	<!--查询维修单明细 -->
+	<select id="queryMaintenanceDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, b.code, b.unit, b.num, b.name
+		from assets_maintenance_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.maintenance_id = #{maintenanceId}
+		</where>
+	</select>
+
+	<!--查询领用单明细 -->
+	<select id="queryUseDetail" resultType="camelKeyMap">
+		select a.id, a.assets_id, b.code, b.unit, b.num,
+		b.name
+		from assets_use_detail a
+		left join assets_info b on b.id = a.assets_id
+		<where>
+			a.use_id = #{useId}
+		</where>
+	</select>
+
+	<!--查询盘点资产明细 -->
+	<select id="queryInventoryAssetsDetail" resultType="camelKeyMap">
+		select * from assets_info
+		<where>
+			gldw = #{companyId}
+			<if test="zcmlList != null and zcmlList.size() > 0">
+				and category in
+				<foreach collection="zcmlList" item="item" open="("
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="statusList != null and statusList.size() > 0">
+				and status in
+				<foreach collection="statusList" item="item" open="("
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="sybmList != null and sybmList > 0">
+				and use_dept_id in
+				<foreach collection="sybmList" item="item" open="("
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="zcwzList != null and zcwzList.size() > 0">
+				and position in
+				<foreach collection="zcwzList" item="item" open="("
+					close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<!--查询盘点资产明细 -->
+	<select id="queryInventoryDetail" resultType="camelKeyMap">
+		select a.*,b.code,b.name,b.num,b.status as "assetsStatus", a.actual_num as "actualNum",b.position,c.name as "useName" from
+		inventory_plan_detail a
+		left join assets_info b on b.id = a.assets_id
+		left join sys_account c on c.id = b.use_id
+		<where>
+			a.plan_id = #{planId}
+		</where>
+	</select>
+	
+	<!--更新盘点计划 -->
+	<update id="updateInventoryPlan">
+		update inventory_plan
+		<set>
+			status = #{status}
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	
+	<!--查询采购单明细 -->
+	<select id="queryPurchaseDetail" resultType="camelKeyMap">
+		select a.* from assets_purchase_detail a
+		<where>
+			a.purchase_id = #{purchaseId}
+		</where>
+	</select>
+
+</mapper>
