@@ -145,4 +145,9 @@ public class AssetsBorrowHandler implements RuleHandler {
 		}
 		
 	}
+
+	@Override
+	public void printData(Map<String, Object> params) {
+		// TODO Auto-generated method stub
+	}
 }

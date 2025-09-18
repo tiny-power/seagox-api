@@ -32,4 +32,6 @@ public interface RuleHandler extends InitializingBean {
     
     public void flowFinish(Map<String, Object> params);
     
+    public void printData(Map<String, Object> params);
+    
 }

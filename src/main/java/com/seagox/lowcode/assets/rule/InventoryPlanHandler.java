@@ -125,4 +125,9 @@ public class InventoryPlanHandler implements RuleHandler {
 		jdbcTemplate.update("update inventory_plan set status = 1 where id = ?", businessKey);
 		jdbcTemplateUtils.batchInsert("inventory_plan_detail", list);
 	}
+
+	@Override
+	public void printData(Map<String, Object> params) {
+		// TODO Auto-generated method stub
+	}
 }

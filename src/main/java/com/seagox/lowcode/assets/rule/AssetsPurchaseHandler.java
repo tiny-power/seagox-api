@@ -139,4 +139,9 @@ public class AssetsPurchaseHandler implements RuleHandler {
 	public void flowFinish(Map<String, Object> params) {
 		
 	}
+
+	@Override
+	public void printData(Map<String, Object> params) {
+		// TODO Auto-generated method stub
+	}
 }

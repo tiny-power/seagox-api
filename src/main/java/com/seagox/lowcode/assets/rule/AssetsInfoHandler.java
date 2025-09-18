@@ -196,4 +196,9 @@ public class AssetsInfoHandler implements RuleHandler {
 		return String.format(f, number);
 	}
 
+	@Override
+	public void printData(Map<String, Object> params) {
+		// TODO Auto-generated method stub
+	}
+
 }

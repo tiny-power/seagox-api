@@ -55,11 +55,11 @@ import com.seagox.lowcode.service.ICompanyService;
 import com.seagox.lowcode.util.AviatorUtils;
 import com.seagox.lowcode.util.ExcelStyleUtils;
 import com.seagox.lowcode.util.ExcelUtils;
-import com.seagox.lowcode.util.ExportUtils;
 import com.seagox.lowcode.util.ImportResult;
 import com.seagox.lowcode.util.JdbcTemplateUtils;
 import com.seagox.lowcode.util.JsqlparserUtils;
 import com.seagox.lowcode.util.TreeUtils;
+import com.seagox.lowcode.util.WordUtils;
 import com.seagox.lowcode.util.XmlUtils;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
@@ -1315,11 +1315,21 @@ public class FormService implements IFormService {
 		String fileName = System.currentTimeMillis() + ".docx";
 		OutputStream out = null;
 		try {
-			out = new FileOutputStream(workingDir + "/" + fileName);
-			Map<String, Object> variable = new HashMap<>();
-			variable.put("businessType", businessType);
-			variable.put("businessKey", businessKey);
-			ExportUtils.exportWord(url, variable, out, null);
+			// 打印规则
+			RuleHandler eventService = RuleHandlerFactory.getHandler(form.getMark());
+			if (eventService != null) {
+				try {
+					BusinessTable businessTable = businessTableMapper.selectById(form.getDataSource());
+					Map<String, Object> variable = jdbcTemplate.queryForMap("select * from " + businessTable.getName() + " where id = " + businessKey);
+					variable.put("businessType", businessType);
+					variable.put("businessKey", businessKey);
+					eventService.printData(variable);
+					out = new FileOutputStream(workingDir + "/" + fileName);
+					WordUtils.exportWord(url, variable, out, null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

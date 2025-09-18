@@ -138,4 +138,9 @@ public class AssetsAllocateHandler implements RuleHandler {
 			jdbcTemplateUtils.updateById("assets_info", result);
 		}
 	}
+
+	@Override
+	public void printData(Map<String, Object> params) {
+		// TODO Auto-generated method stub
+	}
 }
