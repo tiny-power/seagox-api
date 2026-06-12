@@ -95,6 +95,12 @@
 		    <artifactId>jjwt</artifactId>
 		    <version>0.7.0</version>
 		</dependency>
+		<!-- Java 9+ 不再内置 JAXB，jjwt 0.7.0 运行时仍依赖 DatatypeConverter -->
+		<dependency>
+		    <groupId>javax.xml.bind</groupId>
+		    <artifactId>jaxb-api</artifactId>
+		    <version>2.3.1</version>
+		</dependency>
         <!-- fastjson -->
         <dependency>
 		    <groupId>com.alibaba</groupId>
