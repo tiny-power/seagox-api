@@ -1,15 +1,10 @@
 package com.seagox.lowcode.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.entity.DicDetail;
-import com.seagox.lowcode.entity.Form;
 import com.seagox.lowcode.mapper.DicDetailMapper;
-import com.seagox.lowcode.mapper.FormMapper;
 import com.seagox.lowcode.service.IDicDetailService;
 import com.seagox.lowcode.util.TreeUtils;
 
@@ -27,9 +22,6 @@ public class DicDetailService implements IDicDetailService {
 
 	@Autowired
 	private DicDetailMapper dicDetailMapper;
-
-	@Autowired
-	private FormMapper formMapper;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -75,7 +67,6 @@ public class DicDetailService implements IDicDetailService {
 		}
 		dicDetail.setLastStage(1);
 		dicDetailMapper.insert(dicDetail);
-		updateFormDicData("add", companyId, dicDetail);
 		return ResultData.success(null);
 	}
 
@@ -100,7 +91,6 @@ public class DicDetailService implements IDicDetailService {
 			}
 			dicDetailMapper.updateById(dicDetail);
 			dicDetail.setClassifyId(originalDicDetail.getClassifyId());
-			updateFormDicData("edit", companyId, dicDetail);
 			return ResultData.success(null);
 		} else {
 			LambdaQueryWrapper<DicDetail> qw = new LambdaQueryWrapper<>();
@@ -123,7 +113,6 @@ public class DicDetailService implements IDicDetailService {
 				}
 				dicDetailMapper.updateById(dicDetail);
 				dicDetail.setClassifyId(originalDicDetail.getClassifyId());
-				updateFormDicData("edit", companyId, dicDetail);
 				return ResultData.success(null);
 			} else {
 				return ResultData.warn(ResultCode.PARAMETER_ERROR, "字典值已经存在");
@@ -151,7 +140,6 @@ public class DicDetailService implements IDicDetailService {
 				jdbcTemplate.update(sql);
 			}
 		}
-		updateFormDicData("delete", companyId, dicDetail);
 		return ResultData.success(null);
 	}
 
@@ -161,84 +149,6 @@ public class DicDetailService implements IDicDetailService {
 		qw.eq(DicDetail::getClassifyId, classifyId).orderByAsc(DicDetail::getSort);
 		List<DicDetail> list = dicDetailMapper.selectList(qw);
 		return ResultData.success(list);
-	}
-
-	public void updateFormDicData(String type, Long companyId, DicDetail dicDetail) {
-		LambdaQueryWrapper<Form> qw = new LambdaQueryWrapper<>();
-		qw.eq(Form::getCompanyId, companyId);
-		List<Form> formList = formMapper.selectList(qw);
-		for (Form form : formList) {
-			boolean isUpdate = false;
-			JSONObject options = JSON.parseObject(form.getOptions());
-			JSONArray searchColumn = options.getJSONArray("searchColumn");
-			for (int i = 0; i < searchColumn.size(); i++) {
-				JSONObject searchColumnDetail = searchColumn.getJSONObject(i);
-				Long source = searchColumnDetail.getLong("source");
-				if (!StringUtils.isEmpty(source)) {
-					if (source.equals(dicDetail.getClassifyId())) {
-						isUpdate = true;
-						JSONArray detailOptions = searchColumnDetail.getJSONArray("options");
-						if (type.equals("add")) {
-							detailOptions.add(dicDetail);
-						} else if (type.equals("edit")) {
-							for (int j = 0; j < detailOptions.size(); j++) {
-								JSONObject detail = detailOptions.getJSONObject(j);
-								if (detail.getLong("id").equals(dicDetail.getId())) {
-									detail.put("name", dicDetail.getName());
-									detail.put("code", dicDetail.getCode());
-									searchColumnDetail.put("options", detailOptions);
-									break;
-								}
-							}
-						} else if (type.equals("delete")) {
-							for (int j = 0; j < detailOptions.size(); j++) {
-								JSONObject detail = detailOptions.getJSONObject(j);
-								if (detail.getLong("id").equals(dicDetail.getId())) {
-									detailOptions.remove(j);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			JSONArray tableColumn = options.getJSONArray("tableColumn");
-			for (int i = 0; i < tableColumn.size(); i++) {
-				JSONObject tableColumnDetail = tableColumn.getJSONObject(i);
-				Long formatter = tableColumnDetail.getLong("formatter");
-				if (!StringUtils.isEmpty(formatter)) {
-					if (formatter.equals(dicDetail.getClassifyId())) {
-						isUpdate = true;
-						JSONArray detailOptions = tableColumnDetail.getJSONArray("options");
-						if (type.equals("add")) {
-							detailOptions.add(dicDetail);
-						} else if (type.equals("edit")) {
-							for (int j = 0; j < detailOptions.size(); j++) {
-								JSONObject detail = detailOptions.getJSONObject(j);
-								if (detail.getLong("id").equals(dicDetail.getId())) {
-									detail.put("name", dicDetail.getName());
-									detail.put("code", dicDetail.getCode());
-									tableColumnDetail.put("options", detailOptions.toString());
-									break;
-								}
-							}
-						} else if (type.equals("delete")) {
-							for (int j = 0; j < detailOptions.size(); j++) {
-								JSONObject detail = detailOptions.getJSONObject(j);
-								if (detail.getLong("id").equals(dicDetail.getId())) {
-									detailOptions.remove(j);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (isUpdate) {
-				form.setOptions(options.toString());
-				formMapper.updateById(form);
-			}
-		}
 	}
 
 	@Transactional
@@ -254,7 +164,6 @@ public class DicDetailService implements IDicDetailService {
 			dicDetail.setStatus(1);
 			dicDetail.setLastStage(1);
 			dicDetailMapper.insert(dicDetail);
-			updateFormDicData("add", companyId, dicDetail);
 		}
 		return ResultData.success(null);
 	}

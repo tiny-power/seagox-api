@@ -55,11 +55,11 @@ public class SeaDefinitionController {
     }
     
     /**
-     * 通过表单id查询流程
+     * 通过业务类型查询流程
      */
-    @GetMapping("/queryByFormId/{formId}")
-    public ResultData queryByFormId(@PathVariable Long formId) {
-        return seaDefinitionService.queryByFormId(formId);
+    @GetMapping("/queryByBusinessType/{businessType}")
+    public ResultData queryByBusinessType(@PathVariable String businessType) {
+        return seaDefinitionService.queryByBusinessType(businessType);
     }
 
 }

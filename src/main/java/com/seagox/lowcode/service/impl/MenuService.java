@@ -4,15 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.entity.Company;
-import com.seagox.lowcode.entity.Form;
 import com.seagox.lowcode.mapper.CompanyMapper;
-import com.seagox.lowcode.mapper.FormMapper;
 import com.seagox.lowcode.entity.SysMenu;
 import com.seagox.lowcode.entity.SysRole;
 import com.seagox.lowcode.entity.UserRole;
 import com.seagox.lowcode.mapper.MenuMapper;
 import com.seagox.lowcode.mapper.RoleMapper;
-import com.seagox.lowcode.mapper.ShortcutMapper;
 import com.seagox.lowcode.mapper.UserRoleMapper;
 import com.seagox.lowcode.service.IMenuService;
 import com.seagox.lowcode.util.TreeUtils;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +33,6 @@ public class MenuService implements IMenuService {
 
     @Autowired
     private RoleMapper roleMapper;
-    
-    @Autowired
-    private FormMapper formMapper;
-    
-    @Autowired
-    private ShortcutMapper shortcutMapper;
     
     @Autowired
     private CompanyMapper companyMapper;
@@ -67,76 +57,6 @@ public class MenuService implements IMenuService {
     @Override
     public ResultData insert(SysMenu menu) {
         menuMapper.insert(menu);
-        if(menu.getType().equals(1)) {
-        	if(menu.getClassify().equals(1)) {
-        		Form form = formMapper.selectById(menu.getPath());
-            	SysMenu addMenu = new SysMenu();
-            	addMenu.setCompanyId(menu.getCompanyId());
-            	addMenu.setClassify(1);
-            	addMenu.setIcon(menu.getIcon());
-            	addMenu.setName("新增");
-            	addMenu.setParentId(menu.getId());
-            	addMenu.setPath(form.getMark() + ":add");
-            	addMenu.setType(2);
-            	addMenu.setSort(1);
-            	menuMapper.insert(addMenu);
-            	
-            	SysMenu editMenu = new SysMenu();
-            	editMenu.setCompanyId(menu.getCompanyId());
-            	editMenu.setClassify(1);
-            	editMenu.setIcon(menu.getIcon());
-            	editMenu.setName("编辑");
-            	editMenu.setParentId(menu.getId());
-            	editMenu.setPath(form.getMark() + ":edit");
-            	editMenu.setType(2);
-            	editMenu.setSort(2);
-            	menuMapper.insert(editMenu);
-            	
-            	SysMenu deleteMenu = new SysMenu();
-            	deleteMenu.setCompanyId(menu.getCompanyId());
-            	deleteMenu.setClassify(1);
-            	deleteMenu.setIcon(menu.getIcon());
-            	deleteMenu.setName("删除");
-            	deleteMenu.setParentId(menu.getId());
-            	deleteMenu.setPath(form.getMark() + ":delete");
-            	deleteMenu.setType(2);
-            	deleteMenu.setSort(3);
-            	menuMapper.insert(deleteMenu);
-            	
-            	SysMenu viewMenu = new SysMenu();
-            	viewMenu.setCompanyId(menu.getCompanyId());
-            	viewMenu.setClassify(1);
-            	viewMenu.setIcon(menu.getIcon());
-            	viewMenu.setName("查看");
-            	viewMenu.setParentId(menu.getId());
-            	viewMenu.setPath(form.getMark() + ":view");
-            	viewMenu.setType(2);
-            	viewMenu.setSort(4);
-            	menuMapper.insert(viewMenu);
-            	
-            	SysMenu exportMenu = new SysMenu();
-            	exportMenu.setCompanyId(menu.getCompanyId());
-            	exportMenu.setClassify(1);
-            	exportMenu.setIcon(menu.getIcon());
-            	exportMenu.setName("导出");
-            	exportMenu.setParentId(menu.getId());
-            	exportMenu.setPath(form.getMark() + ":export");
-            	exportMenu.setType(2);
-            	exportMenu.setSort(5);
-            	menuMapper.insert(exportMenu);
-            	
-            	SysMenu importMenu = new SysMenu();
-            	importMenu.setCompanyId(menu.getCompanyId());
-            	importMenu.setClassify(1);
-            	importMenu.setIcon(menu.getIcon());
-            	importMenu.setName("导入");
-            	importMenu.setParentId(menu.getId());
-            	importMenu.setPath(form.getMark() + ":import");
-            	importMenu.setType(2);
-            	importMenu.setSort(6);
-            	menuMapper.insert(importMenu);
-        	}
-        }
         return ResultData.success(null);
     }
 
@@ -178,15 +98,6 @@ public class MenuService implements IMenuService {
         List<Map<String, Object>> list = new ArrayList<>();
         if (!StringUtils.isEmpty(roleStr)) {
         	list = TreeUtils.categoryTreeHandle(menuMapper.queryUserMenu(roleStr.split(","), classify), "parentId", 0L);
-        }
-        if(classify.equals(1)) {
-        	Map<String, Object> shortcut = new HashMap<>();
-            shortcut.put("icon", "iconfont icon-xihuan");
-            shortcut.put("name", "我的收藏");
-            shortcut.put("type", 5);
-            shortcut.put("path", "shortcut");
-            shortcut.put("children", shortcutMapper.queryListByUserId(companyId, userId));
-        	list.add(0, shortcut);
         }
         return ResultData.success(list);
     }

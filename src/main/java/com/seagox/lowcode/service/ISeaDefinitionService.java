@@ -28,8 +28,8 @@ public interface ISeaDefinitionService {
     public ResultData delete(Long id);
     
     /**
-     * 通过表单id查询流程
+     * 通过业务类型查询流程
      */
-    public ResultData queryByFormId(Long formId);
+    public ResultData queryByBusinessType(String businessType);
 
 }

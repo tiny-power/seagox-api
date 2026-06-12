@@ -1,32 +1,3 @@
-DROP TABLE IF EXISTS `business_field`;
-CREATE TABLE `business_field`  (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `business_table_id` bigint(20) NOT NULL COMMENT '业务表id',
-    `name` varchar(64) NOT NULL COMMENT '名称',
-    `remark` varchar(64) NOT NULL COMMENT '注释',
-    `type` varchar(20) NOT NULL COMMENT '类型',
-    `kind` varchar(20) NOT NULL COMMENT '种类',
-    `length` int(4) DEFAULT 0 COMMENT '长度',
-    `decimals` int(4) DEFAULT 0 COMMENT '小数',
-    `not_null` int(4) DEFAULT 0 COMMENT '不为空(0:否;1:是;)',
-    `default_value` varchar(200) DEFAULT NULL COMMENT '默认值',
-    `target_table_id` bigint(20) DEFAULT NULL COMMENT '目标模型',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '业务字段';
-
-DROP TABLE IF EXISTS `business_table`;
-CREATE TABLE `business_table`  (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `name` varchar(64) NOT NULL COMMENT '名称',
-    `remark` varchar(64) NOT NULL COMMENT '注释',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '业务表';
-
 DROP TABLE IF EXISTS `company`;
 CREATE TABLE `company`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -93,69 +64,6 @@ CREATE TABLE `dic_detail`  (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典详情';
 
-DROP TABLE IF EXISTS `door`;
-CREATE TABLE `door` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-	`authority` text NULL COMMENT '权限',
-	`path` bigint(20) NOT NULL COMMENT '页面路径',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '门户管理';
-
-DROP TABLE IF EXISTS `form`;
-CREATE TABLE `form`  (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `mark` varchar(100) NOT NULL COMMENT '标识',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `data_source` bigint(20) NOT NULL COMMENT '数据源配置',
-    `workbook` text NOT NULL COMMENT 'excel配置',
-    `options` longtext NULL COMMENT '参数json',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '表单管理';
-
-DROP TABLE IF EXISTS `form_athority`;
-CREATE TABLE `form_athority`  (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `form_id` bigint(20) NOT NULL COMMENT '表单id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `members` text NOT NULL COMMENT '权限成员',
-    `type` int(4) DEFAULT 1 COMMENT '类型(1:提交状态;2:查看状态;)',
-    `field` text NOT NULL COMMENT '字段权限',
-    `scope` text COMMENT '数据范围',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '表单权限';
-
-DROP TABLE IF EXISTS `gauge`;
-CREATE TABLE `gauge` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `config` text NULL COMMENT '配置',
-    `script` text NULL COMMENT '脚本',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '仪表板';
-
-DROP TABLE IF EXISTS `import_rule`;
-CREATE TABLE `import_rule`  (
-    `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `form_id` bigint(20) NOT NULL COMMENT '表单id',
-    `start_line` int(4) DEFAULT 2 COMMENT '数据起始行',
-    `rules` text COMMENT '规则',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '导入规则';
-
-
 DROP TABLE IF EXISTS `job`;
 CREATE TABLE `job`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -172,7 +80,7 @@ CREATE TABLE `job`  (
 DROP TABLE IF EXISTS `sea_definition`;
 CREATE TABLE `sea_definition`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `form_id` bigint(20) NOT NULL COMMENT '表单id',
+    `business_type` varchar(50) NOT NULL COMMENT '业务类型',
     `name` varchar(30) NOT NULL COMMENT '名称',
     `resources` text NULL comment '流程文件',
     `empower` text comment '授权',
@@ -230,28 +138,6 @@ CREATE TABLE `sea_node_detail`  (
     `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '流程节点详情';
-
-DROP TABLE IF EXISTS `serial`;
-CREATE TABLE `serial` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-	`options` text NOT NULL COMMENT '要素',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '编号设置';
-
-DROP TABLE IF EXISTS `shortcut`;
-CREATE TABLE `shortcut`  (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `user_id` bigint(20) NOT NULL COMMENT '用户id',
-    `menu_id` bigint(20) NOT NULL COMMENT '菜单id',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '快捷入口';
 
 DROP TABLE IF EXISTS `sys_account`;
 CREATE TABLE `sys_account` (
@@ -342,17 +228,6 @@ CREATE TABLE `sys_role`  (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统角色';
-
-DROP TABLE IF EXISTS `table_column_config`;
-CREATE TABLE `table_column_config` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id` bigint(20) NOT NULL COMMENT '用户id',
-  `form_id` bigint(20) NOT NULL COMMENT '表单id',
-  `options` longtext NOT NULL COMMENT '配置',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表头配置';
 
 DROP TABLE IF EXISTS `user_role`;
 CREATE TABLE `user_role` (

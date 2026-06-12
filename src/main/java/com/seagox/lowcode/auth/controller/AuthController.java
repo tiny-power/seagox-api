@@ -10,7 +10,6 @@ import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.entity.DicDetail;
 import com.seagox.lowcode.mapper.DicDetailMapper;
-import com.seagox.lowcode.service.IGenerateService;
 import com.seagox.lowcode.util.WeiChatUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -51,9 +50,6 @@ public class AuthController {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
-	@Autowired
-	private IGenerateService generateService;
 	
 	@GetMapping("/unit")
 	public ResultData unit() {
@@ -324,16 +320,5 @@ public class AuthController {
     public void preview(String url, String fileName, HttpServletResponse response) {
         uploadService.preview(url, fileName, response);
     }
-    
-    /**
-	 * 代码生成
-	 *
-	 * @param mark 标识
-	 * @param tableName 表名
-	 */
-	@GetMapping("/generateCode")
-	public ResultData generateCode(String mark, String tableName) {
-		return generateService.generateCode(mark, tableName);
-	}
 
 }

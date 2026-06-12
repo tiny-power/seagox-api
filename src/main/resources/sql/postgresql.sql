@@ -1,51 +1,3 @@
-DROP TABLE IF EXISTS "public"."business_field";
-CREATE TABLE "public"."business_field" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"business_table_id" BIGINT NOT NULL,
-	"name" VARCHAR(64) NOT NULL,
-	"remark" VARCHAR(64) NOT NULL,
-	"type" VARCHAR(20) NOT NULL,
-	"kind" VARCHAR(20) NOT NULL,
-	"length" INTEGER DEFAULT 0,
-	"decimals" INTEGER DEFAULT 0,
-	"not_null" INTEGER DEFAULT 0,
-	"default_value" VARCHAR(200),
-	"target_table_id" BIGINT DEFAULT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."business_field"."id" IS '主键';
-COMMENT ON COLUMN "public"."business_field"."business_table_id" IS '业务表id';
-COMMENT ON COLUMN "public"."business_field"."name" IS '名称';
-COMMENT ON COLUMN "public"."business_field"."remark" IS '注释';
-COMMENT ON COLUMN "public"."business_field"."type" IS '类型';
-COMMENT ON COLUMN "public"."business_field"."kind" IS '种类';
-COMMENT ON COLUMN "public"."business_field"."length" IS '长度';
-COMMENT ON COLUMN "public"."business_field"."decimals" IS '小数';
-COMMENT ON COLUMN "public"."business_field"."not_null" IS '不为空(1:是;0:否;)';
-COMMENT ON COLUMN "public"."business_field"."default_value" IS '默认值';
-COMMENT ON COLUMN "public"."business_field"."target_table_id" IS '目标模型';
-COMMENT ON COLUMN "public"."business_field"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."business_field"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."business_field" IS '业务字段';
-
-DROP TABLE IF EXISTS "public"."business_table";
-CREATE TABLE "public"."business_table" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"name" VARCHAR(64) NOT NULL,
-	"remark" VARCHAR(64) NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."business_table"."id" IS '主键';
-COMMENT ON COLUMN "public"."business_table"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."business_table"."name" IS '名称';
-COMMENT ON COLUMN "public"."business_table"."remark" IS '注释';
-COMMENT ON COLUMN "public"."business_table"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."business_table"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."business_table" IS '业务表';
-
 DROP TABLE IF EXISTS "public"."company";
 CREATE TABLE "public"."company" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,
@@ -153,104 +105,6 @@ COMMENT ON COLUMN "public"."dic_detail"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."dic_detail"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."dic_detail" IS '字典详情';
 
-DROP TABLE IF EXISTS "public"."door";
-CREATE TABLE "public"."door" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"name" VARCHAR(30) NOT NULL,
-	"authority" TEXT,
-	"path" BIGINT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."door"."id" IS '主键';
-COMMENT ON COLUMN "public"."door"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."door"."name" IS '名称';
-COMMENT ON COLUMN "public"."door"."authority" IS '权限';
-COMMENT ON COLUMN "public"."door"."path" IS '页面路径';
-COMMENT ON COLUMN "public"."door"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."door"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."door" IS '门户管理';
-
-DROP TABLE IF EXISTS "public"."form";
-CREATE TABLE "public"."form" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"mark" VARCHAR(100) NOT NULL,
-	"name" VARCHAR(30) NOT NULL,
-	"data_source" BIGINT NOT NULL,
-	"workbook" TEXT NOT NULL,
-	"options" TEXT,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."form"."id" IS '主键';
-COMMENT ON COLUMN "public"."form"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."form"."mark" IS '标识';
-COMMENT ON COLUMN "public"."form"."name" IS '名称';
-COMMENT ON COLUMN "public"."form"."data_source" IS '数据源配置';
-COMMENT ON COLUMN "public"."form"."workbook" IS 'excel配置';
-COMMENT ON COLUMN "public"."form"."options" IS '其他参数';
-COMMENT ON COLUMN "public"."form"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."form"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."form" IS '表单管理';
-
-DROP TABLE IF EXISTS "public"."form_athority";
-CREATE TABLE "public"."form_athority"  (
-    "id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"form_id" BIGINT NOT NULL,
-    "name" VARCHAR(30) NOT NULL,
-    "members" text NOT NULL,
-    "type" INTEGER DEFAULT NULL,
-	"field" text NOT NULL,
-	"scope" text,
-    "create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."form_athority"."id" IS '主键';
-COMMENT ON COLUMN "public"."form_athority"."form_id" IS '表单id';
-COMMENT ON COLUMN "public"."form_athority"."name" IS '名称';
-COMMENT ON COLUMN "public"."form_athority"."members" IS '权限成员';
-COMMENT ON COLUMN "public"."form_athority"."type" IS '类型(1:提交状态;2:查看状态;)';
-COMMENT ON COLUMN "public"."form_athority"."field" IS '字段权限';
-COMMENT ON COLUMN "public"."form_athority"."scope" IS '数据范围';
-COMMENT ON TABLE "public"."form_athority" IS '表单权限';
-
-DROP TABLE IF EXISTS "public"."gauge";
-CREATE TABLE "public"."gauge" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"name" VARCHAR(30) NOT NULL,
-	"config" TEXT,
-	"script" TEXT,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."gauge"."id" IS '主键';
-COMMENT ON COLUMN "public"."gauge"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."gauge"."name" IS '名称';
-COMMENT ON COLUMN "public"."gauge"."config" IS '配置';
-COMMENT ON COLUMN "public"."gauge"."script" IS '脚本';
-COMMENT ON COLUMN "public"."gauge"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."gauge"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."gauge" IS '仪表板';
-
-DROP TABLE IF EXISTS "public"."import_rule";
-CREATE TABLE "public"."import_rule"  (
-    "id" BIGSERIAL PRIMARY KEY NOT NULL,
-    "form_id" BIGINT NOT NULL,
-    "start_line" BIGINT DEFAULT 2,
-    "rules" text,
-    "create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."import_rule"."id" IS '主键';
-COMMENT ON COLUMN "public"."import_rule"."form_id" IS '表单id';
-COMMENT ON COLUMN "public"."import_rule"."start_line" IS '数据起始行';
-COMMENT ON COLUMN "public"."import_rule"."rules" IS '规则';
-COMMENT ON COLUMN "public"."import_rule"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."import_rule"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."import_rule" IS '导入规则';
 
 DROP TABLE IF EXISTS "public"."job";
 CREATE TABLE "public"."job" (
@@ -276,7 +130,7 @@ COMMENT ON TABLE "public"."job" IS '任务调度';
 DROP TABLE IF EXISTS "public"."sea_definition";
 CREATE TABLE "public"."sea_definition"  (
     "id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"form_id" BIGINT NOT NULL,
+	"business_type" VARCHAR(50) NOT NULL,
 	"name" VARCHAR(30) NOT NULL,
     "resources" TEXT DEFAULT NULL,
     "empower" TEXT,
@@ -284,7 +138,7 @@ CREATE TABLE "public"."sea_definition"  (
 	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."sea_definition"."id" IS '主键';
-COMMENT ON COLUMN "public"."sea_definition"."form_id" IS '表单id';
+COMMENT ON COLUMN "public"."sea_definition"."business_type" IS '业务类型';
 COMMENT ON COLUMN "public"."sea_definition"."name" IS '名称';
 COMMENT ON COLUMN "public"."sea_definition"."resources" IS '流程文件';
 COMMENT ON COLUMN "public"."sea_definition"."empower" IS '授权';
@@ -377,40 +231,6 @@ COMMENT ON COLUMN "public"."sea_node_detail"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sea_node_detail"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."sea_node_detail" IS '流程节点详情';
 
-DROP TABLE IF EXISTS "public"."serial";
-CREATE TABLE "public"."serial" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"name" VARCHAR(30) NOT NULL,
-	"options" TEXT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."serial"."id" IS '主键';
-COMMENT ON COLUMN "public"."serial"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."serial"."name" IS '名称';
-COMMENT ON COLUMN "public"."serial"."options" IS '要素';
-COMMENT ON COLUMN "public"."serial"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."serial"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."serial" IS '门户管理';
-
-
-DROP TABLE IF EXISTS "public"."shortcut";
-CREATE TABLE "public"."shortcut" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"user_id" BIGINT NOT NULL,
-	"menu_id" BIGINT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."shortcut"."id" IS '主键';
-COMMENT ON COLUMN "public"."shortcut"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."shortcut"."user_id" IS '用户id';
-COMMENT ON COLUMN "public"."shortcut"."menu_id" IS '菜单id';
-COMMENT ON COLUMN "public"."shortcut"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."shortcut"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."shortcut" IS '快捷入口';
 
 DROP TABLE IF EXISTS "public"."sys_account";
 CREATE TABLE "public"."sys_account" (
@@ -562,22 +382,6 @@ COMMENT ON COLUMN "public"."sys_role"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."sys_role" IS '系统角色';
 
-DROP TABLE IF EXISTS "public"."table_column_config";
-CREATE TABLE "public"."table_column_config" (
-	"id" BIGSERIAL PRIMARY KEY NOT NULL,
-	"user_id" BIGINT NOT NULL,
-    "form_id" BIGINT NOT NULL,
-	"options" text NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."table_column_config"."id" IS '主键';
-COMMENT ON COLUMN "public"."table_column_config"."user_id" IS '用户id';
-COMMENT ON COLUMN "public"."table_column_config"."form_id" IS '表单id';
-COMMENT ON COLUMN "public"."table_column_config"."options" IS '配置';
-COMMENT ON COLUMN "public"."table_column_config"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."table_column_config"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."table_column_config" IS '表头配置';
 
 DROP TABLE IF EXISTS "public"."user_role";
 CREATE TABLE "public"."user_role" (

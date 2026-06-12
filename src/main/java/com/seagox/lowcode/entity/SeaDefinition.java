@@ -19,9 +19,9 @@ public class SeaDefinition {
     private Long id;
 
     /**
-     * 表单id
+     * 业务类型
      */
-    private Long formId;
+    private String businessType;
 
     /**
      * 名称
@@ -66,12 +66,12 @@ public class SeaDefinition {
         this.id = id;
     }
 
-    public Long getFormId() {
-		return formId;
+	public String getBusinessType() {
+		return businessType;
 	}
 
-	public void setFormId(Long formId) {
-		this.formId = formId;
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
 	}
 
 	public String getName() {

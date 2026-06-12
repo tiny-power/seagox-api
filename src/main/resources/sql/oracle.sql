@@ -1,51 +1,3 @@
-CREATE TABLE business_field (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    business_table_id NUMBER(20) NOT NULL,
-    name VARCHAR2(64) NOT NULL,
-    remark VARCHAR2(64) NOT NULL,
-    type VARCHAR2(20) NOT NULL,
-    kind VARCHAR2(20) NOT NULL,
-    length NUMBER(4) DEFAULT 0,
-    decimals NUMBER(4) DEFAULT 0,
-    not_null NUMBER(4) DEFAULT 0,
-    default_value VARCHAR2(200),
-    target_table_id NUMBER(20) DEFAULT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence business_field_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN business_field.id IS '主键';
-COMMENT ON COLUMN business_field.business_table_id IS '业务表id';
-COMMENT ON COLUMN business_field.name IS '名称';
-COMMENT ON COLUMN business_field.remark IS '注释';
-COMMENT ON COLUMN business_field.type IS '类型';
-COMMENT ON COLUMN business_field.kind IS '种类';
-COMMENT ON COLUMN business_field.length IS '长度';
-COMMENT ON COLUMN business_field.decimals IS '小数';
-COMMENT ON COLUMN business_field.not_null IS '不为空(1:是;0:否;)';
-COMMENT ON COLUMN business_field.default_value IS '默认值';
-COMMENT ON COLUMN business_field.target_table_id IS '目标模型';
-COMMENT ON COLUMN business_field.create_time IS '创建时间';
-COMMENT ON COLUMN business_field.update_time IS '更新时间';
-COMMENT ON TABLE business_field IS '业务字段';
-
-CREATE TABLE business_table (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    name VARCHAR2(64) NOT NULL,
-    remark VARCHAR2(64) NOT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence business_table_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN business_table.id IS '主键';
-COMMENT ON COLUMN business_table.company_id IS '公司id';
-COMMENT ON COLUMN business_table.name IS '名称';
-COMMENT ON COLUMN business_table.remark IS '注释';
-COMMENT ON COLUMN business_table.create_time IS '创建时间';
-COMMENT ON COLUMN business_table.update_time IS '更新时间';
-COMMENT ON TABLE business_table IS '业务表';
-
 CREATE TABLE company (
     id NUMBER(20) PRIMARY KEY NOT NULL,
     parent_id NUMBER(20),
@@ -153,105 +105,6 @@ COMMENT ON COLUMN dic_detail.create_time IS '创建时间';
 COMMENT ON COLUMN dic_detail.update_time IS '更新时间';
 COMMENT ON TABLE dic_detail IS '字典详情';
 
-CREATE TABLE door (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    name VARCHAR2(30) NOT NULL,
-	authority clob,
-	path NUMBER(20) NOT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence door_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN door.id IS '主键';
-COMMENT ON COLUMN door.company_id IS '公司id';
-COMMENT ON COLUMN door.name IS '名称';
-COMMENT ON COLUMN door.authority IS '权限';
-COMMENT ON COLUMN door.path IS '页面路径';
-COMMENT ON COLUMN door.create_time IS '创建时间';
-COMMENT ON COLUMN door.update_time IS '更新时间';
-COMMENT ON TABLE door IS '门户管理';
-
-CREATE TABLE form (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    mark VARCHAR2(100) NOT NULL,
-    name VARCHAR2(30) NOT NULL,
-    data_source NUMBER(20) NOT NULL,
-    workbook clob,
-    options clob,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence form_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN form.id IS '主键';
-COMMENT ON COLUMN form.company_id IS '公司id';
-COMMENT ON COLUMN form.mark IS '标识';
-COMMENT ON COLUMN form.name IS '名称';
-COMMENT ON COLUMN form.data_source IS '数据源配置';
-COMMENT ON COLUMN form.workbook IS 'excel配置';
-COMMENT ON COLUMN form.options IS '其他参数';
-COMMENT ON COLUMN form.create_time IS '创建时间';
-COMMENT ON COLUMN form.update_time IS '更新时间';
-COMMENT ON TABLE form IS '表单管理';
-
-CREATE TABLE form_athority  (
-	id NUMBER(20) PRIMARY KEY NOT NULL,
-    form_id NUMBER(20) NOT NULL,
-    name VARCHAR2(30) NOT NULL,
-    members clob,
-    type NUMBER(4),
-	field clob,
-	scope clob,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence form_athority_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN form_athority.id IS '主键';
-COMMENT ON COLUMN form_athority.form_id IS '表单id';
-COMMENT ON COLUMN form_athority.name IS '名称';
-COMMENT ON COLUMN form_athority.members IS '权限成员';
-COMMENT ON COLUMN form_athority.type IS '类型(1:提交状态;2:查看状态;)';
-COMMENT ON COLUMN form_athority.field IS '字段权限';
-COMMENT ON COLUMN form_athority.scope IS '数据范围';
-COMMENT ON TABLE form_athority IS '表单权限';
-
-CREATE TABLE gauge (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    name VARCHAR2(30) NOT NULL,
-    config clob,
-    script clob,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence gauge_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN gauge.id IS '主键';
-COMMENT ON COLUMN gauge.company_id IS '公司id';
-COMMENT ON COLUMN gauge.name IS '名称';
-COMMENT ON COLUMN gauge.config IS '配置';
-COMMENT ON COLUMN gauge.script IS '脚本';
-COMMENT ON COLUMN gauge.create_time IS '创建时间';
-COMMENT ON COLUMN gauge.update_time IS '更新时间';
-COMMENT ON TABLE gauge IS '仪表板';
-
-CREATE TABLE import_rule  (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    form_id NUMBER(20) NOT NULL,
-    start_line NUMBER(4) DEFAULT 2,
-    rules clob,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-	update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence import_rule_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN import_rule.id IS '主键';
-COMMENT ON COLUMN import_rule.form_id IS '表单id';
-COMMENT ON COLUMN import_rule.start_line IS '数据起始行';
-COMMENT ON COLUMN import_rule.rules IS '规则';
-COMMENT ON COLUMN import_rule.create_time IS '创建时间';
-COMMENT ON COLUMN import_rule.update_time IS '更新时间';
-COMMENT ON TABLE import_rule IS '导入规则';
-
 CREATE TABLE job (
     id NUMBER(20) PRIMARY KEY NOT NULL,
     company_id NUMBER(20) NOT NULL,
@@ -275,7 +128,7 @@ COMMENT ON TABLE job IS '任务调度';
 
 CREATE TABLE sea_definition  (
     id NUMBER(20) PRIMARY KEY NOT NULL,
-	form_id NUMBER(20) NOT NULL,
+	business_type VARCHAR2(50) NOT NULL,
 	name VARCHAR2(30) NOT NULL,
     resources clob DEFAULT NULL,
     empower clob DEFAULT ,
@@ -284,7 +137,7 @@ CREATE TABLE sea_definition  (
 );
 CREATE sequence sea_definition_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
 COMMENT ON COLUMN sea_definition.id IS '主键';
-COMMENT ON COLUMN sea_definition.form_id IS '表单id';
+COMMENT ON COLUMN sea_definition.business_type IS '业务类型';
 COMMENT ON COLUMN sea_definition.name IS '名称';
 COMMENT ON COLUMN sea_definition.resources IS '流程文件';
 COMMENT ON COLUMN sea_definition.empower IS '授权';
@@ -377,39 +230,6 @@ COMMENT ON COLUMN sea_node_detail.create_time IS '创建时间';
 COMMENT ON COLUMN sea_node_detail.update_time IS '更新时间';
 COMMENT ON TABLE sea_node_detail IS '流程节点详情';
 
-CREATE TABLE serial (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    name VARCHAR2(30) NOT NULL,
-	options clob NOT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence door_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN serial.id IS '主键';
-COMMENT ON COLUMN serial.company_id IS '公司id';
-COMMENT ON COLUMN serial.name IS '名称';
-COMMENT ON COLUMN serial.options IS '要素';
-COMMENT ON COLUMN serial.create_time IS '创建时间';
-COMMENT ON COLUMN serial.update_time IS '更新时间';
-COMMENT ON TABLE serial IS '编号设置';
-
-CREATE TABLE shortcut (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    company_id NUMBER(20) NOT NULL,
-    user_id NUMBER(20) NOT NULL,
-    menu_id NUMBER(20) NOT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence shortcut_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN shortcut.id IS '主键';
-COMMENT ON COLUMN shortcut.company_id IS '公司id';
-COMMENT ON COLUMN shortcut.user_id IS '用户id';
-COMMENT ON COLUMN shortcut.menu_id IS '菜单id';
-COMMENT ON COLUMN shortcut.create_time IS '创建时间';
-COMMENT ON COLUMN shortcut.update_time IS '更新时间';
-COMMENT ON TABLE shortcut IS '快捷入口';
 
 CREATE TABLE sys_account (
     id NUMBER(20) PRIMARY KEY NOT NULL,
@@ -560,23 +380,6 @@ COMMENT ON COLUMN sys_role.path IS '菜单权限(以,隔开)';
 COMMENT ON COLUMN sys_role.create_time IS '创建时间';
 COMMENT ON COLUMN sys_role.update_time IS '更新时间';
 COMMENT ON TABLE sys_role IS '系统角色';
-
-CREATE TABLE table_column_config (
-    id NUMBER(20) PRIMARY KEY NOT NULL,
-    user_id NUMBER(20) NOT NULL,
-    form_id NUMBER(20) NOT NULL,
-    options clob NOT NULL,
-    create_time date DEFAULT CURRENT_TIMESTAMP,
-    update_time date DEFAULT CURRENT_TIMESTAMP
-);
-CREATE sequence table_column_config_seq increment by 1 start with 1 nomaxvalue minvalue 1 order nocycle;
-COMMENT ON COLUMN table_column_config.id IS '主键';
-COMMENT ON COLUMN table_column_config.user_id IS '用户id';
-COMMENT ON COLUMN table_column_config.form_id IS '表单id';
-COMMENT ON COLUMN table_column_config.options IS '配置';
-COMMENT ON COLUMN table_column_config.create_time IS '创建时间';
-COMMENT ON COLUMN table_column_config.update_time IS '更新时间';
-COMMENT ON TABLE table_column_config IS '表头配置';
 
 CREATE TABLE user_role (
     id NUMBER(20) PRIMARY KEY NOT NULL,

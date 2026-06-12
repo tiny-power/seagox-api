@@ -14,13 +14,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.common.ResultData;
-import com.seagox.lowcode.entity.BusinessTable;
-import com.seagox.lowcode.entity.Form;
-import com.seagox.lowcode.mapper.BusinessTableMapper;
-import com.seagox.lowcode.mapper.FormMapper;
 import com.seagox.lowcode.mapper.SeaInstanceMapper;
 import com.seagox.lowcode.service.IFlowService;
-import com.seagox.lowcode.service.IFormService;
 
 @Service
 public class FlowService implements IFlowService {
@@ -30,15 +25,6 @@ public class FlowService implements IFlowService {
 	
 	@Autowired
 	private RuntimeService runtimeService;
-	
-	@Autowired
-	private IFormService formService;
-	
-	@Autowired
-	private FormMapper formMapper;
-	
-	@Autowired
-	private BusinessTableMapper tableMapper;
 	
 	@Autowired
     private JdbcTemplate jdbcTemplate;
@@ -140,43 +126,5 @@ public class FlowService implements IFlowService {
 		result.put("failList", failList);
 		return ResultData.success(result);
 	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public ResultData batchSubmit(Long companyId, Long userId, String batchData) {
-		JSONObject result = new JSONObject();
-		int successNum = 0;
-		int errorNum = 0;
-		List<String> failList = new ArrayList<>();
-		JSONArray batchArray = JSONArray.parseArray(batchData);
-		for (int i = 0; i < batchArray.size(); i++) {
-			JSONObject item = batchArray.getJSONObject(i);
-			String businessType = item.getString("businessType");
-			String businessKey = item.getString("businessKey");
-			Map<String, Object> params = new HashMap<>();
-			params.put("companyId", companyId);
-			params.put("userId", userId);
-			params.put("_formId", businessType);
-			params.put("_type", "submit");
-			Form form = formMapper.selectById(businessType);
-			BusinessTable table = tableMapper.selectById(form.getDataSource());
-			String sql = "select * from " + table.getName() + " where id = ?";
-			Map<String, Object> formData = jdbcTemplate.queryForMap(sql, businessKey);
-			params.putAll(formData);
-			ResultData updateResult = formService.updateCustom(params);
-			if(updateResult.getCode() == 200) {
-				successNum ++;
-			} else if (updateResult.getCode() == 10002) {
-				errorNum ++;
-				failList.addAll((ArrayList) updateResult.getData());
-			} else {
-				errorNum ++;
-				failList.add(updateResult.getMessage());
-			}
-		}
-		result.put("successNum", successNum);
-		result.put("errorNum", errorNum);
-		result.put("failList", failList);
-		return ResultData.success(result);
-	}
+	
 }
