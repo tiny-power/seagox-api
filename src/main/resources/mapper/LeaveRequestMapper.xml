@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.mapper.LeaveRequestMapper">
+
+    <!--分页查询-->
+    <select id="queryByPage" resultType="camelKeyMap">
+        SELECT
+            a.id,
+            a.company_id as "companyId",
+            a.applicant_id as "applicantId",
+            b.name as "applicantName",
+            a.leave_type as "leaveType",
+            a.duration,
+            a.reason,
+            a.status,
+            <if test="_databaseId == 'mysql'">
+                DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') AS "startTime",
+                DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s') AS "endTime",
+                DATE_FORMAT(a.submit_time, '%Y-%m-%d %H:%i:%s') AS "submitTime",
+                DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.start_time, 120 ) AS "startTime",
+                CONVERT(varchar, a.end_time, 120 ) AS "endTime",
+                CONVERT(varchar, a.submit_time, 120 ) AS "submitTime",
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+        FROM leave_request a
+        LEFT JOIN sys_account b ON b.id = a.applicant_id
+        <where>
+            a.company_id = #{companyId}
+            <if test="applicantId != null">
+                AND a.applicant_id = #{applicantId}
+            </if>
+            <if test="_databaseId == 'mysql' and applicantName != null and applicantName != ''">
+                AND b.name LIKE CONCAT('%', #{applicantName}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and applicantName != null and applicantName != ''">
+                AND b.name LIKE '%' || #{applicantName} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and applicantName != null and applicantName != ''">
+                AND b.name LIKE '%' || #{applicantName} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and applicantName != null and applicantName != ''">
+                AND b.name LIKE '%' || #{applicantName} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and applicantName != null and applicantName != ''">
+                AND b.name LIKE '%' || #{applicantName} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and applicantName != null and applicantName != ''">
+                AND b.name LIKE '%' + #{applicantName} + '%'
+            </if>
+            <if test="leaveType != null">
+                AND a.leave_type = #{leaveType}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="_databaseId == 'mysql' and startTime != null and startTime != ''">
+                AND DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'postgresql' and startTime != null and startTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'kingbase' and startTime != null and startTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'dm' and startTime != null and startTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'oracle' and startTime != null and startTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{startTime} and #{endTime}
+            </if>
+            <if test="_databaseId == 'sqlserver' and startTime != null and startTime != ''">
+                AND CONVERT(varchar, a.start_time, 120 ) between #{startTime} and #{endTime}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+</mapper>

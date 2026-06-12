@@ -126,6 +126,35 @@ COMMENT ON COLUMN "public"."job"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."job"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."job" IS '任务调度';
 
+DROP TABLE IF EXISTS "public"."leave_request";
+CREATE TABLE "public"."leave_request" (
+	"id" BIGSERIAL PRIMARY KEY NOT NULL,
+	"company_id" BIGINT NOT NULL,
+	"applicant_id" BIGINT NOT NULL,
+	"leave_type" INTEGER NOT NULL,
+	"start_time" TIMESTAMP NOT NULL,
+	"end_time" TIMESTAMP NOT NULL,
+	"duration" NUMERIC(10,2) NOT NULL,
+	"reason" VARCHAR(500) NOT NULL,
+	"status" INTEGER DEFAULT 0,
+	"submit_time" TIMESTAMP,
+	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."leave_request"."id" IS '主键';
+COMMENT ON COLUMN "public"."leave_request"."company_id" IS '公司id';
+COMMENT ON COLUMN "public"."leave_request"."applicant_id" IS '申请人id';
+COMMENT ON COLUMN "public"."leave_request"."leave_type" IS '请假类型(1:事假;2:病假;3:年假;4:调休;5:婚假;6:产假;7:丧假;8:其他;)';
+COMMENT ON COLUMN "public"."leave_request"."start_time" IS '开始时间';
+COMMENT ON COLUMN "public"."leave_request"."end_time" IS '结束时间';
+COMMENT ON COLUMN "public"."leave_request"."duration" IS '请假时长';
+COMMENT ON COLUMN "public"."leave_request"."reason" IS '请假事由';
+COMMENT ON COLUMN "public"."leave_request"."status" IS '状态(0:草稿;1:已提交;2:已撤销;)';
+COMMENT ON COLUMN "public"."leave_request"."submit_time" IS '提交时间';
+COMMENT ON COLUMN "public"."leave_request"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."leave_request"."update_time" IS '更新时间';
+COMMENT ON TABLE "public"."leave_request" IS '请假单';
+
 DROP TABLE IF EXISTS "public"."sea_definition";
 CREATE TABLE "public"."sea_definition"  (
     "id" BIGSERIAL PRIMARY KEY NOT NULL,
@@ -405,7 +434,7 @@ SELECT setval('company_id_seq',(SELECT max(id) FROM "public"."company"));
 INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 1, now(), now());
 select setval('department_id_seq',(SELECT max(id) FROM "public"."department"));
 
-INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', now(), now());
+INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26', now(), now());
 SELECT setval('sys_role_id_seq',(SELECT max(id) FROM "public"."sys_role"));
 
 INSERT INTO "public"."sys_account" VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$7xaqWKLFZRc2mg7JIX.B/OCtijP2zYZack60pbC3WxDGvtfvKld3W', NULL, 1, 2, NULL, 0, now(), now());
@@ -436,5 +465,12 @@ INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name"
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (17, 1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (18, 1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (19, 1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (20, 1, NULL, 5, '协同办公', 'iconfont icon-xihuan', 'office', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (21, 1, 20, 4, '请假单', 'iconfont icon-xihuan', 'leave', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (22, 1, 21, 2, '新增', 'iconfont icon-xihuan', 'leave:add', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (23, 1, 21, 2, '编辑', 'iconfont icon-xihuan', 'leave:edit', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (24, 1, 21, 2, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (25, 1, 21, 2, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (26, 1, 21, 2, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
 SELECT setval('sys_menu_id_seq',(SELECT max(id) FROM "public"."sys_menu"));
 COMMIT;

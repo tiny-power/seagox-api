@@ -77,6 +77,23 @@ CREATE TABLE `job`  (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务调度';
 
+DROP TABLE IF EXISTS `leave_request`;
+CREATE TABLE `leave_request` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `company_id` bigint(20) NOT NULL COMMENT '公司id',
+    `applicant_id` bigint(20) NOT NULL COMMENT '申请人id',
+    `leave_type` int(4) NOT NULL COMMENT '请假类型(1:事假;2:病假;3:年假;4:调休;5:婚假;6:产假;7:丧假;8:其他;)',
+    `start_time` datetime NOT NULL COMMENT '开始时间',
+    `end_time` datetime NOT NULL COMMENT '结束时间',
+    `duration` decimal(10,2) NOT NULL COMMENT '请假时长',
+    `reason` varchar(500) NOT NULL COMMENT '请假事由',
+    `status` int(4) DEFAULT 0 COMMENT '状态(0:草稿;1:已提交;2:已撤销;)',
+    `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '请假单';
+
 DROP TABLE IF EXISTS `sea_definition`;
 CREATE TABLE `sea_definition`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -244,7 +261,7 @@ CREATE TABLE `user_role` (
 BEGIN;
 INSERT INTO company VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
 INSERT INTO department VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
-INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', now(), now());
+INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26', now(), now());
 INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$7xaqWKLFZRc2mg7JIX.B/OCtijP2zYZack60pbC3WxDGvtfvKld3W', NULL, 1, 2, NULL, 0, now(), now());
 INSERT INTO user_role VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO dept_user VALUES (1, 1, 1, 1, now(), now());
@@ -267,4 +284,11 @@ INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (17, 1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3,  now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (18, 1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11,  now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (19, 1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (20, 1, NULL, 5, '协同办公', 'iconfont icon-xihuan', 'office', 1, 2, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (21, 1, 20, 4, '请假单', 'iconfont icon-xihuan', 'leave', 1, 1, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (22, 1, 21, 2, '新增', 'iconfont icon-xihuan', 'leave:add', 1, 1, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (23, 1, 21, 2, '编辑', 'iconfont icon-xihuan', 'leave:edit', 1, 2, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (24, 1, 21, 2, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (25, 1, 21, 2, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (26, 1, 21, 2, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
 COMMIT;
