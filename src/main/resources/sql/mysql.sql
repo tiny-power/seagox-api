@@ -98,7 +98,7 @@ CREATE TABLE `door` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` bigint(20) NOT NULL COMMENT '公司id',
     `name` varchar(30) NOT NULL COMMENT '名称',
-	`authority` text DEFAULT NULL COMMENT '权限',
+	`authority` text NULL COMMENT '权限',
 	`path` bigint(20) NOT NULL COMMENT '页面路径',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -113,7 +113,7 @@ CREATE TABLE `form`  (
     `name` varchar(30) NOT NULL COMMENT '名称',
     `data_source` bigint(20) NOT NULL COMMENT '数据源配置',
     `workbook` text NOT NULL COMMENT 'excel配置',
-    `options` longtext DEFAULT NULL COMMENT '参数json',
+    `options` longtext NULL COMMENT '参数json',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
@@ -138,8 +138,8 @@ CREATE TABLE `gauge` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` bigint(20) NOT NULL COMMENT '公司id',
     `name` varchar(30) NOT NULL COMMENT '名称',
-    `config` text DEFAULT NULL COMMENT '配置',
-    `script` text DEFAULT NULL COMMENT '脚本',
+    `config` text NULL COMMENT '配置',
+    `script` text NULL COMMENT '脚本',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
@@ -174,7 +174,7 @@ CREATE TABLE `sea_definition`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `form_id` bigint(20) NOT NULL COMMENT '表单id',
     `name` varchar(30) NOT NULL COMMENT '名称',
-    `resources` text DEFAULT NULL comment '流程文件',
+    `resources` text NULL comment '流程文件',
     `empower` text comment '授权',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -290,11 +290,11 @@ CREATE TABLE `sys_log` (
   `ip` varchar(50) NOT NULL COMMENT 'ip',
   `uri` varchar(200) NOT NULL COMMENT 'uri',
   `method` varchar(255) NOT NULL COMMENT '方法',
-  `params` longtext DEFAULT NULL COMMENT '请求参数',
+  `params` longtext NULL COMMENT '请求参数',
   `ua` varchar(500) DEFAULT NULL COMMENT '浏览器信息',
   `status` int(4) DEFAULT 1 COMMENT '状态(1:成功;2:失败;)',
   `cost_time` int(4) NOT NULL COMMENT '花费时间',
-  `result` longtext DEFAULT NULL COMMENT '返回结果',
+  `result` longtext NULL COMMENT '返回结果',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日记';
@@ -324,8 +324,8 @@ CREATE TABLE `sys_message`  (
     `from_user_id` bigint(20) NOT NULL COMMENT '用户id(来自)',
     `to_user_id` bigint(20) NOT NULL COMMENT '用户id(给谁)',
     `title` varchar(50) NOT NULL COMMENT '标题',
-    `business_type` bigint(20) DEFAULT NUll COMMENT '业务类型',
-    `business_key` bigint(20) DEFAULT NUll COMMENT '业务key',
+    `business_type` bigint(20) DEFAULT NULL COMMENT '业务类型',
+    `business_key` bigint(20) DEFAULT NULL COMMENT '业务key',
     `status` int(4) DEFAULT 0 COMMENT '状态(0:未读;1:已读;)',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -373,23 +373,23 @@ INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,1
 INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$7xaqWKLFZRc2mg7JIX.B/OCtijP2zYZack60pbC3WxDGvtfvKld3W', NULL, 1, 2, NULL, 0, now(), now());
 INSERT INTO user_role VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO dept_user VALUES (1, 1, 1, 1, now(), now());
-INSERT INTO sys_menu VALUES (1, 1, NULL, 5, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
-INSERT INTO sys_menu VALUES (2, 1, 1, 4, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1,  now(), now());
-INSERT INTO sys_menu VALUES (3, 1, 1, 4, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2,  now(), now());
-INSERT INTO sys_menu VALUES (4, 1, 2, 2, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3,  now(), now());
-INSERT INTO sys_menu VALUES (5, 1, 2, 2, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1,  now(), now());
-INSERT INTO sys_menu VALUES (6, 1, 2, 2, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1,  now(), now());
-INSERT INTO sys_menu VALUES (7, 1, 2, 2, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4,  now(), now());
-INSERT INTO sys_menu VALUES (8, 1, 2, 2, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5,  now(), now());
-INSERT INTO sys_menu VALUES (9, 1, 2, 2, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6,  now(), now());
-INSERT INTO sys_menu VALUES (10, 1, 2, 2, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7,  now(), now());
-INSERT INTO sys_menu VALUES (11, 1, 2, 2, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2,  now(), now());
-INSERT INTO sys_menu VALUES (12, 1, 2, 2, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8,  now(), now());
-INSERT INTO sys_menu VALUES (13, 1, 2, 2, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9,  now(), now());
-INSERT INTO sys_menu VALUES (14, 1, 2, 2, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10,  now(), now());
-INSERT INTO sys_menu VALUES (15, 1, 3, 2, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1,  now(), now());
-INSERT INTO sys_menu VALUES (16, 1, 3, 2, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2,  now(), now());
-INSERT INTO sys_menu VALUES (17, 1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3,  now(), now());
-INSERT INTO sys_menu VALUES (18, 1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11,  now(), now());
-INSERT INTO sys_menu VALUES (19, 1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (1, 1, NULL, 5, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (2, 1, 1, 4, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (3, 1, 1, 4, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (4, 1, 2, 2, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (5, 1, 2, 2, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (6, 1, 2, 2, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (7, 1, 2, 2, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (8, 1, 2, 2, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (9, 1, 2, 2, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (10, 1, 2, 2, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (11, 1, 2, 2, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (12, 1, 2, 2, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (13, 1, 2, 2, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (14, 1, 2, 2, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (15, 1, 3, 2, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (16, 1, 3, 2, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (17, 1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (18, 1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11,  now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (19, 1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4,  now(), now());
 COMMIT;

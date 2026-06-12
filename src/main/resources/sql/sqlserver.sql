@@ -2091,29 +2091,29 @@ EXEC sp_addextendedproperty
 	'TABLE', N'table_column_config'
 GO
 
-INSERT INTO dbo.company VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
-INSERT INTO dbo.department VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
-INSERT INTO dbo.sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', now(), now());
-INSERT INTO dbo.sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$7xaqWKLFZRc2mg7JIX.B/OCtijP2zYZack60pbC3WxDGvtfvKld3W', NULL, 1, 2, NULL, 0, now(), now());
-INSERT INTO dbo.user_role VALUES (1, 1, 1, 1, now(), now());
-INSERT INTO dbo.dept_user VALUES (1, 1, 1, 1, now(), now());
-INSERT INTO dbo.sys_menu VALUES (1, 1, NULL, 5, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
-INSERT INTO dbo.sys_menu VALUES (2, 1, 1, 4, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (3, 1, 1, 4, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (4, 1, 2, 2, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (5, 1, 2, 2, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (6, 1, 2, 2, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (7, 1, 2, 2, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (8, 1, 2, 2, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (9, 1, 2, 2, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (10, 1, 2, 2, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (11, 1, 2, 2, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (12, 1, 2, 2, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (13, 1, 2, 2, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (14, 1, 2, 2, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (15, 1, 3, 2, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (16, 1, 3, 2, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (17, 1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (18, 1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11,  now(), now());
-INSERT INTO dbo.sys_menu VALUES (19, 1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4,  now(), now());
+INSERT INTO dbo.company (parent_id, mark, code, name, alias, logo, sort, create_time, update_time) VALUES (NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.department (company_id, parent_id, code, name, director, charge_leader, sort, create_time, update_time) VALUES (1, NULL, '101', '默认部门', NULL, NULL, 0, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_role (company_id, name, path, create_time, update_time) VALUES (1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', GETDATE(), GETDATE());
+INSERT INTO dbo.sys_account (avatar, account, email, phone, name, sex, password, position, status, type, openid, sort, create_time, update_time) VALUES (NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$7xaqWKLFZRc2mg7JIX.B/OCtijP2zYZack60pbC3WxDGvtfvKld3W', NULL, 1, 2, NULL, 0, GETDATE(), GETDATE());
+INSERT INTO dbo.user_role (company_id, user_id, role_id, create_time, update_time) VALUES (1, 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.dept_user (company_id, department_id, user_id, create_time, update_time) VALUES (1, 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, NULL, 5, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 1, 4, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 1, 4, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 3, 2, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 3, 2, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 3, 2, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 2, 2, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11, GETDATE(), GETDATE());
+INSERT INTO dbo.sys_menu (company_id, parent_id, type, name, icon, path, status, sort, create_time, update_time) VALUES (1, 3, 2, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4, GETDATE(), GETDATE());
 GO
