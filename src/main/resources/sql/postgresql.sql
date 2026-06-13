@@ -435,7 +435,7 @@ SELECT setval('company_id_seq',(SELECT max(id) FROM "public"."company"));
 INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 1, now(), now());
 select setval('department_id_seq',(SELECT max(id) FROM "public"."department"));
 
-INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31', now(), now());
+INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32', now(), now());
 SELECT setval('sys_role_id_seq',(SELECT max(id) FROM "public"."sys_role"));
 
 INSERT INTO "public"."sys_account" VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
@@ -473,10 +473,11 @@ INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name"
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (24, 1, 21, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (25, 1, 21, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (26, 1, 21, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (27, 1, 20, 2, '待办事项', 'iconfont icon-xihuan', 'todoItem', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (28, 1, 20, 2, '待发事项', 'iconfont icon-xihuan', 'readyItem', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (29, 1, 20, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 4, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (30, 1, 20, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (31, 1, 20, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 6, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (27, 1, 1, 1, '我的工作', 'iconfont icon-xihuan', 'myWork', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (28, 1, 27, 2, '待办事项', 'iconfont icon-xihuan', 'todoItem', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (29, 1, 27, 2, '待发事项', 'iconfont icon-xihuan', 'readyItem', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (30, 1, 27, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (31, 1, 27, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (32, 1, 27, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 5, now(), now());
 SELECT setval('sys_menu_id_seq',(SELECT max(id) FROM "public"."sys_menu"));
 COMMIT;
