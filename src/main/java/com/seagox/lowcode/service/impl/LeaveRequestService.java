@@ -10,6 +10,8 @@ import com.seagox.lowcode.entity.SeaDefinition;
 import com.seagox.lowcode.entity.SeaInstance;
 import com.seagox.lowcode.entity.SeaNode;
 import com.seagox.lowcode.entity.SeaNodeDetail;
+import com.seagox.lowcode.entity.SysAccount;
+import com.seagox.lowcode.mapper.AccountMapper;
 import com.seagox.lowcode.mapper.LeaveRequestMapper;
 import com.seagox.lowcode.mapper.SeaDefinitionMapper;
 import com.seagox.lowcode.mapper.SeaInstanceMapper;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Date;
 import java.util.ArrayList;
@@ -40,6 +43,9 @@ public class LeaveRequestService implements ILeaveRequestService {
 
     @Autowired
     private LeaveRequestMapper leaveRequestMapper;
+
+    @Autowired
+    private AccountMapper accountMapper;
 
     @Autowired
     private SeaDefinitionMapper seaDefinitionMapper;
@@ -65,6 +71,29 @@ public class LeaveRequestService implements ILeaveRequestService {
                 leaveType, status, startTime, endTime);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
         return ResultData.success(pageInfo);
+    }
+
+    @Override
+    public ResultData queryById(Long id) {
+        LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
+        if (leaveRequest == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+        }
+        SysAccount applicant = accountMapper.selectById(leaveRequest.getApplicantId());
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", leaveRequest.getId());
+        data.put("companyId", leaveRequest.getCompanyId());
+        data.put("applicantId", leaveRequest.getApplicantId());
+        data.put("applicantName", applicant == null ? "" : applicant.getName());
+        data.put("leaveType", leaveRequest.getLeaveType());
+        data.put("startTime", formatDate(leaveRequest.getStartTime()));
+        data.put("endTime", formatDate(leaveRequest.getEndTime()));
+        data.put("duration", leaveRequest.getDuration());
+        data.put("reason", leaveRequest.getReason());
+        data.put("status", leaveRequest.getStatus());
+        data.put("submitTime", formatDate(leaveRequest.getSubmitTime()));
+        data.put("createTime", formatDate(leaveRequest.getCreateTime()));
+        return ResultData.success(data);
     }
 
     @Override
@@ -199,7 +228,7 @@ public class LeaveRequestService implements ILeaveRequestService {
         Map<String, Object> variables = new HashMap<>();
         variables.put("companyId", leaveRequest.getCompanyId());
         variables.put("creator", leaveRequest.getApplicantId());
-        variables.put("title", "请假单-" + leaveRequest.getId());
+        variables.put("title", buildFlowTitle(leaveRequest));
         variables.put("businessType", BUSINESS_TYPE);
         variables.put("businessKey", leaveRequest.getId());
         variables.put("resources", seaDefinition.getResources());
@@ -209,6 +238,21 @@ public class LeaveRequestService implements ILeaveRequestService {
         variables.put("duration", leaveRequest.getDuration());
         variables.put("reason", leaveRequest.getReason());
         return variables;
+    }
+
+    private String buildFlowTitle(LeaveRequest leaveRequest) {
+        SysAccount applicant = accountMapper.selectById(leaveRequest.getApplicantId());
+        if (applicant != null && !StringUtils.isEmpty(applicant.getName())) {
+            return "请假单-" + applicant.getName();
+        }
+        return "请假单-" + leaveRequest.getApplicantId();
+    }
+
+    private String formatDate(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
 
     private void clearProcess(String businessType, String businessKey) {

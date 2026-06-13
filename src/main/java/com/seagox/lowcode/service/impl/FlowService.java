@@ -12,11 +12,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.entity.LeaveRequest;
 import com.seagox.lowcode.mapper.LeaveRequestMapper;
+import com.seagox.lowcode.mapper.MessageMapper;
 import com.seagox.lowcode.mapper.SeaInstanceMapper;
 import com.seagox.lowcode.service.IFlowService;
+import com.seagox.lowcode.service.ILeaveRequestService;
 
 @Service
 public class FlowService implements IFlowService {
@@ -29,6 +32,12 @@ public class FlowService implements IFlowService {
 	
 	@Autowired
 	private LeaveRequestMapper leaveRequestMapper;
+	
+	@Autowired
+	private ILeaveRequestService leaveRequestService;
+	
+	@Autowired
+	private MessageMapper messageMapper;
 
 	/**
 	 * 待办事项
@@ -93,6 +102,40 @@ public class FlowService implements IFlowService {
 	@Override
 	public ResultData queryProcessInfo(String businessType, String businessKey) {
 		return ResultData.success(seaInstanceMapper.queryProcessInfo(businessType, businessKey));
+	}
+
+	@Override
+	public ResultData batchSubmit(String batchData) {
+		JSONObject result = new JSONObject();
+		int successNum = 0;
+		int errorNum = 0;
+		List<String> failList = new ArrayList<>();
+		JSONArray batchArray = JSONArray.parseArray(batchData);
+		for (int i = 0; i < batchArray.size(); i++) {
+			JSONObject item = batchArray.getJSONObject(i);
+			String businessType = item.getString("businessType");
+			String businessKey = item.getString("businessKey");
+			try {
+				if (!LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+					throw new IllegalArgumentException("暂不支持该类别提交");
+				}
+				ResultData submitResult = leaveRequestService.submit(Long.valueOf(businessKey));
+				if (submitResult.getCode() != ResultCode.SUCCESS.getCode()) {
+					throw new IllegalArgumentException(submitResult.getMessage());
+				}
+				if (item.getLong("id") != null) {
+					messageMapper.deleteById(item.getLong("id"));
+				}
+				successNum ++;
+			} catch (Exception e) {
+				errorNum ++;
+				failList.add(e.getMessage());
+			}
+		}
+		result.put("successNum", successNum);
+		result.put("errorNum", errorNum);
+		result.put("failList", failList);
+		return ResultData.success(result);
 	}
 
 	@Override

@@ -49,4 +49,9 @@ public interface IFlowService {
 	public ResultData batchApprove(Long companyId, Long userId, Boolean approved, String comment, String rejectNode,
 			String batchData);
 
+	/**
+	 * 批量提交
+	 */
+	public ResultData batchSubmit(String batchData);
+
 }

@@ -13,6 +13,11 @@ public interface ILeaveRequestService {
                                   String endTime);
 
     /**
+     * 查询详情
+     */
+    public ResultData queryById(Long id);
+
+    /**
      * 新增
      */
     public ResultData insert(LeaveRequest leaveRequest);

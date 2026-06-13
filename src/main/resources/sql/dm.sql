@@ -373,7 +373,7 @@ CREATE TABLE "public"."sys_message" (
 	"from_user_id" BIGINT NOT NULL,
 	"to_user_id" BIGINT NOT NULL,
 	"title" VARCHAR(150) NOT NULL,
-	"business_type" VARCHAR(150) NOT NULL,
+	"business_type" VARCHAR(150),
 	"business_key" BIGINT NOT NULL,
 	"status" INTEGER DEFAULT 0,
 	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

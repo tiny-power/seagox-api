@@ -112,4 +112,12 @@ public class FlowController {
         return flowService.batchApprove(companyId, userId, approved, comment, rejectNode, batchData);
     }
 
+    /**
+     * 批量提交
+     */
+    @PostMapping("/batchSubmit")
+    public ResultData batchSubmit(String batchData) {
+        return flowService.batchSubmit(batchData);
+    }
+
 }

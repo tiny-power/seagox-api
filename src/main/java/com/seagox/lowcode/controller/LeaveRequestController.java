@@ -32,6 +32,14 @@ public class LeaveRequestController {
     }
 
     /**
+     * 查询详情
+     */
+    @GetMapping("/queryById/{id}")
+    public ResultData queryById(@PathVariable Long id) {
+        return leaveRequestService.queryById(id);
+    }
+
+    /**
      * 新增
      */
     @PostMapping("/insert")
