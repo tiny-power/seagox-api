@@ -29,12 +29,7 @@ public class SysMenu {
     private Long parentId;
     
     /**
-     * 类别(1:PC端;2:移动端;)
-     */
-    private Integer classify;
-
-    /**
-     * 类型(1:表单列表;2:按钮;3:新增表单;4:菜单页面;5:目录;6:仪表板;7:单页面;)
+     * 类型(1:目录;2:页面;3:按钮;)
      */
     private Integer type;
 
@@ -101,14 +96,6 @@ public class SysMenu {
         this.parentId = parentId;
     }
     
-    public Integer getClassify() {
-		return classify;
-	}
-
-	public void setClassify(Integer classify) {
-		this.classify = classify;
-	}
-
     public Integer getType() {
         return type;
     }

@@ -41,7 +41,7 @@ public class MenuService implements IMenuService {
      * 查询全部通过公司id
      */
     @Override
-    public ResultData queryByCompanyId(Long companyId, int classify, int status) {
+    public ResultData queryByCompanyId(Long companyId, int status) {
     	Company company = companyMapper.selectById(companyId);
     	if(company.getParentId() != null) {
     		String prefix = company.getCode().substring(0, 4);
@@ -49,7 +49,7 @@ public class MenuService implements IMenuService {
             qw.eq(Company::getCode, prefix);
             companyId = companyMapper.selectOne(qw).getId();
     	}
-        List<Map<String, Object>> list = menuMapper.queryByCompanyId(companyId, classify, status);
+        List<Map<String, Object>> list = menuMapper.queryByCompanyId(companyId, status);
         return ResultData.success(TreeUtils.categoryTreeHandle(list, "parentId", 0L));
     }
     
@@ -81,7 +81,7 @@ public class MenuService implements IMenuService {
     }
 
     @Override
-    public ResultData queryUserMenu(Long companyId, Long userId, Integer classify) {
+    public ResultData queryUserMenu(Long companyId, Long userId) {
         LambdaQueryWrapper<UserRole> qw = new LambdaQueryWrapper<>();
         qw.eq(UserRole::getCompanyId, companyId)
         	.eq(UserRole::getUserId, userId);
@@ -97,7 +97,7 @@ public class MenuService implements IMenuService {
         }
         List<Map<String, Object>> list = new ArrayList<>();
         if (!StringUtils.isEmpty(roleStr)) {
-        	list = TreeUtils.categoryTreeHandle(menuMapper.queryUserMenu(roleStr.split(","), classify), "parentId", 0L);
+            list = TreeUtils.categoryTreeHandle(menuMapper.queryUserMenu(roleStr.split(",")), "parentId", 0L);
         }
         return ResultData.success(list);
     }

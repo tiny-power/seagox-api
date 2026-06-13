@@ -75,7 +75,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu orgMenu = new SysMenu();
 				orgMenu.setCompanyId(company.getId());
 				orgMenu.setParentId(null);
-				orgMenu.setType(5);
+				orgMenu.setType(1);
 				orgMenu.setName("组织架构");
 				orgMenu.setIcon("iconfont icon-xihuan");
 				orgMenu.setPath("organization");
@@ -86,7 +86,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu contactMenu = new SysMenu();
 				contactMenu.setCompanyId(company.getId());
 				contactMenu.setParentId(orgMenu.getId());
-				contactMenu.setType(4);
+				contactMenu.setType(2);
 				contactMenu.setName("通讯录");
 				contactMenu.setIcon("iconfont icon-xihuan");
 				contactMenu.setPath("contact");
@@ -97,7 +97,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu roleMenu = new SysMenu();
 				roleMenu.setCompanyId(company.getId());
 				roleMenu.setParentId(orgMenu.getId());
-				roleMenu.setType(4);
+				roleMenu.setType(2);
 				roleMenu.setName("角色管理");
 				roleMenu.setIcon("iconfont icon-xihuan");
 				roleMenu.setPath("role");
@@ -108,7 +108,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userExportMenu = new SysMenu();
 				userExportMenu.setCompanyId(company.getId());
 				userExportMenu.setParentId(contactMenu.getId());
-				userExportMenu.setType(2);
+				userExportMenu.setType(3);
 				userExportMenu.setName("导出用户");
 				userExportMenu.setIcon("iconfont icon-xihuan");
 				userExportMenu.setPath("user:export");
@@ -119,7 +119,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userDownloadMenu = new SysMenu();
 				userDownloadMenu.setCompanyId(company.getId());
 				userDownloadMenu.setParentId(contactMenu.getId());
-				userDownloadMenu.setType(2);
+				userDownloadMenu.setType(3);
 				userDownloadMenu.setName("导出用户模板");
 				userDownloadMenu.setIcon("iconfont icon-xihuan");
 				userDownloadMenu.setPath("user:download");
@@ -130,7 +130,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu deptDownloadMenu = new SysMenu();
 				deptDownloadMenu.setCompanyId(company.getId());
 				deptDownloadMenu.setParentId(contactMenu.getId());
-				deptDownloadMenu.setType(2);
+				deptDownloadMenu.setType(3);
 				deptDownloadMenu.setName("导出部门模板");
 				deptDownloadMenu.setIcon("iconfont icon-xihuan");
 				deptDownloadMenu.setPath("dept:download");
@@ -141,7 +141,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userAddMenu = new SysMenu();
 				userAddMenu.setCompanyId(company.getId());
 				userAddMenu.setParentId(contactMenu.getId());
-				userAddMenu.setType(2);
+				userAddMenu.setType(3);
 				userAddMenu.setName("新增用户");
 				userAddMenu.setIcon("iconfont icon-xihuan");
 				userAddMenu.setPath("user:add");
@@ -152,7 +152,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userEditMenu = new SysMenu();
 				userEditMenu.setCompanyId(company.getId());
 				userEditMenu.setParentId(contactMenu.getId());
-				userEditMenu.setType(2);
+				userEditMenu.setType(3);
 				userEditMenu.setName("编辑用户");
 				userEditMenu.setIcon("iconfont icon-xihuan");
 				userEditMenu.setPath("user:edit");
@@ -163,7 +163,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userDeleteMenu = new SysMenu();
 				userDeleteMenu.setCompanyId(company.getId());
 				userDeleteMenu.setParentId(contactMenu.getId());
-				userDeleteMenu.setType(2);
+				userDeleteMenu.setType(3);
 				userDeleteMenu.setName("删除用户");
 				userDeleteMenu.setIcon("iconfont icon-xihuan");
 				userDeleteMenu.setPath("user:delete");
@@ -174,7 +174,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userResetMenu = new SysMenu();
 				userResetMenu.setCompanyId(company.getId());
 				userResetMenu.setParentId(contactMenu.getId());
-				userResetMenu.setType(2);
+				userResetMenu.setType(3);
 				userResetMenu.setName("密码重置");
 				userResetMenu.setIcon("iconfont icon-xihuan");
 				userResetMenu.setPath("user:reset");
@@ -185,7 +185,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu userImportMenu = new SysMenu();
 				userImportMenu.setCompanyId(company.getId());
 				userImportMenu.setParentId(contactMenu.getId());
-				userImportMenu.setType(2);
+				userImportMenu.setType(3);
 				userImportMenu.setName("导入用户");
 				userImportMenu.setIcon("iconfont icon-xihuan");
 				userImportMenu.setPath("user:import");
@@ -196,7 +196,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu deptAddMenu = new SysMenu();
 				deptAddMenu.setCompanyId(company.getId());
 				deptAddMenu.setParentId(contactMenu.getId());
-				deptAddMenu.setType(2);
+				deptAddMenu.setType(3);
 				deptAddMenu.setName("新增部门");
 				deptAddMenu.setIcon("iconfont icon-xihuan");
 				deptAddMenu.setPath("dept:add");
@@ -207,7 +207,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu deptEditMenu = new SysMenu();
 				deptEditMenu.setCompanyId(company.getId());
 				deptEditMenu.setParentId(contactMenu.getId());
-				deptEditMenu.setType(2);
+				deptEditMenu.setType(3);
 				deptEditMenu.setName("编辑部门");
 				deptEditMenu.setIcon("iconfont icon-xihuan");
 				deptEditMenu.setPath("dept:edit");
@@ -218,7 +218,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu deptDeleteMenu = new SysMenu();
 				deptDeleteMenu.setCompanyId(company.getId());
 				deptDeleteMenu.setParentId(contactMenu.getId());
-				deptDeleteMenu.setType(2);
+				deptDeleteMenu.setType(3);
 				deptDeleteMenu.setName("删除部门");
 				deptDeleteMenu.setIcon("iconfont icon-xihuan");
 				deptDeleteMenu.setPath("dept:delete");
@@ -229,7 +229,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu deptImportMenu = new SysMenu();
 				deptImportMenu.setCompanyId(company.getId());
 				deptImportMenu.setParentId(contactMenu.getId());
-				deptImportMenu.setType(2);
+				deptImportMenu.setType(3);
 				deptImportMenu.setName("导入部门");
 				deptImportMenu.setIcon("iconfont icon-xihuan");
 				deptImportMenu.setPath("dept:import");
@@ -240,7 +240,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu roleAddMenu = new SysMenu();
 				roleAddMenu.setCompanyId(company.getId());
 				roleAddMenu.setParentId(roleMenu.getId());
-				roleAddMenu.setType(2);
+				roleAddMenu.setType(3);
 				roleAddMenu.setName("新增");
 				roleAddMenu.setIcon("iconfont icon-xihuan");
 				roleAddMenu.setPath("role:add");
@@ -251,7 +251,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu roleEditMenu = new SysMenu();
 				roleEditMenu.setCompanyId(company.getId());
 				roleEditMenu.setParentId(roleMenu.getId());
-				roleEditMenu.setType(2);
+				roleEditMenu.setType(3);
 				roleEditMenu.setName("编辑");
 				roleEditMenu.setIcon("iconfont icon-xihuan");
 				roleEditMenu.setPath("role:edit");
@@ -262,7 +262,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu roleDeleteMenu = new SysMenu();
 				roleDeleteMenu.setCompanyId(company.getId());
 				roleDeleteMenu.setParentId(roleMenu.getId());
-				roleDeleteMenu.setType(2);
+				roleDeleteMenu.setType(3);
 				roleDeleteMenu.setName("删除");
 				roleDeleteMenu.setIcon("iconfont icon-xihuan");
 				roleDeleteMenu.setPath("role:delete");
@@ -273,7 +273,7 @@ public class CompanyService implements ICompanyService {
 				SysMenu roleAuthorizeMenu = new SysMenu();
 				roleAuthorizeMenu.setCompanyId(company.getId());
 				roleAuthorizeMenu.setParentId(roleMenu.getId());
-				roleAuthorizeMenu.setType(2);
+				roleAuthorizeMenu.setType(3);
 				roleAuthorizeMenu.setName("授权");
 				roleAuthorizeMenu.setIcon("iconfont icon-xihuan");
 				roleAuthorizeMenu.setPath("role:authorize");
@@ -429,8 +429,7 @@ public class CompanyService implements ICompanyService {
 		List<SysMenu> routes = new ArrayList<>();
 		if (!org.springframework.util.StringUtils.isEmpty(permissions)) {
 			LambdaQueryWrapper<SysMenu> sysMenuQw = new LambdaQueryWrapper<>();
-			sysMenuQw.in(SysMenu::getType, Arrays.asList("4,7".split(","))).in(SysMenu::getId,
-					Arrays.asList(permissions.split(",")));
+			sysMenuQw.eq(SysMenu::getType, 2).in(SysMenu::getId, Arrays.asList(permissions.split(",")));
 			routes = menuMapper.selectList(sysMenuQw);
 			permissions = org.apache.commons.lang3.StringUtils.join(menuMapper.queryUserMenuStr(permissions.split(",")),
 					",");

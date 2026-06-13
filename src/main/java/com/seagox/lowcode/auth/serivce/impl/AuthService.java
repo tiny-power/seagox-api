@@ -104,8 +104,7 @@ public class AuthService implements IAuthService {
 				List<SysMenu> routes = new ArrayList<>();
 				if (!org.springframework.util.StringUtils.isEmpty(permissions)) {
 					LambdaQueryWrapper<SysMenu> sysMenuQw = new LambdaQueryWrapper<>();
-					sysMenuQw.in(SysMenu::getType, Arrays.asList("4,7".split(","))).in(SysMenu::getId,
-							Arrays.asList(permissions.split(",")));
+					sysMenuQw.eq(SysMenu::getType, 2).in(SysMenu::getId, Arrays.asList(permissions.split(",")));
 					routes = menuMapper.selectList(sysMenuQw);
 					permissions = StringUtils.join(menuMapper.queryUserMenuStr(permissions.split(",")), ",");
 				}
@@ -235,8 +234,7 @@ public class AuthService implements IAuthService {
 					List<SysMenu> routes = new ArrayList<>();
 					if (!org.springframework.util.StringUtils.isEmpty(permissions)) {
 						LambdaQueryWrapper<SysMenu> sysMenuQw = new LambdaQueryWrapper<>();
-						sysMenuQw.in(SysMenu::getType, Arrays.asList("4,7".split(","))).in(SysMenu::getId,
-								Arrays.asList(permissions.split(",")));
+						sysMenuQw.eq(SysMenu::getType, 2).in(SysMenu::getId, Arrays.asList(permissions.split(",")));
 						routes = menuMapper.selectList(sysMenuQw);
 						permissions = StringUtils.join(menuMapper.queryUserMenuStr(permissions.split(",")), ",");
 					}

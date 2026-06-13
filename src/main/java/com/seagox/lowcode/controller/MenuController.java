@@ -25,8 +25,8 @@ public class MenuController {
      * @param companyId 公司id
      */
     @GetMapping("/queryByCompanyId")
-    public ResultData queryByPage(Long companyId, Integer classify, @RequestParam(value = "status", defaultValue = "0") Integer status) {
-        return menuService.queryByCompanyId(companyId, classify, status);
+    public ResultData queryByPage(Long companyId, @RequestParam(value = "status", defaultValue = "0") Integer status) {
+        return menuService.queryByCompanyId(companyId, status);
     }
 
     /**
@@ -61,11 +61,10 @@ public class MenuController {
      *
      * @param companyId 公司id
      * @param userId    用户id
-     * @param classify 类别(1:PC端;2:移动端;)
      */
     @GetMapping("/queryUserMenu")
-    public ResultData queryUserMenu(Long companyId, Long userId, Integer classify) {
-        return menuService.queryUserMenu(companyId, userId, classify);
+    public ResultData queryUserMenu(Long companyId, Long userId) {
+        return menuService.queryUserMenu(companyId, userId);
     }
 
     /**

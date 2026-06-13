@@ -8,7 +8,7 @@ public interface IMenuService {
     /**
      * 查询全部通过公司id
      */
-    public ResultData queryByCompanyId(Long companyId, int classify, int status);
+    public ResultData queryByCompanyId(Long companyId, int status);
 
     /**
      * 新增
@@ -30,9 +30,8 @@ public interface IMenuService {
      *
      * @param companyId 公司id
      * @param userId    用户id
-     * @param classify 类别(1:PC端;2:移动端;)
      */
-    public ResultData queryUserMenu(Long companyId, Long userId, Integer classify);
+    public ResultData queryUserMenu(Long companyId, Long userId);
 
     /**
      * 查询用户快捷入口权限

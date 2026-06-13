@@ -17,12 +17,12 @@ public interface MenuMapper extends BaseMapper<SysMenu> {
      *
      * @param companyId 公司id
      */
-    public List<Map<String, Object>> queryByCompanyId(@Param("companyId") Long companyId, @Param("classify") int classify, @Param("status") int status);
+    public List<Map<String, Object>> queryByCompanyId(@Param("companyId") Long companyId, @Param("status") int status);
 
     /**
      * 查询用户权限
      */
-    public List<Map<String, Object>> queryUserMenu(@Param("ids")String[] ids, @Param("classify")Integer classify);
+    public List<Map<String, Object>> queryUserMenu(@Param("ids")String[] ids);
 
     /**
      * 查询用户权限
