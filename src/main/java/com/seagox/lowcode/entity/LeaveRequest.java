@@ -57,7 +57,7 @@ public class LeaveRequest {
     private String reason;
 
     /**
-     * 状态(0:草稿;1:已提交;2:已撤销;)
+     * 状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)
      */
     private Integer status;
 

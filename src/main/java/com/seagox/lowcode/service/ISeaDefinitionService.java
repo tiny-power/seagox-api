@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface ISeaDefinitionService {
 
     /**
+     * 分页查询
+     */
+    public ResultData queryByPage(Integer pageNo, Integer pageSize, String businessType, String name);
+
+    /**
      * 添加
      */
     public ResultData insert(SeaDefinition seaDefinition);

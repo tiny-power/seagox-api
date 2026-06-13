@@ -20,10 +20,25 @@ public class SeaDefinitionController {
     private ISeaDefinitionService seaDefinitionService;
 
     /**
+     * 分页查询
+     *
+     * @param pageNo 起始页
+     * @param pageSize 每页大小
+     * @param businessType 业务类型
+     * @param name 名称
+     */
+    @GetMapping("/queryByPage")
+    public ResultData queryByPage(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                  String businessType, String name) {
+        return seaDefinitionService.queryByPage(pageNo, pageSize, businessType, name);
+    }
+
+    /**
      * 新增
      */
     @PostMapping("/insert")
-    @LogPoint("新增表单设计")
+    @LogPoint("新增流程定义")
     public ResultData insert(@Valid SeaDefinition seaDefinition) {
         return seaDefinitionService.insert(seaDefinition);
     }

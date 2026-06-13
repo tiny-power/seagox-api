@@ -260,7 +260,7 @@ public class RuntimeService extends ServiceImpl<SeaNodeDetailMapper, SeaNodeDeta
 					
 					SysMessage message = new SysMessage();
 					message.setBusinessKey(Long.valueOf(seaInstance.getBusinessKey()));
-					message.setBusinessType(Long.valueOf(seaInstance.getBusinessType()));
+					message.setBusinessType(seaInstance.getBusinessType());
 					message.setCompanyId(seaInstance.getCompanyId());
 					message.setFromUserId(seaInstance.getUserId());
 					message.setTitle(seaInstance.getName());
@@ -343,7 +343,7 @@ public class RuntimeService extends ServiceImpl<SeaNodeDetailMapper, SeaNodeDeta
 			seaInstanceMapper.updateById(seaInstance);
 			SysMessage message = new SysMessage();
 			message.setBusinessKey(Long.valueOf(seaInstance.getBusinessKey()));
-			message.setBusinessType(Long.valueOf(seaInstance.getBusinessType()));
+			message.setBusinessType(seaInstance.getBusinessType());
 			message.setCompanyId(seaInstance.getCompanyId());
 			message.setFromUserId(seaInstance.getUserId());
 			message.setTitle(seaInstance.getName());

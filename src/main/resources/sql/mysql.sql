@@ -87,7 +87,7 @@ CREATE TABLE `leave_request` (
     `end_time` datetime NOT NULL COMMENT '结束时间',
     `duration` decimal(10,2) NOT NULL COMMENT '请假时长',
     `reason` varchar(500) NOT NULL COMMENT '请假事由',
-    `status` int(4) DEFAULT 0 COMMENT '状态(0:草稿;1:已提交;2:已撤销;)',
+    `status` int(4) DEFAULT 0 COMMENT '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)',
     `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -103,7 +103,8 @@ CREATE TABLE `sea_definition`  (
     `empower` text comment '授权',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_sea_definition_business_type` (`business_type`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '流程定义';
 
 DROP TABLE IF EXISTS `sea_instance`;
@@ -226,7 +227,7 @@ CREATE TABLE `sys_message`  (
     `from_user_id` bigint(20) NOT NULL COMMENT '用户id(来自)',
     `to_user_id` bigint(20) NOT NULL COMMENT '用户id(给谁)',
     `title` varchar(50) NOT NULL COMMENT '标题',
-    `business_type` bigint(20) DEFAULT NULL COMMENT '业务类型',
+    `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型',
     `business_key` bigint(20) DEFAULT NULL COMMENT '业务key',
     `status` int(4) DEFAULT 0 COMMENT '状态(0:未读;1:已读;)',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -260,7 +261,7 @@ CREATE TABLE `user_role` (
 BEGIN;
 INSERT INTO company VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
 INSERT INTO department VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
-INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26', now(), now());
+INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31', now(), now());
 INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
 INSERT INTO user_role VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO dept_user VALUES (1, 1, 1, 1, now(), now());
@@ -290,4 +291,9 @@ INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (24, 1, 21, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (25, 1, 21, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (26, 1, 21, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (27, 1, 20, 2, '待办事项', 'iconfont icon-xihuan', 'todoItem', 1, 2, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (28, 1, 20, 2, '待发事项', 'iconfont icon-xihuan', 'readyItem', 1, 3, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (29, 1, 20, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 4, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (30, 1, 20, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 5, now(), now());
+INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (31, 1, 20, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 6, now(), now());
 COMMIT;

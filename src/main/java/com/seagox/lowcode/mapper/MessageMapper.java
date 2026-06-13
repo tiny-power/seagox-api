@@ -25,6 +25,6 @@ public interface MessageMapper extends BaseMapper<SysMessage> {
     /**
      * 删除消息记录
      */
-    public void deleteMessage(@Param("businessType") Long businessType, @Param("businessKey") Long businessKey);
+    public void deleteMessage(@Param("businessType") String businessType, @Param("businessKey") Long businessKey);
 
 }

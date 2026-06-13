@@ -43,7 +43,7 @@ public class SysMessage {
     /**
      * 业务类型
      */
-    private Long businessType;
+    private String businessType;
 
     /**
      * 业务key
@@ -117,11 +117,11 @@ public class SysMessage {
         this.title = title;
     }
 
-    public Long getBusinessType() {
+    public String getBusinessType() {
         return businessType;
     }
 
-    public void setBusinessType(Long businessType) {
+    public void setBusinessType(String businessType) {
         this.businessType = businessType;
     }
 

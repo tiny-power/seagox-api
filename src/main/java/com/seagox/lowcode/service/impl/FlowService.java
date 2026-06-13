@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -14,6 +13,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.entity.LeaveRequest;
+import com.seagox.lowcode.mapper.LeaveRequestMapper;
 import com.seagox.lowcode.mapper.SeaInstanceMapper;
 import com.seagox.lowcode.service.IFlowService;
 
@@ -27,7 +28,7 @@ public class FlowService implements IFlowService {
 	private RuntimeService runtimeService;
 	
 	@Autowired
-    private JdbcTemplate jdbcTemplate;
+	private LeaveRequestMapper leaveRequestMapper;
 
 	/**
 	 * 待办事项
@@ -108,13 +109,15 @@ public class FlowService implements IFlowService {
 			Map<String, Object> variables = new HashMap<>();
 			variables.put("companyId", companyId);
 			variables.put("creator", userId);
+			variables.put("userId", userId);
 			variables.put("businessType", businessType);
 			variables.put("businessKey", businessKey);
 			variables.put("approved", approved);
 			variables.put("comment", comment);
 			variables.put("rejectNode", rejectNode);
 			try {
-				runtimeService.completeTask(item);
+				int processStatus = runtimeService.completeTask(variables);
+				syncBusinessStatus(businessType, businessKey, approved, processStatus);
 				successNum ++;
 			} catch (Exception e) {
 				errorNum ++;
@@ -125,6 +128,21 @@ public class FlowService implements IFlowService {
 		result.put("errorNum", errorNum);
 		result.put("failList", failList);
 		return ResultData.success(result);
+	}
+
+	private void syncBusinessStatus(String businessType, String businessKey, Boolean approved, int processStatus) {
+		if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+			LeaveRequest leaveRequest = new LeaveRequest();
+			leaveRequest.setId(Long.valueOf(businessKey));
+			if (processStatus == 1) {
+				leaveRequest.setStatus(LeaveRequestService.STATUS_APPROVED);
+			} else if (!approved && processStatus == 3) {
+				leaveRequest.setStatus(LeaveRequestService.STATUS_REJECTED);
+			} else {
+				return;
+			}
+			leaveRequestMapper.updateById(leaveRequest);
+		}
 	}
 	
 }
