@@ -2,6 +2,9 @@ server:
   port: 80
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
   jackson:
     time-zone: GMT+8
   mvc:
@@ -28,7 +31,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:
-  mapper-locations: classpath:/mapper/*.xml
+  mapper-locations: classpath*:/mapper/*.xml
   type-aliases-package: com.seagox.lowcode
   global-config.db-config.id-type: AUTO # oracle 配置INPUT
   type-handlers-package: com.seagox.lowcode.common

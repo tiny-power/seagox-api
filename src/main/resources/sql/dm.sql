@@ -156,111 +156,6 @@ COMMENT ON COLUMN "public"."leave_request"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."leave_request"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."leave_request" IS '请假单';
 
-DROP TABLE IF EXISTS "public"."sea_definition";
-CREATE TABLE "public"."sea_definition"  (
-    "id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	"business_type" VARCHAR(150) NOT NULL,
-	"name" VARCHAR(30) NOT NULL,
-    "resources" TEXT DEFAULT NULL,
-    "empower" TEXT,
-    "create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "uk_sea_definition_business_type" UNIQUE ("business_type")
-);
-COMMENT ON COLUMN "public"."sea_definition"."id" IS '主键';
-COMMENT ON COLUMN "public"."sea_definition"."business_type" IS '业务类型';
-COMMENT ON COLUMN "public"."sea_definition"."name" IS '名称';
-COMMENT ON COLUMN "public"."sea_definition"."resources" IS '流程文件';
-COMMENT ON COLUMN "public"."sea_definition"."empower" IS '授权';
-COMMENT ON COLUMN "public"."sea_definition"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sea_definition"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."sea_definition" IS '流程定义';
-
-DROP TABLE IF EXISTS "public"."sea_instance";
-CREATE TABLE "public"."sea_instance" (
-	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"user_id" BIGINT NOT NULL,
-	"name" VARCHAR(150) NOT NULL,
-	"business_type" VARCHAR(150) NOT NULL,
-	"business_key" VARCHAR(150) NOT NULL,
-	"resources" TEXT NOT NULL,
-	"status" INTEGER DEFAULT 0,
-	"start_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"end_time" TIMESTAMP,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."sea_instance"."id" IS '主键';
-COMMENT ON COLUMN "public"."sea_instance"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sea_instance"."user_id" IS '用户id';
-COMMENT ON COLUMN "public"."sea_instance"."name" IS '名称';
-COMMENT ON COLUMN "public"."sea_instance"."business_type" IS '业务类型';
-COMMENT ON COLUMN "public"."sea_instance"."business_key" IS '业务key';
-COMMENT ON COLUMN "public"."sea_instance"."resources" IS '流程文件';
-COMMENT ON COLUMN "public"."sea_instance"."status" IS '状态(0:活动;1:完成;2:暂停;3:终止;)';
-COMMENT ON COLUMN "public"."sea_instance"."start_time" IS '开始时间';
-COMMENT ON COLUMN "public"."sea_instance"."end_time" IS '结束时间';
-COMMENT ON COLUMN "public"."sea_instance"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sea_instance"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."sea_instance" IS '流程实例';
-
-DROP TABLE IF EXISTS "public"."sea_node";
-CREATE TABLE "public"."sea_node" (
-	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	"def_id" BIGINT NOT NULL,
-	"mark" VARCHAR(150) NOT NULL,
-	"label" VARCHAR(150) NOT NULL,
-	"type" INTEGER DEFAULT 1,
-	"status" INTEGER DEFAULT 0,
-	"start_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"end_time" TIMESTAMP,
-	"precede" VARCHAR(500) DEFAULT NULL,
-	"path" VARCHAR(5000) NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."sea_node"."id" IS '主键';
-COMMENT ON COLUMN "public"."sea_node"."def_id" IS '流程实例id';
-COMMENT ON COLUMN "public"."sea_node"."mark" IS '节点id';
-COMMENT ON COLUMN "public"."sea_node"."name" IS '节点名称';
-COMMENT ON COLUMN "public"."sea_node"."type" IS '类型(1:开始;2:结束;3:审批任务;4:抄送任务;5:脚本任务;6:排它网关;7:并行网关;8:手动选择;9:空节点;)';
-COMMENT ON COLUMN "public"."sea_node"."status" IS '状态(0:活动;1:通过;2:不通过;3:完成;4:终止;)';
-COMMENT ON COLUMN "public"."sea_node"."start_time" IS '开始时间';
-COMMENT ON COLUMN "public"."sea_node"."end_time" IS '结束时间';
-COMMENT ON COLUMN "public"."sea_node"."precede" IS '前导';
-COMMENT ON COLUMN "public"."sea_node"."path" IS '路径';
-COMMENT ON COLUMN "public"."sea_node"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sea_node"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."sea_node" IS '流程节点';
-
-DROP TABLE IF EXISTS "public"."sea_node_detail";
-CREATE TABLE "public"."sea_node_detail" (
-	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	"company_id" BIGINT NOT NULL,
-	"node_id" BIGINT NOT NULL,
-	"name" VARCHAR(100) NOT NULL,
-	"assignee" VARCHAR(100) NOT NULL,
-	"status" INTEGER DEFAULT 0,
-	"remark" VARCHAR(800),
-	"start_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"end_time" TIMESTAMP,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."sea_node_detail"."id" IS '主键';
-COMMENT ON COLUMN "public"."sea_node_detail"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sea_node_detail"."node_id" IS '流程节点id';
-COMMENT ON COLUMN "public"."sea_node_detail"."name" IS '名称';
-COMMENT ON COLUMN "public"."sea_node_detail"."assignee" IS '签收人或被委托id';
-COMMENT ON COLUMN "public"."sea_node_detail"."status" IS '状态(0:待办;1:同意;2:拒绝;3:已阅;)';
-COMMENT ON COLUMN "public"."sea_node_detail"."remark" IS '评论';
-COMMENT ON COLUMN "public"."sea_node_detail"."start_time" IS '开始时间';
-COMMENT ON COLUMN "public"."sea_node_detail"."end_time" IS '结束时间';
-COMMENT ON COLUMN "public"."sea_node_detail"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sea_node_detail"."update_time" IS '更新时间';
-COMMENT ON TABLE "public"."sea_node_detail" IS '流程节点详情';
-
 DROP TABLE IF EXISTS "public"."sys_account";
 CREATE TABLE "public"."sys_account" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -432,7 +327,7 @@ INSERT INTO "public"."company" VALUES (1, NULL, 'seagox', '1001', '默认单位'
 
 INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 1, now(), now());
 
-INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32', now(), now());
+INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35', now(), now());
 
 INSERT INTO "public"."sys_account" VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
 
@@ -472,4 +367,7 @@ INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name"
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (30, 1, 27, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 3, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (31, 1, 27, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 4, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (32, 1, 27, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 5, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (33, 1, 21, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (34, 1, 21, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (35, 1, 21, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
 COMMIT;

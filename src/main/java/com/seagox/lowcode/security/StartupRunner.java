@@ -1,8 +1,8 @@
 package com.seagox.lowcode.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.seagox.lowcode.entity.Job;
-import com.seagox.lowcode.mapper.JobMapper;
+import com.seagox.lowcode.system.entity.Job;
+import com.seagox.lowcode.system.mapper.JobMapper;
 import com.seagox.lowcode.util.SchedulerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

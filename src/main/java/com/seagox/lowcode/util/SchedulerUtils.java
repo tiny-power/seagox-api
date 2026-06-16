@@ -4,8 +4,8 @@ import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.seagox.lowcode.strategy.job.JobHandler;
-import com.seagox.lowcode.strategy.job.JobHandlerFactory;
+import com.seagox.lowcode.system.job.JobHandler;
+import com.seagox.lowcode.system.job.JobHandlerFactory;
 
 import java.util.Date;
 

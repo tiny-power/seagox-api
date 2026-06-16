@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.seagox.lowcode.mapper.LeaveRequestMapper">
+<mapper namespace="com.seagox.lowcode.business.mapper.LeaveRequestMapper">
 
     <!--分页查询-->
     <select id="queryByPage" resultType="camelKeyMap">
@@ -97,6 +97,121 @@
             </if>
             <if test="_databaseId == 'sqlserver' and startTime != null and startTime != ''">
                 AND CONVERT(varchar, a.start_time, 120 ) between #{startTime} and #{endTime}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!--导出列表-->
+    <select id="exportList" resultType="camelKeyMap">
+        SELECT
+            a.id,
+            c.name as "companyName",
+            b.account as "applicantAccount",
+            b.name as "applicantName",
+            CASE a.leave_type
+                WHEN 1 THEN '事假'
+                WHEN 2 THEN '病假'
+                WHEN 3 THEN '年假'
+                WHEN 4 THEN '调休'
+                WHEN 5 THEN '婚假'
+                WHEN 6 THEN '产假'
+                WHEN 7 THEN '丧假'
+                WHEN 8 THEN '其他'
+                ELSE ''
+            END as "leaveTypeName",
+            a.duration,
+            a.reason,
+            CASE a.status
+                WHEN 0 THEN '草稿'
+                WHEN 1 THEN '审批中'
+                WHEN 2 THEN '已撤销'
+                WHEN 3 THEN '已通过'
+                WHEN 4 THEN '已驳回'
+                ELSE ''
+            END as "statusName",
+            <if test="_databaseId == 'mysql'">
+                DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') AS "startTime",
+                DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s') AS "endTime",
+                DATE_FORMAT(a.submit_time, '%Y-%m-%d %H:%i:%s') AS "submitTime",
+                DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'kingbase'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'dm'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'oracle'">
+                to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') AS "startTime",
+                to_char(a.end_time,'yyyy-MM-dd HH24:MI:ss') AS "endTime",
+                to_char(a.submit_time,'yyyy-MM-dd HH24:MI:ss') AS "submitTime",
+                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                CONVERT(varchar, a.start_time, 120 ) AS "startTime",
+                CONVERT(varchar, a.end_time, 120 ) AS "endTime",
+                CONVERT(varchar, a.submit_time, 120 ) AS "submitTime",
+                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+            </if>
+        FROM leave_request a
+        LEFT JOIN sys_account b ON b.id = a.applicant_id
+        LEFT JOIN company c ON c.id = a.company_id
+        <where>
+            a.company_id = #{exportCompanyId}
+            <if test="_databaseId == 'mysql' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE CONCAT('%', #{exportApplicantName}, '%')
+            </if>
+            <if test="_databaseId == 'postgresql' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE '%' || #{exportApplicantName} || '%'
+            </if>
+            <if test="_databaseId == 'kingbase' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE '%' || #{exportApplicantName} || '%'
+            </if>
+            <if test="_databaseId == 'dm' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE '%' || #{exportApplicantName} || '%'
+            </if>
+            <if test="_databaseId == 'oracle' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE '%' || #{exportApplicantName} || '%'
+            </if>
+            <if test="_databaseId == 'sqlserver' and exportApplicantName != null and exportApplicantName != ''">
+                AND b.name LIKE '%' + #{exportApplicantName} + '%'
+            </if>
+            <if test="exportLeaveType != null">
+                AND a.leave_type = #{exportLeaveType}
+            </if>
+            <if test="exportStatus != null">
+                AND a.status = #{exportStatus}
+            </if>
+            <if test="_databaseId == 'mysql' and exportStartTime != null and exportStartTime != ''">
+                AND DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') between #{exportStartTime} and #{exportEndTime}
+            </if>
+            <if test="_databaseId == 'postgresql' and exportStartTime != null and exportStartTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{exportStartTime} and #{exportEndTime}
+            </if>
+            <if test="_databaseId == 'kingbase' and exportStartTime != null and exportStartTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{exportStartTime} and #{exportEndTime}
+            </if>
+            <if test="_databaseId == 'dm' and exportStartTime != null and exportStartTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{exportStartTime} and #{exportEndTime}
+            </if>
+            <if test="_databaseId == 'oracle' and exportStartTime != null and exportStartTime != ''">
+                AND to_char(a.start_time,'yyyy-MM-dd HH24:MI:ss') between #{exportStartTime} and #{exportEndTime}
+            </if>
+            <if test="_databaseId == 'sqlserver' and exportStartTime != null and exportStartTime != ''">
+                AND CONVERT(varchar, a.start_time, 120 ) between #{exportStartTime} and #{exportEndTime}
             </if>
         </where>
         ORDER BY a.create_time DESC

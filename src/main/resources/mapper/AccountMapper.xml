@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.seagox.lowcode.mapper.AccountMapper">
+<mapper namespace="com.seagox.lowcode.system.mapper.AccountMapper">
 	<!--查询全部通过公司id-->
 	<select id="queryByCompanyId" resultType="camelKeyMap">
         SELECT a.id, a.account, a.name, a.sex, a.sort, a.status, a.type,
