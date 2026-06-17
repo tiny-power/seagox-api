@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS `project_stage_dependency` (
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目ID',
     `stage_id` BIGINT UNSIGNED NOT NULL COMMENT '当前阶段ID',
     `predecessor_stage_id` BIGINT UNSIGNED NOT NULL COMMENT '前置阶段ID',
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='项目阶段前置依赖表';
 
 CREATE TABLE IF NOT EXISTS `project_member` (
-	`id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+	`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目id',
     `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id',
     `role_code` VARCHAR(40) NOT NULL COMMENT '项目角色(DESIGNER设计师、ASSISTANT设计助理、CIVIL_PM土建项目经理、DECORATION_PM精装项目经理、CONSTRUCTOR施工员、QC质检员、COST成控人员、FINANCE财务人员、MANAGER老板/管理层、OWNER/业主、OWNER_FAMILY/业主家属)',
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `project_member` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='项目成员';
 
 CREATE TABLE IF NOT EXISTS `construction_log` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
     `stage_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '当前项目阶段ID',
     `log_date` DATE NOT NULL COMMENT '日记日期',
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `construction_log` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='施工日志';
 
 CREATE TABLE IF NOT EXISTS `inspection` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目id',
     `stage_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '当前项目阶段ID',
     `inspection_name` VARCHAR(100) NOT NULL COMMENT '验收名称',
@@ -181,9 +181,9 @@ CREATE TABLE IF NOT EXISTS `payment_request` (
     `applicant_id` BIGINT UNSIGNED NOT NULL COMMENT '申请人id',
     `amount` DECIMAL(18,2) NOT NULL COMMENT '金额',
     `description` TEXT COMMENT '描述',
-    `attachments` JSON, COMMENT '合同、发票、送货单'
+    `attachments` JSON COMMENT '合同、发票、送货单',
     `status` INT UNSIGNED DEFAULT 0 COMMENT '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)',
-    `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
+    `submit_time` DATETIME DEFAULT NULL COMMENT '提交时间',
 	`created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '修改人',
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
     `sender_user_id` BIGINT UNSIGNED NOT NULL COMMENT '发送人用户ID',
     `recipient_user_id` BIGINT UNSIGNED NOT NULL COMMENT '接收人用户ID',
-    `type` VARCHAR(20) NOT NULL DEFAULT 'NOTICE' COMMENT '消息类型：AI提醒','管家提醒','节点逾期','请款审批',
+    `type` VARCHAR(20) NOT NULL DEFAULT 'NOTICE' COMMENT '消息类型：AI提醒、管家提醒、节点逾期、请款审批',
     `title` VARCHAR(200) NOT NULL COMMENT '消息标题',
     `content` TEXT NOT NULL COMMENT '消息内容',
     `status` VARCHAR(20) NOT NULL DEFAULT 'UNREAD' COMMENT '阅读状态：UNREAD未读、READ已读',
@@ -267,4 +267,3 @@ CREATE TABLE IF NOT EXISTS `notification` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='提醒/通知';
-

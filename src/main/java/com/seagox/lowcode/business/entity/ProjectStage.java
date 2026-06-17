@@ -1,0 +1,326 @@
+package com.seagox.lowcode.business.entity;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
+/**
+ * 项目阶段
+ */
+public class ProjectStage {
+
+    /**
+     * 主键
+     */
+    private Long id;
+
+    /**
+     * 所属项目ID
+     */
+    private Long projectId;
+
+    /**
+     * 流程类型：DESIGN设计、CIVIL土建、DECORATION精装、DELIVERY交付、AFTER_SALES售后
+     */
+    private String flowType;
+
+    /**
+     * 阶段编码
+     */
+    private String stageCode;
+
+    /**
+     * 阶段名称
+     */
+    private String stageName;
+
+    /**
+     * 排序号
+     */
+    private Integer sortOrder;
+
+    /**
+     * 状态：NOT_STARTED未开始、IN_PROGRESS进行中、PENDING_ACCEPTANCE待验收、RECTIFYING整改中、COMPLETED已完成、PAUSED暂停、CANCELLED已取消
+     */
+    private String status;
+
+    /**
+     * 阶段负责人用户ID
+     */
+    private Long managerUserId;
+
+    /**
+     * 计划开始日期
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date plannedStartDate;
+
+    /**
+     * 计划完成日期
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date plannedEndDate;
+
+    /**
+     * 计划工期天数
+     */
+    private Integer plannedDays;
+
+    /**
+     * 实际开始日期
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date actualStartDate;
+
+    /**
+     * 实际完成日期
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date actualEndDate;
+
+    /**
+     * 完成进度百分比
+     */
+    private BigDecimal progressPercent;
+
+    /**
+     * 是否允许与其他阶段并行
+     */
+    private Integer allowParallel;
+
+    /**
+     * 完成人用户ID
+     */
+    private Long completedBy;
+
+    /**
+     * 完成时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date completedAt;
+
+    /**
+     * 阶段阻塞原因
+     */
+    private String blockedReason;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 创建人
+     */
+    private Long createdBy;
+
+    /**
+     * 创建时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+
+    /**
+     * 修改人
+     */
+    private Long updatedBy;
+
+    /**
+     * 修改时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date updatedAt;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
+
+    public String getStageCode() {
+        return stageCode;
+    }
+
+    public void setStageCode(String stageCode) {
+        this.stageCode = stageCode;
+    }
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Long getManagerUserId() {
+        return managerUserId;
+    }
+
+    public void setManagerUserId(Long managerUserId) {
+        this.managerUserId = managerUserId;
+    }
+
+    public Date getPlannedStartDate() {
+        return plannedStartDate;
+    }
+
+    public void setPlannedStartDate(Date plannedStartDate) {
+        this.plannedStartDate = plannedStartDate;
+    }
+
+    public Date getPlannedEndDate() {
+        return plannedEndDate;
+    }
+
+    public void setPlannedEndDate(Date plannedEndDate) {
+        this.plannedEndDate = plannedEndDate;
+    }
+
+    public Integer getPlannedDays() {
+        return plannedDays;
+    }
+
+    public void setPlannedDays(Integer plannedDays) {
+        this.plannedDays = plannedDays;
+    }
+
+    public Date getActualStartDate() {
+        return actualStartDate;
+    }
+
+    public void setActualStartDate(Date actualStartDate) {
+        this.actualStartDate = actualStartDate;
+    }
+
+    public Date getActualEndDate() {
+        return actualEndDate;
+    }
+
+    public void setActualEndDate(Date actualEndDate) {
+        this.actualEndDate = actualEndDate;
+    }
+
+    public BigDecimal getProgressPercent() {
+        return progressPercent;
+    }
+
+    public void setProgressPercent(BigDecimal progressPercent) {
+        this.progressPercent = progressPercent;
+    }
+
+    public Integer getAllowParallel() {
+        return allowParallel;
+    }
+
+    public void setAllowParallel(Integer allowParallel) {
+        this.allowParallel = allowParallel;
+    }
+
+    public Long getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(Long completedBy) {
+        this.completedBy = completedBy;
+    }
+
+    public Date getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(Date completedAt) {
+        this.completedAt = completedAt;
+    }
+
+    public String getBlockedReason() {
+        return blockedReason;
+    }
+
+    public void setBlockedReason(String blockedReason) {
+        this.blockedReason = blockedReason;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+}
