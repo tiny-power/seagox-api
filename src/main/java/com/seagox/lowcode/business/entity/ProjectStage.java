@@ -1,6 +1,5 @@
 package com.seagox.lowcode.business.entity;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,131 +9,52 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ProjectStage {
 
-    /**
-     * 主键
-     */
     private Long id;
 
-    /**
-     * 所属项目ID
-     */
     private Long projectId;
 
-    /**
-     * 流程类型：DESIGN设计、CIVIL土建、DECORATION精装、DELIVERY交付、AFTER_SALES售后
-     */
-    private String flowType;
+    private Integer flowType;
 
-    /**
-     * 阶段编码
-     */
-    private String stageCode;
-
-    /**
-     * 阶段名称
-     */
     private String stageName;
 
-    /**
-     * 排序号
-     */
-    private Integer sortOrder;
+    private Integer status;
 
-    /**
-     * 状态：NOT_STARTED未开始、IN_PROGRESS进行中、PENDING_ACCEPTANCE待验收、RECTIFYING整改中、COMPLETED已完成、PAUSED暂停、CANCELLED已取消
-     */
-    private String status;
-
-    /**
-     * 阶段负责人用户ID
-     */
     private Long managerUserId;
 
-    /**
-     * 计划开始日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedStartDate;
 
-    /**
-     * 计划完成日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedEndDate;
 
-    /**
-     * 计划工期天数
-     */
     private Integer plannedDays;
 
-    /**
-     * 实际开始日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualStartDate;
 
-    /**
-     * 实际完成日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualEndDate;
 
-    /**
-     * 完成进度百分比
-     */
-    private BigDecimal progressPercent;
-
-    /**
-     * 是否允许与其他阶段并行
-     */
-    private Integer allowParallel;
-
-    /**
-     * 完成人用户ID
-     */
     private Long completedBy;
 
-    /**
-     * 完成时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date completedAt;
 
-    /**
-     * 阶段阻塞原因
-     */
-    private String blockedReason;
-
-    /**
-     * 备注
-     */
     private String remark;
 
-    /**
-     * 创建人
-     */
     private Long createdBy;
 
-    /**
-     * 创建时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
-    /**
-     * 修改人
-     */
     private Long updatedBy;
 
-    /**
-     * 修改时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
@@ -155,20 +75,12 @@ public class ProjectStage {
         this.projectId = projectId;
     }
 
-    public String getFlowType() {
+    public Integer getFlowType() {
         return flowType;
     }
 
-    public void setFlowType(String flowType) {
+    public void setFlowType(Integer flowType) {
         this.flowType = flowType;
-    }
-
-    public String getStageCode() {
-        return stageCode;
-    }
-
-    public void setStageCode(String stageCode) {
-        this.stageCode = stageCode;
     }
 
     public String getStageName() {
@@ -179,19 +91,11 @@ public class ProjectStage {
         this.stageName = stageName;
     }
 
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -243,22 +147,6 @@ public class ProjectStage {
         this.actualEndDate = actualEndDate;
     }
 
-    public BigDecimal getProgressPercent() {
-        return progressPercent;
-    }
-
-    public void setProgressPercent(BigDecimal progressPercent) {
-        this.progressPercent = progressPercent;
-    }
-
-    public Integer getAllowParallel() {
-        return allowParallel;
-    }
-
-    public void setAllowParallel(Integer allowParallel) {
-        this.allowParallel = allowParallel;
-    }
-
     public Long getCompletedBy() {
         return completedBy;
     }
@@ -273,14 +161,6 @@ public class ProjectStage {
 
     public void setCompletedAt(Date completedAt) {
         this.completedAt = completedAt;
-    }
-
-    public String getBlockedReason() {
-        return blockedReason;
-    }
-
-    public void setBlockedReason(String blockedReason) {
-        this.blockedReason = blockedReason;
     }
 
     public String getRemark() {
@@ -322,5 +202,4 @@ public class ProjectStage {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

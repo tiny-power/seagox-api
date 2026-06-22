@@ -6,10 +6,14 @@ package com.seagox.lowcode.business.entity;
 public class StageInspectionItem {
 
     private Long id;
+
     private Long projectId;
+
     private Long stageId;
+
     private String name;
-    private String status;
+
+    private Integer status;
 
     public Long getId() {
         return id;
@@ -43,11 +47,11 @@ public class StageInspectionItem {
         this.name = name;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

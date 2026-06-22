@@ -9,65 +9,32 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ProjectMember {
 
-    /**
-     * 主键
-     */
     private Long id;
 
-    /**
-     * 项目id
-     */
     private Long projectId;
 
-    /**
-     * 用户id
-     */
     private Long userId;
 
-    /**
-     * 项目角色(DESIGNER设计师、ASSISTANT设计助理、CIVIL_PM土建项目经理、DECORATION_PM精装项目经理、CONSTRUCTOR施工员、QC质检员、COST成控人员、FINANCE财务人员、MANAGER老板/管理层、OWNER/业主、OWNER_FAMILY/业主家属)
-     */
-    private String roleCode;
+    private Integer roleCode;
 
-    /**
-     * 加入项目时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date joinedAt;
 
-    /**
-     * 退出项目时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date leftAt;
 
-    /**
-     * 状态：ACTIVE有效、INACTIVE无效
-     */
-    private String status;
+    private Integer status;
 
-    /**
-     * 创建人
-     */
     private Long createdBy;
 
-    /**
-     * 创建时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
-    /**
-     * 修改人
-     */
     private Long updatedBy;
 
-    /**
-     * 修改时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
@@ -96,11 +63,11 @@ public class ProjectMember {
         this.userId = userId;
     }
 
-    public String getRoleCode() {
+    public Integer getRoleCode() {
         return roleCode;
     }
 
-    public void setRoleCode(String roleCode) {
+    public void setRoleCode(Integer roleCode) {
         this.roleCode = roleCode;
     }
 
@@ -120,11 +87,11 @@ public class ProjectMember {
         this.leftAt = leftAt;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -159,5 +126,4 @@ public class ProjectMember {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

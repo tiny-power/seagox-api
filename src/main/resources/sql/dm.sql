@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS "public"."company";
-CREATE TABLE "public"."company" (
+CREATE TABLE IF NOT EXISTS "public"."company" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"parent_id" BIGINT,
 	"mark" VARCHAR(100) NOT NULL,
@@ -23,8 +22,7 @@ COMMENT ON COLUMN "public"."company"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."company"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."company" IS '公司';
 
-DROP TABLE IF EXISTS "public"."department";
-CREATE TABLE "public"."department" (
+CREATE TABLE IF NOT EXISTS "public"."department" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"parent_id" BIGINT,
@@ -48,8 +46,7 @@ COMMENT ON COLUMN "public"."department"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."department"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."department" IS '部门';
 
-DROP TABLE IF EXISTS "public"."dept_user";
-CREATE TABLE "public"."dept_user" (
+CREATE TABLE IF NOT EXISTS "public"."dept_user" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"department_id" BIGINT NOT NULL,
@@ -65,8 +62,7 @@ COMMENT ON COLUMN "public"."dept_user"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."dept_user"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."dept_user" IS '部门用户';
 
-DROP TABLE IF EXISTS "public"."dic_classify";
-CREATE TABLE "public"."dic_classify" (
+CREATE TABLE IF NOT EXISTS "public"."dic_classify" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"name" VARCHAR(100) NOT NULL,
@@ -80,8 +76,7 @@ COMMENT ON COLUMN "public"."dic_classify"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."dic_classify"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."dic_classify" IS '字典分类';
 
-DROP TABLE IF EXISTS "public"."dic_detail";
-CREATE TABLE "public"."dic_detail" (
+CREATE TABLE IF NOT EXISTS "public"."dic_detail" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"parent_id" BIGINT,
 	"classify_id" BIGINT NOT NULL,
@@ -106,8 +101,7 @@ COMMENT ON COLUMN "public"."dic_detail"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."dic_detail" IS '字典详情';
 
 
-DROP TABLE IF EXISTS "public"."job";
-CREATE TABLE "public"."job" (
+CREATE TABLE IF NOT EXISTS "public"."job" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"name" VARCHAR(100) NOT NULL,
@@ -127,8 +121,7 @@ COMMENT ON COLUMN "public"."job"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."job"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."job" IS '任务调度';
 
-DROP TABLE IF EXISTS "public"."leave_request";
-CREATE TABLE "public"."leave_request" (
+CREATE TABLE IF NOT EXISTS "public"."leave_request" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"applicant_id" BIGINT NOT NULL,
@@ -156,8 +149,397 @@ COMMENT ON COLUMN "public"."leave_request"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."leave_request"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."leave_request" IS '请假单';
 
-DROP TABLE IF EXISTS "public"."sys_account";
-CREATE TABLE "public"."sys_account" (
+CREATE TABLE IF NOT EXISTS "public"."project" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "code" VARCHAR(150) NOT NULL,
+    "cover" VARCHAR(600) NOT NULL,
+    "name" VARCHAR(600) NOT NULL,
+    "address" VARCHAR(1500) NOT NULL,
+    "budget_amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
+    "status" INTEGER DEFAULT 1,
+    "current_phase" INTEGER DEFAULT 1,
+    "health_status" INTEGER DEFAULT 1,
+    "pause_reason" VARCHAR(1500) DEFAULT NULL,
+    "cancel_reason" VARCHAR(1500) DEFAULT NULL,
+    "planned_start_date" DATE NULL,
+    "planned_end_date" DATE NULL,
+    "actual_start_date" DATE NULL,
+    "actual_end_date" DATE NULL,
+    "created_by" BIGINT NOT NULL,
+    "updated_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."project"."id" IS '主键';
+COMMENT ON COLUMN "public"."project"."code" IS '项目编号';
+COMMENT ON COLUMN "public"."project"."cover" IS '封面图';
+COMMENT ON COLUMN "public"."project"."name" IS '项目名称';
+COMMENT ON COLUMN "public"."project"."address" IS '地址';
+COMMENT ON COLUMN "public"."project"."budget_amount" IS '预算金额';
+COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)';
+COMMENT ON COLUMN "public"."project"."current_phase" IS '当前主要阶段(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)';
+COMMENT ON COLUMN "public"."project"."health_status" IS '健康状态(1:正常;2:预警;3:滞后;4:异常;)';
+COMMENT ON COLUMN "public"."project"."pause_reason" IS '暂停原因';
+COMMENT ON COLUMN "public"."project"."cancel_reason" IS '取消原因';
+COMMENT ON COLUMN "public"."project"."planned_start_date" IS '计划开始日期';
+COMMENT ON COLUMN "public"."project"."planned_end_date" IS '计划结束日期';
+COMMENT ON COLUMN "public"."project"."actual_start_date" IS '实际开始日期';
+COMMENT ON COLUMN "public"."project"."actual_end_date" IS '实际结束日期';
+COMMENT ON COLUMN "public"."project"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."project"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."project"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."project"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."project" IS '项目';
+
+CREATE TABLE IF NOT EXISTS "public"."project_stage" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "flow_type" INTEGER DEFAULT 1,
+    "stage_name" VARCHAR(300) NOT NULL,
+    "status" INTEGER DEFAULT 1,
+    "manager_user_id" BIGINT DEFAULT NULL,
+    "planned_start_date" DATE DEFAULT NULL,
+    "planned_end_date" DATE DEFAULT NULL,
+    "planned_days" INTEGER DEFAULT NULL,
+    "actual_start_date" DATE DEFAULT NULL,
+    "actual_end_date" DATE DEFAULT NULL,
+    "completed_by" BIGINT DEFAULT NULL,
+    "completed_at" TIMESTAMP DEFAULT NULL,
+    "remark" VARCHAR(3000) DEFAULT NULL,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT NOT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."project_stage"."id" IS '主键';
+COMMENT ON COLUMN "public"."project_stage"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:设计;2:土建;3:精装;4:交付;5:售后)';
+COMMENT ON COLUMN "public"."project_stage"."stage_name" IS '阶段名称';
+COMMENT ON COLUMN "public"."project_stage"."status" IS '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)';
+COMMENT ON COLUMN "public"."project_stage"."manager_user_id" IS '阶段负责人用户ID';
+COMMENT ON COLUMN "public"."project_stage"."planned_start_date" IS '计划开始日期';
+COMMENT ON COLUMN "public"."project_stage"."planned_end_date" IS '计划完成日期';
+COMMENT ON COLUMN "public"."project_stage"."planned_days" IS '计划工期天数';
+COMMENT ON COLUMN "public"."project_stage"."actual_start_date" IS '实际开始日期';
+COMMENT ON COLUMN "public"."project_stage"."actual_end_date" IS '实际完成日期';
+COMMENT ON COLUMN "public"."project_stage"."completed_by" IS '完成人用户ID';
+COMMENT ON COLUMN "public"."project_stage"."completed_at" IS '完成时间';
+COMMENT ON COLUMN "public"."project_stage"."remark" IS '备注';
+COMMENT ON COLUMN "public"."project_stage"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."project_stage"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."project_stage"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."project_stage"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."project_stage" IS '项目阶段';
+
+CREATE TABLE IF NOT EXISTS "public"."project_stage_dependency" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "stage_id" BIGINT NOT NULL,
+    "predecessor_stage_id" BIGINT NOT NULL
+);
+COMMENT ON COLUMN "public"."project_stage_dependency"."id" IS '主键';
+COMMENT ON COLUMN "public"."project_stage_dependency"."project_id" IS '项目ID';
+COMMENT ON COLUMN "public"."project_stage_dependency"."stage_id" IS '当前阶段ID';
+COMMENT ON COLUMN "public"."project_stage_dependency"."predecessor_stage_id" IS '前置阶段ID';
+COMMENT ON TABLE "public"."project_stage_dependency" IS '项目阶段前置依赖表';
+
+CREATE TABLE IF NOT EXISTS "public"."stage_inspection_item" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "stage_id" BIGINT NOT NULL,
+    "name" VARCHAR(600) NOT NULL,
+    "status" INTEGER DEFAULT 0
+);
+COMMENT ON COLUMN "public"."stage_inspection_item"."id" IS '主键';
+COMMENT ON COLUMN "public"."stage_inspection_item"."project_id" IS '项目ID';
+COMMENT ON COLUMN "public"."stage_inspection_item"."stage_id" IS '当前阶段ID';
+COMMENT ON COLUMN "public"."stage_inspection_item"."name" IS '名称';
+COMMENT ON COLUMN "public"."stage_inspection_item"."status" IS '状态(0:未开始;1:进行中;2:已完成;)';
+COMMENT ON TABLE "public"."stage_inspection_item" IS '阶段验收条目';
+
+CREATE TABLE IF NOT EXISTS "public"."project_member" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "user_id" BIGINT NOT NULL,
+    "role_code" INTEGER DEFAULT 1,
+    "joined_at" TIMESTAMP NOT NULL,
+    "left_at" TIMESTAMP NULL,
+    "status" INTEGER DEFAULT 1,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT NOT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."project_member"."id" IS '主键';
+COMMENT ON COLUMN "public"."project_member"."project_id" IS '项目id';
+COMMENT ON COLUMN "public"."project_member"."user_id" IS '用户id';
+COMMENT ON COLUMN "public"."project_member"."role_code" IS '项目角色(1:设计师;2:设计助理;3:土建项目经理;4:精装项目经理;5:施工员;6:质检员;7:成控人员;8:财务人员;9:老板/管理层;10:业主;11:业主家属;)';
+COMMENT ON COLUMN "public"."project_member"."joined_at" IS '加入项目时间';
+COMMENT ON COLUMN "public"."project_member"."left_at" IS '退出项目时间';
+COMMENT ON COLUMN "public"."project_member"."status" IS '状态(1:有效;2:禁用;)';
+COMMENT ON COLUMN "public"."project_member"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."project_member"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."project_member"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."project_member"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."project_member" IS '项目成员';
+
+CREATE TABLE IF NOT EXISTS "public"."construction_log" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "stage_id" BIGINT DEFAULT NULL,
+    "log_date" DATE NOT NULL,
+    "filled_by" BIGINT NOT NULL,
+    "current_progress_summary" VARCHAR(3000) DEFAULT NULL,
+    "expected_completion_at" TIMESTAMP DEFAULT NULL,
+    "next_day_plan" CLOB NOT NULL,
+    "site_issues" CLOB DEFAULT NULL,
+    "has_issue" SMALLINT NOT NULL DEFAULT 0,
+    "assistants" CLOB DEFAULT NULL,
+    "submitted_at" TIMESTAMP DEFAULT NULL,
+    "attachments" CLOB DEFAULT NULL,
+    "status" INTEGER DEFAULT 1,
+    "created_by" BIGINT DEFAULT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."construction_log"."id" IS '主键';
+COMMENT ON COLUMN "public"."construction_log"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."construction_log"."stage_id" IS '当前项目阶段ID';
+COMMENT ON COLUMN "public"."construction_log"."log_date" IS '日记日期';
+COMMENT ON COLUMN "public"."construction_log"."filled_by" IS '填写人用户ID';
+COMMENT ON COLUMN "public"."construction_log"."current_progress_summary" IS '今日工作内容';
+COMMENT ON COLUMN "public"."construction_log"."expected_completion_at" IS '预计完成时间';
+COMMENT ON COLUMN "public"."construction_log"."next_day_plan" IS '明日计划';
+COMMENT ON COLUMN "public"."construction_log"."site_issues" IS '需要协调事项';
+COMMENT ON COLUMN "public"."construction_log"."has_issue" IS '是否存在现场问题(0:否;1:是;)';
+COMMENT ON COLUMN "public"."construction_log"."assistants" IS '配合人员';
+COMMENT ON COLUMN "public"."construction_log"."submitted_at" IS '提交时间';
+COMMENT ON COLUMN "public"."construction_log"."attachments" IS '附件';
+COMMENT ON COLUMN "public"."construction_log"."status" IS '状态(1:已提交;2:草稿;)';
+COMMENT ON COLUMN "public"."construction_log"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."construction_log"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."construction_log"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."construction_log"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."construction_log" IS '施工日志';
+
+CREATE TABLE IF NOT EXISTS "public"."inspection" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "stage_id" BIGINT DEFAULT NULL,
+    "inspection_items" CLOB DEFAULT NULL,
+    "plan_inspection_time" TIMESTAMP DEFAULT NULL,
+    "site_photos" CLOB DEFAULT NULL,
+    "participants" CLOB DEFAULT NULL,
+    "signatures" CLOB DEFAULT NULL,
+    "passed_at" TIMESTAMP DEFAULT NULL,
+    "acceptance_comments" VARCHAR(3000) DEFAULT NULL,
+    "remark" VARCHAR(3000) DEFAULT NULL,
+    "status" INTEGER DEFAULT 1,
+    "created_by" BIGINT DEFAULT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."inspection"."id" IS '主键';
+COMMENT ON COLUMN "public"."inspection"."project_id" IS '项目id';
+COMMENT ON COLUMN "public"."inspection"."stage_id" IS '项目阶段ID';
+COMMENT ON COLUMN "public"."inspection"."inspection_items" IS '项目阶段条目，格式为条目ID、条目名称、条目状态等';
+COMMENT ON COLUMN "public"."inspection"."plan_inspection_time" IS '计划验收时间';
+COMMENT ON COLUMN "public"."inspection"."site_photos" IS '验收现场总体照片';
+COMMENT ON COLUMN "public"."inspection"."participants" IS '参与人员，格式为用户ID、姓名、角色等';
+COMMENT ON COLUMN "public"."inspection"."signatures" IS '签字信息，包含签字人、角色、签字文件、签字时间';
+COMMENT ON COLUMN "public"."inspection"."passed_at" IS '验收通过时间';
+COMMENT ON COLUMN "public"."inspection"."acceptance_comments" IS '验收意见';
+COMMENT ON COLUMN "public"."inspection"."remark" IS '备注';
+COMMENT ON COLUMN "public"."inspection"."status" IS '状态(1:待验收;2:验收中;3:已完成;)';
+COMMENT ON COLUMN "public"."inspection"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."inspection"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."inspection"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."inspection"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."inspection" IS '验收单';
+
+CREATE TABLE IF NOT EXISTS "public"."issue_ticket" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "source_type" INTEGER DEFAULT 1,
+    "source_id" BIGINT DEFAULT NULL,
+    "title" VARCHAR(600) NOT NULL,
+    "description" CLOB NOT NULL,
+    "issue_attachments" CLOB,
+    "reported_by" BIGINT NOT NULL,
+    "reported_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "assigned_by" BIGINT DEFAULT NULL,
+    "assigned_at" TIMESTAMP DEFAULT NULL,
+    "rectification_deadline" TIMESTAMP DEFAULT NULL,
+    "rectification_count" INTEGER NOT NULL DEFAULT 0,
+    "rectification_description" CLOB DEFAULT NULL,
+    "rectification_attachments" CLOB,
+    "rectification_user_id" BIGINT DEFAULT NULL,
+    "rectification_submitted_at" TIMESTAMP DEFAULT NULL,
+    "review_user_id" BIGINT DEFAULT NULL,
+    "review_result" INTEGER DEFAULT 1,
+    "review_remark" VARCHAR(3000) DEFAULT NULL,
+    "review_attachments" CLOB DEFAULT NULL,
+    "reviewed_at" TIMESTAMP DEFAULT NULL,
+    "closed_by" BIGINT DEFAULT NULL,
+    "closed_at" TIMESTAMP DEFAULT NULL,
+    "status" INTEGER DEFAULT 1,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."issue_ticket"."id" IS '主键';
+COMMENT ON COLUMN "public"."issue_ticket"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."issue_ticket"."source_type" IS '来源类型(1:施工日记;2:验收单;3:交接单;)';
+COMMENT ON COLUMN "public"."issue_ticket"."source_id" IS '来源ID';
+COMMENT ON COLUMN "public"."issue_ticket"."title" IS '问题标题';
+COMMENT ON COLUMN "public"."issue_ticket"."description" IS '问题描述';
+COMMENT ON COLUMN "public"."issue_ticket"."issue_attachments" IS '问题附件';
+COMMENT ON COLUMN "public"."issue_ticket"."reported_by" IS '问题发现人用户ID';
+COMMENT ON COLUMN "public"."issue_ticket"."reported_at" IS '问题发现时间';
+COMMENT ON COLUMN "public"."issue_ticket"."assigned_by" IS '分配人用户ID';
+COMMENT ON COLUMN "public"."issue_ticket"."assigned_at" IS '分配时间';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_deadline" IS '整改截止时间';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_count" IS '整改提交次数';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_description" IS '整改说明';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_attachments" IS '整改附件';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_user_id" IS '整改责任人用户ID';
+COMMENT ON COLUMN "public"."issue_ticket"."rectification_submitted_at" IS '整改提交时间';
+COMMENT ON COLUMN "public"."issue_ticket"."review_user_id" IS '复验人或质检员用户ID';
+COMMENT ON COLUMN "public"."issue_ticket"."review_result" IS '复验结果(1:通过;2:不通过)';
+COMMENT ON COLUMN "public"."issue_ticket"."review_remark" IS '复验说明';
+COMMENT ON COLUMN "public"."issue_ticket"."review_attachments" IS '复验附件';
+COMMENT ON COLUMN "public"."issue_ticket"."reviewed_at" IS '复验时间';
+COMMENT ON COLUMN "public"."issue_ticket"."closed_by" IS '关闭人用户ID';
+COMMENT ON COLUMN "public"."issue_ticket"."closed_at" IS '问题关闭时间';
+COMMENT ON COLUMN "public"."issue_ticket"."status" IS '状态(1:待整改;2:整改中;3:待复验;4:已关闭;)';
+COMMENT ON COLUMN "public"."issue_ticket"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."issue_ticket"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."issue_ticket"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."issue_ticket"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."issue_ticket" IS '问题单';
+
+CREATE TABLE IF NOT EXISTS "public"."payment_request" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "company_id" BIGINT NOT NULL,
+    "amount" DECIMAL(18,2) NOT NULL,
+    "reason" CLOB,
+    "attachments" CLOB,
+    "applicant_id" BIGINT NOT NULL,
+    "submit_time" TIMESTAMP DEFAULT NULL,
+    "status" INTEGER DEFAULT 0,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."payment_request"."id" IS '主键';
+COMMENT ON COLUMN "public"."payment_request"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."payment_request"."company_id" IS '公司id';
+COMMENT ON COLUMN "public"."payment_request"."amount" IS '金额';
+COMMENT ON COLUMN "public"."payment_request"."reason" IS '请款事由';
+COMMENT ON COLUMN "public"."payment_request"."attachments" IS '附件';
+COMMENT ON COLUMN "public"."payment_request"."applicant_id" IS '申请人id';
+COMMENT ON COLUMN "public"."payment_request"."submit_time" IS '提交时间';
+COMMENT ON COLUMN "public"."payment_request"."status" IS '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)';
+COMMENT ON COLUMN "public"."payment_request"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."payment_request"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."payment_request"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."payment_request"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."payment_request" IS '请款单';
+
+CREATE TABLE IF NOT EXISTS "public"."material_arrival" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "name" VARCHAR(600) NOT NULL,
+    "arrival_at" TIMESTAMP NOT NULL,
+    "remark" VARCHAR(3000) DEFAULT NULL,
+    "attachments" CLOB,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."material_arrival"."id" IS '主键';
+COMMENT ON COLUMN "public"."material_arrival"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."material_arrival"."name" IS '材料名称';
+COMMENT ON COLUMN "public"."material_arrival"."arrival_at" IS '到达时间';
+COMMENT ON COLUMN "public"."material_arrival"."remark" IS '备注';
+COMMENT ON COLUMN "public"."material_arrival"."attachments" IS '附件';
+COMMENT ON COLUMN "public"."material_arrival"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."material_arrival"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."material_arrival"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."material_arrival"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."material_arrival" IS '材料到场记录';
+
+CREATE TABLE IF NOT EXISTS "public"."project_handover" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "handover_type" INTEGER DEFAULT 1,
+    "handover_time" TIMESTAMP DEFAULT NULL,
+    "handover_content" VARCHAR(3000) DEFAULT NULL,
+    "handover_user_id" BIGINT NOT NULL,
+    "receiver_user_id" BIGINT NOT NULL,
+    "handover_signature_url" VARCHAR(1500) NOT NULL,
+    "receiver_signature_url" VARCHAR(1500) DEFAULT NULL,
+    "handover_signed_at" TIMESTAMP DEFAULT NULL,
+    "receiver_signed_at" TIMESTAMP DEFAULT NULL,
+    "attachment" CLOB,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."project_handover"."id" IS '主键';
+COMMENT ON COLUMN "public"."project_handover"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."project_handover"."handover_type" IS '交接类型(1:设计->土建交接;2:设计->精装交接;3:土建->精装交接;)';
+COMMENT ON COLUMN "public"."project_handover"."handover_time" IS '交接时间';
+COMMENT ON COLUMN "public"."project_handover"."handover_content" IS '交接内容';
+COMMENT ON COLUMN "public"."project_handover"."handover_user_id" IS '移交负责人用户ID';
+COMMENT ON COLUMN "public"."project_handover"."receiver_user_id" IS '接收负责人用户ID';
+COMMENT ON COLUMN "public"."project_handover"."handover_signature_url" IS '移交方签字文件url';
+COMMENT ON COLUMN "public"."project_handover"."receiver_signature_url" IS '接收方签字文件url';
+COMMENT ON COLUMN "public"."project_handover"."handover_signed_at" IS '移交方签字时间';
+COMMENT ON COLUMN "public"."project_handover"."receiver_signed_at" IS '接收方签字时间';
+COMMENT ON COLUMN "public"."project_handover"."attachment" IS '附件';
+COMMENT ON COLUMN "public"."project_handover"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."project_handover"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."project_handover"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."project_handover"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."project_handover" IS '交接单';
+
+CREATE TABLE IF NOT EXISTS "public"."notification" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "sender_user_id" BIGINT NOT NULL,
+    "recipient_user_id" BIGINT NOT NULL,
+    "type" INTEGER DEFAULT 1,
+    "title" VARCHAR(600) NOT NULL,
+    "content" CLOB NOT NULL,
+    "status" INTEGER DEFAULT 1,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."notification"."id" IS '主键';
+COMMENT ON COLUMN "public"."notification"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."notification"."sender_user_id" IS '发送人用户ID';
+COMMENT ON COLUMN "public"."notification"."recipient_user_id" IS '接收人用户ID';
+COMMENT ON COLUMN "public"."notification"."type" IS '消息类型(1:AI提醒;2:管家提醒;3:节点逾期;4:请款审批;)';
+COMMENT ON COLUMN "public"."notification"."title" IS '消息标题';
+COMMENT ON COLUMN "public"."notification"."content" IS '消息内容';
+COMMENT ON COLUMN "public"."notification"."status" IS '阅读状态(1:未读;2:已读;)';
+COMMENT ON COLUMN "public"."notification"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."notification"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."notification"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."notification"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."notification" IS '提醒/通知';
+
+CREATE TABLE IF NOT EXISTS "public"."sys_account" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"avatar" VARCHAR(800) DEFAULT NULL,
 	"account" VARCHAR(150) NOT NULL,
@@ -191,8 +573,7 @@ COMMENT ON COLUMN "public"."sys_account"."openid" IS 'openid';
 COMMENT ON COLUMN "public"."sys_account"."sort" IS '排序';
 COMMENT ON TABLE "public"."sys_account" IS '用户';
 
-DROP TABLE IF EXISTS "public"."sys_icon";
-CREATE TABLE "public"."sys_icon"  (
+CREATE TABLE IF NOT EXISTS "public"."sys_icon"  (
     "id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
     "name" varchar(30) NOT NULL,
     "font" varchar(50) NOT NULL
@@ -202,8 +583,7 @@ COMMENT ON COLUMN "public"."sys_icon"."name" IS '名称';
 COMMENT ON COLUMN "public"."sys_icon"."font" IS 'font_class';
 COMMENT ON TABLE "public"."sys_icon" IS 'icon数据';
 
-DROP TABLE IF EXISTS "public"."sys_log";
-CREATE TABLE "public"."sys_log" (
+CREATE TABLE IF NOT EXISTS "public"."sys_log" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"user_id" BIGINT NOT NULL,
@@ -233,8 +613,7 @@ COMMENT ON COLUMN "public"."sys_log"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_log"."ua" IS '浏览器信息';
 COMMENT ON TABLE "public"."sys_log" IS '操作日记';
 
-DROP TABLE IF EXISTS "public"."sys_menu";
-CREATE TABLE "public"."sys_menu" (
+CREATE TABLE IF NOT EXISTS "public"."sys_menu" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"parent_id" BIGINT,
@@ -260,8 +639,7 @@ COMMENT ON COLUMN "public"."sys_menu"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_menu"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."sys_menu" IS '菜单';
 
-DROP TABLE IF EXISTS "public"."sys_message";
-CREATE TABLE "public"."sys_message" (
+CREATE TABLE IF NOT EXISTS "public"."sys_message" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"type" INTEGER DEFAULT 1,
@@ -287,8 +665,7 @@ COMMENT ON COLUMN "public"."sys_message"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_message"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."sys_message" IS '消息表';
 
-DROP TABLE IF EXISTS "public"."sys_role";
-CREATE TABLE "public"."sys_role" (
+CREATE TABLE IF NOT EXISTS "public"."sys_role" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"name" VARCHAR(100) NOT NULL,
@@ -305,8 +682,7 @@ COMMENT ON COLUMN "public"."sys_role"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."sys_role" IS '系统角色';
 
 
-DROP TABLE IF EXISTS "public"."user_role";
-CREATE TABLE "public"."user_role" (
+CREATE TABLE IF NOT EXISTS "public"."user_role" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"user_id" BIGINT NOT NULL,
@@ -325,7 +701,7 @@ COMMENT ON TABLE "public"."user_role" IS '用户角色';
 BEGIN;
 INSERT INTO "public"."company" VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
 
-INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 1, now(), now());
+INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
 
 INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35', now(), now());
 

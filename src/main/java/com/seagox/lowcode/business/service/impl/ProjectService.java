@@ -79,7 +79,7 @@ public class ProjectService implements IProjectService {
 
         List<ProjectStage> stages = stageMapper.selectList(new LambdaQueryWrapper<ProjectStage>()
                 .eq(ProjectStage::getProjectId, id)
-                .orderByAsc(ProjectStage::getSortOrder));
+                .orderByAsc(ProjectStage::getId));
         List<ProjectStageDependency> dependencies = dependencyMapper.selectList(
                 new LambdaQueryWrapper<ProjectStageDependency>()
                         .eq(ProjectStageDependency::getProjectId, id));
@@ -119,8 +119,8 @@ public class ProjectService implements IProjectService {
         }
 
         Date now = new Date();
-        project.setStatus(StringUtils.isEmpty(project.getStatus()) ? "DRAFT" : project.getStatus());
-        project.setHealthStatus(StringUtils.isEmpty(project.getHealthStatus()) ? "NORMAL" : project.getHealthStatus());
+        project.setStatus(StringUtils.isEmpty(project.getStatus()) ? 1 : project.getStatus());
+        project.setHealthStatus(StringUtils.isEmpty(project.getHealthStatus()) ? 1 : project.getHealthStatus());
         project.setCreatedBy(userId);
         project.setUpdatedBy(userId);
         project.setCreatedAt(now);
@@ -210,7 +210,7 @@ public class ProjectService implements IProjectService {
             for (ProjectMember member : request.getMembers()) {
                 member.setId(null);
                 member.setProjectId(projectId);
-                member.setStatus(StringUtils.isEmpty(member.getStatus()) ? "ACTIVE" : member.getStatus());
+                member.setStatus(StringUtils.isEmpty(member.getStatus()) ? 1 : member.getStatus());
                 member.setJoinedAt(member.getJoinedAt() == null ? now : member.getJoinedAt());
                 member.setCreatedBy(userId);
                 member.setUpdatedBy(userId);
@@ -225,7 +225,7 @@ public class ProjectService implements IProjectService {
             for (ProjectStageSaveRequest stage : request.getStages()) {
                 stage.setId(null);
                 stage.setProjectId(projectId);
-                stage.setStatus(StringUtils.isEmpty(stage.getStatus()) ? "NOT_STARTED" : stage.getStatus());
+                stage.setStatus(StringUtils.isEmpty(stage.getStatus()) ? 1 : stage.getStatus());
                 stage.setCreatedBy(userId);
                 stage.setUpdatedBy(userId);
                 stage.setCreatedAt(now);
@@ -271,7 +271,7 @@ public class ProjectService implements IProjectService {
             inspectionItem.setProjectId(projectId);
             inspectionItem.setStageId(stage.getId());
             inspectionItem.setStatus(StringUtils.isEmpty(inspectionItem.getStatus())
-                    ? "NOT_STARTED" : inspectionItem.getStatus());
+                    ? 0 : inspectionItem.getStatus());
             inspectionMapper.insert(inspectionItem);
         }
     }

@@ -20,6 +20,11 @@ public class MaterialArrival {
     private Long projectId;
 
     /**
+     * 材料名称
+     */
+    private String name;
+
+    /**
      * 到达时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -27,9 +32,14 @@ public class MaterialArrival {
     private Date arrivalAt;
 
     /**
-     * 相关附件
+     * 备注
      */
-    private String files;
+    private String remark;
+
+    /**
+     * 附件
+     */
+    private String attachments;
 
     /**
      * 创建人
@@ -71,6 +81,14 @@ public class MaterialArrival {
         this.projectId = projectId;
     }
 
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
     public Date getArrivalAt() {
         return arrivalAt;
     }
@@ -79,12 +97,20 @@ public class MaterialArrival {
         this.arrivalAt = arrivalAt;
     }
 
-    public String getFiles() {
-        return files;
+    public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+    public String getAttachments() {
+        return attachments;
     }
 
-    public void setFiles(String files) {
-        this.files = files;
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
     }
 
     public Long getCreatedBy() {

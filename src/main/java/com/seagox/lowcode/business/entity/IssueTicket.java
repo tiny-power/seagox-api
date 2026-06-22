@@ -9,203 +9,76 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class IssueTicket {
 
-    /**
-     * 主键
-     */
     private Long id;
 
-    /**
-     * 编号
-     */
-    private String code;
-
-    /**
-     * 所属项目ID
-     */
     private Long projectId;
 
-    /**
-     * 关联项目阶段ID
-     */
-    private Long stageId;
+    private Integer sourceType;
 
-    /**
-     * 关联验收单ID
-     */
-    private Long inspectionId;
+    private Long sourceId;
 
-    /**
-     * 关联施工日记ID
-     */
-    private Long dailyLogId;
-
-    /**
-     * 问题来源：MANUAL手动创建、DAILY_LOG施工日记、INSPECTION验收发现、OWNER_FEEDBACK业主反馈、AFTER_SALES售后报修
-     */
-    private String sourceType;
-
-    /**
-     * 问题类型：QUALITY质量问题、PROGRESS进度问题、SAFETY安全问题、MATERIAL材料问题、DESIGN设计问题、SERVICE服务问题、OTHER其他问题
-     */
-    private String issueType;
-
-    /**
-     * 问题标题
-     */
     private String title;
 
-    /**
-     * 问题详细描述
-     */
     private String description;
 
-    /**
-     * 严重程度：LOW一般、MEDIUM中等、HIGH严重、CRITICAL紧急
-     */
-    private String severity;
+    private String issueAttachments;
 
-    /**
-     * 问题现场照片，JSON数组
-     */
-    private String issuePhotos;
-
-    /**
-     * 问题发现人用户ID
-     */
     private Long reportedBy;
 
-    /**
-     * 问题发现时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date reportedAt;
 
-    /**
-     * 整改责任人用户ID
-     */
-    private Long responsibleUserId;
-
-    /**
-     * 分配人用户ID
-     */
     private Long assignedBy;
 
-    /**
-     * 分配时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date assignedAt;
 
-    /**
-     * 整改截止时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rectificationDeadline;
 
-    /**
-     * 问题状态：OPEN待分配、ASSIGNED已分配、RECTIFYING整改中、PENDING_REVIEW待复验、REJECTED复验不通过、CLOSED已关闭、CANCELLED已取消
-     */
-    private String status;
-
-    /**
-     * 整改提交次数
-     */
     private Integer rectificationCount;
 
-    /**
-     * 最新整改说明
-     */
     private String rectificationDescription;
 
-    /**
-     * 最新整改完成照片，JSON数组
-     */
-    private String rectificationPhotos;
+    private String rectificationAttachments;
 
-    /**
-     * 整改提交人用户ID
-     */
-    private Long rectificationSubmittedBy;
+    private Long rectificationUserId;
 
-    /**
-     * 整改提交时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rectificationSubmittedAt;
 
-    /**
-     * 复验人或质检员用户ID
-     */
     private Long reviewUserId;
 
-    /**
-     * 复验结果：PASSED通过、REJECTED不通过
-     */
-    private String reviewResult;
+    private Integer reviewResult;
 
-    /**
-     * 复验说明
-     */
     private String reviewRemark;
 
-    /**
-     * 复验现场照片，JSON数组
-     */
-    private String reviewPhotos;
+    private String reviewAttachments;
 
-    /**
-     * 复验时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date reviewedAt;
 
-    /**
-     * 关闭人用户ID
-     */
     private Long closedBy;
 
-    /**
-     * 问题关闭时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date closedAt;
 
-    /**
-     * 取消原因
-     */
-    private String cancelReason;
+    private Integer status;
 
-    /**
-     * 其他备注
-     */
-    private String remark;
-
-    /**
-     * 创建人
-     */
     private Long createdBy;
 
-    /**
-     * 创建时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
-    /**
-     * 修改人
-     */
     private Long updatedBy;
 
-    /**
-     * 修改时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
@@ -218,14 +91,6 @@ public class IssueTicket {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public Long getProjectId() {
         return projectId;
     }
@@ -234,44 +99,20 @@ public class IssueTicket {
         this.projectId = projectId;
     }
 
-    public Long getStageId() {
-        return stageId;
-    }
-
-    public void setStageId(Long stageId) {
-        this.stageId = stageId;
-    }
-
-    public Long getInspectionId() {
-        return inspectionId;
-    }
-
-    public void setInspectionId(Long inspectionId) {
-        this.inspectionId = inspectionId;
-    }
-
-    public Long getDailyLogId() {
-        return dailyLogId;
-    }
-
-    public void setDailyLogId(Long dailyLogId) {
-        this.dailyLogId = dailyLogId;
-    }
-
-    public String getSourceType() {
+    public Integer getSourceType() {
         return sourceType;
     }
 
-    public void setSourceType(String sourceType) {
+    public void setSourceType(Integer sourceType) {
         this.sourceType = sourceType;
     }
 
-    public String getIssueType() {
-        return issueType;
+    public Long getSourceId() {
+        return sourceId;
     }
 
-    public void setIssueType(String issueType) {
-        this.issueType = issueType;
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
     }
 
     public String getTitle() {
@@ -290,20 +131,12 @@ public class IssueTicket {
         this.description = description;
     }
 
-    public String getSeverity() {
-        return severity;
+    public String getIssueAttachments() {
+        return issueAttachments;
     }
 
-    public void setSeverity(String severity) {
-        this.severity = severity;
-    }
-
-    public String getIssuePhotos() {
-        return issuePhotos;
-    }
-
-    public void setIssuePhotos(String issuePhotos) {
-        this.issuePhotos = issuePhotos;
+    public void setIssueAttachments(String issueAttachments) {
+        this.issueAttachments = issueAttachments;
     }
 
     public Long getReportedBy() {
@@ -320,14 +153,6 @@ public class IssueTicket {
 
     public void setReportedAt(Date reportedAt) {
         this.reportedAt = reportedAt;
-    }
-
-    public Long getResponsibleUserId() {
-        return responsibleUserId;
-    }
-
-    public void setResponsibleUserId(Long responsibleUserId) {
-        this.responsibleUserId = responsibleUserId;
     }
 
     public Long getAssignedBy() {
@@ -354,14 +179,6 @@ public class IssueTicket {
         this.rectificationDeadline = rectificationDeadline;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Integer getRectificationCount() {
         return rectificationCount;
     }
@@ -378,20 +195,20 @@ public class IssueTicket {
         this.rectificationDescription = rectificationDescription;
     }
 
-    public String getRectificationPhotos() {
-        return rectificationPhotos;
+    public String getRectificationAttachments() {
+        return rectificationAttachments;
     }
 
-    public void setRectificationPhotos(String rectificationPhotos) {
-        this.rectificationPhotos = rectificationPhotos;
+    public void setRectificationAttachments(String rectificationAttachments) {
+        this.rectificationAttachments = rectificationAttachments;
     }
 
-    public Long getRectificationSubmittedBy() {
-        return rectificationSubmittedBy;
+    public Long getRectificationUserId() {
+        return rectificationUserId;
     }
 
-    public void setRectificationSubmittedBy(Long rectificationSubmittedBy) {
-        this.rectificationSubmittedBy = rectificationSubmittedBy;
+    public void setRectificationUserId(Long rectificationUserId) {
+        this.rectificationUserId = rectificationUserId;
     }
 
     public Date getRectificationSubmittedAt() {
@@ -410,11 +227,11 @@ public class IssueTicket {
         this.reviewUserId = reviewUserId;
     }
 
-    public String getReviewResult() {
+    public Integer getReviewResult() {
         return reviewResult;
     }
 
-    public void setReviewResult(String reviewResult) {
+    public void setReviewResult(Integer reviewResult) {
         this.reviewResult = reviewResult;
     }
 
@@ -426,12 +243,12 @@ public class IssueTicket {
         this.reviewRemark = reviewRemark;
     }
 
-    public String getReviewPhotos() {
-        return reviewPhotos;
+    public String getReviewAttachments() {
+        return reviewAttachments;
     }
 
-    public void setReviewPhotos(String reviewPhotos) {
-        this.reviewPhotos = reviewPhotos;
+    public void setReviewAttachments(String reviewAttachments) {
+        this.reviewAttachments = reviewAttachments;
     }
 
     public Date getReviewedAt() {
@@ -458,20 +275,12 @@ public class IssueTicket {
         this.closedAt = closedAt;
     }
 
-    public String getCancelReason() {
-        return cancelReason;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setCancelReason(String cancelReason) {
-        this.cancelReason = cancelReason;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public Long getCreatedBy() {
@@ -505,5 +314,4 @@ public class IssueTicket {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

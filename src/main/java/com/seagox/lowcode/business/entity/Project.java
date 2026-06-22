@@ -1,6 +1,7 @@
 package com.seagox.lowcode.business.entity;
 
 import java.math.BigDecimal;
+
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,109 +11,52 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Project {
 
-    /**
-     * 主键
-     */
     private Long id;
 
-    /**
-     * 项目编号
-     */
     private String code;
 
-    /**
-     * 封面图
-     */
     private String cover;
 
-    /**
-     * 项目名称
-     */
     private String name;
 
-    /**
-     * 地址
-     */
     private String address;
 
-    /**
-     * 预算金额
-     */
     private BigDecimal budgetAmount;
 
-    /**
-     * 项目状态：DRAFT草稿、PENDING_START待启动、IN_PROGRESS进行中、PAUSED暂停、DELIVERED已交付、AFTER_SALES售后中、CLOSED已完结、CANCELLED已取消
-     */
-    private String status;
+    private Integer status;
 
-    /**
-     * 当前主要阶段：PREPARATION筹备、DESIGN设计、CIVIL土建、DECORATION精装、DELIVERY交付、AFTER_SALES售后
-     */
-    private String currentPhase;
+    private Integer currentPhase;
 
-    /**
-     * 健康状态：NORMAL正常、WARNING预警、DELAYED滞后、CRITICAL严重异常
-     */
-    private String healthStatus;
+    private Integer healthStatus;
 
-    /**
-     * 暂停原因
-     */
     private String pauseReason;
 
-    /**
-     * 取消原因
-     */
     private String cancelReason;
 
-    /**
-     * 计划开始日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedStartDate;
 
-    /**
-     * 计划结束日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedEndDate;
 
-    /**
-     * 实际开始日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualStartDate;
 
-    /**
-     * 实际结束日期
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualEndDate;
 
-    /**
-     * 创建人
-     */
     private Long createdBy;
 
-    /**
-     * 修改人
-     */
     private Long updatedBy;
 
-    /**
-     * 创建时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
-    /**
-     * 修改时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
@@ -165,27 +109,27 @@ public class Project {
         this.budgetAmount = budgetAmount;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
-    public String getCurrentPhase() {
+    public Integer getCurrentPhase() {
         return currentPhase;
     }
 
-    public void setCurrentPhase(String currentPhase) {
+    public void setCurrentPhase(Integer currentPhase) {
         this.currentPhase = currentPhase;
     }
 
-    public String getHealthStatus() {
+    public Integer getHealthStatus() {
         return healthStatus;
     }
 
-    public void setHealthStatus(String healthStatus) {
+    public void setHealthStatus(Integer healthStatus) {
         this.healthStatus = healthStatus;
     }
 
@@ -268,5 +212,4 @@ public class Project {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

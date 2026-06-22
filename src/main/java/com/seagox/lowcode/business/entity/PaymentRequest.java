@@ -36,12 +36,12 @@ public class PaymentRequest {
     private BigDecimal amount;
 
     /**
-     * 描述
+     * 请款事由
      */
-    private String description;
+    private String reason;
 
     /**
-     * 合同、发票、送货单
+     * 附件
      */
     private String attachments;
 
@@ -121,12 +121,12 @@ public class PaymentRequest {
         this.amount = amount;
     }
 
-    public String getDescription() {
-        return description;
+    public String getReason() {
+        return reason;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getAttachments() {

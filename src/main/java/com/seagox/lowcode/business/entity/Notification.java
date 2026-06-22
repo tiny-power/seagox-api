@@ -9,66 +9,30 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Notification {
 
-    /**
-     * 主键
-     */
     private Long id;
 
-    /**
-     * 所属项目ID
-     */
     private Long projectId;
 
-    /**
-     * 发送人用户ID
-     */
     private Long senderUserId;
 
-    /**
-     * 接收人用户ID
-     */
     private Long recipientUserId;
 
-    /**
-     * 消息类型：AI提醒、管家提醒、节点逾期、请款审批
-     */
-    private String type;
+    private Integer type;
 
-    /**
-     * 消息标题
-     */
     private String title;
 
-    /**
-     * 消息内容
-     */
     private String content;
 
-    /**
-     * 阅读状态：UNREAD未读、READ已读
-     */
-    private String status;
+    private Integer status;
 
-    /**
-     * 创建人
-     */
     private Long createdBy;
 
-    /**
-     * 创建时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
-    /**
-     * 修改人
-     */
     private Long updatedBy;
 
-    /**
-     * 修改时间
-     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
@@ -105,11 +69,11 @@ public class Notification {
         this.recipientUserId = recipientUserId;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -129,11 +93,11 @@ public class Notification {
         this.content = content;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -168,5 +132,4 @@ public class Notification {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }
