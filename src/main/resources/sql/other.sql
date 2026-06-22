@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `project` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `code` VARCHAR(50) NOT NULL COMMENT '项目编号',
+    `cover` VARCHAR(200) NOT NULL COMMENT '封面图',
     `name` VARCHAR(200) NOT NULL COMMENT '项目名称',
     `address` VARCHAR(500) NOT NULL COMMENT '地址',
     `budget_amount` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '预算金额',
@@ -54,6 +55,15 @@ CREATE TABLE IF NOT EXISTS `project_stage_dependency` (
     `predecessor_stage_id` BIGINT UNSIGNED NOT NULL COMMENT '前置阶段ID',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='项目阶段前置依赖表';
+
+CREATE TABLE IF NOT EXISTS `stage_inspection_item` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目ID',
+    `stage_id` BIGINT UNSIGNED NOT NULL COMMENT '当前阶段ID',
+    `name` VARCHAR(200) NOT NULL COMMENT '名称',
+    `status` VARCHAR(30) NOT NULL DEFAULT 'NOT_STARTED' COMMENT '状态(0:未开始;1:进行中;2:已完成;)',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='阶段验收条目';
 
 CREATE TABLE IF NOT EXISTS `project_member` (
 	`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',

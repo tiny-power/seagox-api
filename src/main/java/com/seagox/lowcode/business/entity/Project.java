@@ -21,6 +21,11 @@ public class Project {
     private String code;
 
     /**
+     * 封面图
+     */
+    private String cover;
+
+    /**
      * 项目名称
      */
     private String name;
@@ -126,6 +131,14 @@ public class Project {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getName() {

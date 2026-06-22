@@ -15,7 +15,7 @@
     <!--查询全部通过公司id-->
 	<select id="queryByPage" resultType="camelKeyMap">
         SELECT
-        	a.id, a.account, a.name, a.sex, a.sort, a.status, a.type,
+            a.id, a.account, a.name, a.phone, a.sex, a.sort, a.status, a.type,
         	GROUP_CONCAT(f.name) as "roleNames"
        	FROM sys_account a
        	LEFT JOIN dept_user b ON b.user_id = a.id

@@ -238,4 +238,10 @@ INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (33, 1, 27, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (34, 1, 27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
 INSERT INTO sys_menu (`id`, `company_id`, `parent_id`, `type`, `name`, `icon`, `path`, `status`, `sort`, `create_time`, `update_time`) VALUES (35, 1, 27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
+INSERT INTO sys_menu VALUES (36,1,NULL,1,'工程管理','iconfont icon-xihuan','engineering',1,4,now(),now());
+INSERT INTO sys_menu VALUES (37,1,36,2,'项目管理','iconfont icon-xihuan','business/project/project',1,1,now(),now());
+INSERT INTO sys_menu VALUES (38,1,37,3,'新增','iconfont icon-xihuan','project:add',1,1,now(),now());
+INSERT INTO sys_menu VALUES (39,1,37,3,'编辑','iconfont icon-xihuan','project:edit',1,2,now(),now());
+INSERT INTO sys_menu VALUES (40,1,37,3,'删除','iconfont icon-xihuan','project:delete',1,3,now(),now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40' WHERE id=1;
 COMMIT;
