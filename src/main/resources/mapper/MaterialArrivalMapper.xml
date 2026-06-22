@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.MaterialArrivalMapper">
-
     <select id="queryMaterialArrivals" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
                creator.name AS "createdByName"
         FROM material_arrival a
         LEFT JOIN project p ON p.id = a.project_id
@@ -15,19 +16,25 @@
                     <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
                 </choose>
             </if>
+            <if test="params.name != null and params.name != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND a.name LIKE CONCAT('%', #{params.name}, '%')</when>
+                    <otherwise>AND a.name LIKE '%' || #{params.name} || '%'</otherwise>
+                </choose>
+            </if>
             <if test="params.startDate != null and params.startDate != ''">AND a.arrival_at &gt;= #{params.startDate}</if>
             <if test="params.endDate != null and params.endDate != ''">AND a.arrival_at &lt;= #{params.endDate}</if>
         </where>
         ORDER BY a.arrival_at DESC, a.id DESC
     </select>
-
     <select id="queryMaterialArrivalById" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
                creator.name AS "createdByName"
         FROM material_arrival a
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         WHERE a.id = #{id}
     </select>
-
 </mapper>

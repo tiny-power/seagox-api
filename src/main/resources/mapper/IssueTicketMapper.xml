@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.IssueTicketMapper">
-
     <select id="queryIssueTickets" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
-               s.stage_name AS "stageName", reporter.name AS "reportedByName",
-               responsible.name AS "responsibleUserName", reviewer.name AS "reviewUserName"
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               reporter.name AS "reportedByName",
+               assigned.name AS "assignedByName",
+               rectifier.name AS "rectificationUserName",
+               reviewer.name AS "reviewUserName",
+               closer.name AS "closedByName"
         FROM issue_ticket a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN project_stage s ON s.id = a.stage_id
         LEFT JOIN sys_account reporter ON reporter.id = a.reported_by
-        LEFT JOIN sys_account responsible ON responsible.id = a.responsible_user_id
+        LEFT JOIN sys_account assigned ON assigned.id = a.assigned_by
+        LEFT JOIN sys_account rectifier ON rectifier.id = a.rectification_user_id
         LEFT JOIN sys_account reviewer ON reviewer.id = a.review_user_id
+        LEFT JOIN sys_account closer ON closer.id = a.closed_by
         <where>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
@@ -21,34 +26,31 @@
             </if>
             <if test="params.keyword != null and params.keyword != ''">
                 <choose>
-                    <when test="_databaseId == 'mysql'">
-                        AND (a.code LIKE CONCAT('%', #{params.keyword}, '%')
-                        OR a.title LIKE CONCAT('%', #{params.keyword}, '%'))
-                    </when>
-                    <otherwise>
-                        AND (a.code LIKE '%' || #{params.keyword} || '%'
-                        OR a.title LIKE '%' || #{params.keyword} || '%')
-                    </otherwise>
+                    <when test="_databaseId == 'mysql'">AND a.title LIKE CONCAT('%', #{params.keyword}, '%')</when>
+                    <otherwise>AND a.title LIKE '%' || #{params.keyword} || '%'</otherwise>
                 </choose>
             </if>
-            <if test="params.issueType != null and params.issueType != ''">AND a.issue_type = #{params.issueType}</if>
-            <if test="params.severity != null and params.severity != ''">AND a.severity = #{params.severity}</if>
+            <if test="params.sourceType != null and params.sourceType != ''">AND a.source_type = #{params.sourceType}</if>
             <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
         </where>
         ORDER BY a.reported_at DESC, a.id DESC
     </select>
-
     <select id="queryIssueTicketById" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
-               s.stage_name AS "stageName", reporter.name AS "reportedByName",
-               responsible.name AS "responsibleUserName", reviewer.name AS "reviewUserName"
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               reporter.name AS "reportedByName",
+               assigned.name AS "assignedByName",
+               rectifier.name AS "rectificationUserName",
+               reviewer.name AS "reviewUserName",
+               closer.name AS "closedByName"
         FROM issue_ticket a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN project_stage s ON s.id = a.stage_id
         LEFT JOIN sys_account reporter ON reporter.id = a.reported_by
-        LEFT JOIN sys_account responsible ON responsible.id = a.responsible_user_id
+        LEFT JOIN sys_account assigned ON assigned.id = a.assigned_by
+        LEFT JOIN sys_account rectifier ON rectifier.id = a.rectification_user_id
         LEFT JOIN sys_account reviewer ON reviewer.id = a.review_user_id
+        LEFT JOIN sys_account closer ON closer.id = a.closed_by
         WHERE a.id = #{id}
     </select>
-
 </mapper>

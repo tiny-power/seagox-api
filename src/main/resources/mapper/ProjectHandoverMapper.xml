@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.ProjectHandoverMapper">
-
     <select id="queryProjectHandovers" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
-               fs.stage_name AS "fromStageName", ts.stage_name AS "toStageName",
-               hu.name AS "handoverUserName", ru.name AS "receiverUserName"
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               hu.name AS "handoverUserName",
+               ru.name AS "receiverUserName"
         FROM project_handover a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN project_stage fs ON fs.id = a.from_stage_id
-        LEFT JOIN project_stage ts ON ts.id = a.to_stage_id
         LEFT JOIN sys_account hu ON hu.id = a.handover_user_id
         LEFT JOIN sys_account ru ON ru.id = a.receiver_user_id
         <where>
@@ -19,35 +18,22 @@
                     <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
                 </choose>
             </if>
-            <if test="params.keyword != null and params.keyword != ''">
-                <choose>
-                    <when test="_databaseId == 'mysql'">
-                        AND (a.handover_code LIKE CONCAT('%', #{params.keyword}, '%')
-                        OR a.handover_name LIKE CONCAT('%', #{params.keyword}, '%'))
-                    </when>
-                    <otherwise>
-                        AND (a.handover_code LIKE '%' || #{params.keyword} || '%'
-                        OR a.handover_name LIKE '%' || #{params.keyword} || '%')
-                    </otherwise>
-                </choose>
-            </if>
             <if test="params.handoverType != null and params.handoverType != ''">AND a.handover_type = #{params.handoverType}</if>
-            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.startDate != null and params.startDate != ''">AND a.handover_time &gt;= #{params.startDate}</if>
+            <if test="params.endDate != null and params.endDate != ''">AND a.handover_time &lt;= #{params.endDate}</if>
         </where>
-        ORDER BY a.created_at DESC, a.id DESC
+        ORDER BY a.handover_time DESC, a.id DESC
     </select>
-
     <select id="queryProjectHandoverById" resultType="camelKeyMap">
-        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
-               fs.stage_name AS "fromStageName", ts.stage_name AS "toStageName",
-               hu.name AS "handoverUserName", ru.name AS "receiverUserName"
+        SELECT a.*,
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               hu.name AS "handoverUserName",
+               ru.name AS "receiverUserName"
         FROM project_handover a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN project_stage fs ON fs.id = a.from_stage_id
-        LEFT JOIN project_stage ts ON ts.id = a.to_stage_id
         LEFT JOIN sys_account hu ON hu.id = a.handover_user_id
         LEFT JOIN sys_account ru ON ru.id = a.receiver_user_id
         WHERE a.id = #{id}
     </select>
-
 </mapper>
