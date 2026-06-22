@@ -5,14 +5,29 @@ package com.seagox.lowcode.business.entity;
  */
 public class StageInspectionItem {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 项目阶段ID
+     */
     private Long stageId;
 
+    /**
+     * 验收条目名称
+     */
     private String name;
 
+    /**
+     * 验收条目状态
+     */
     private Integer status;
 
     public Long getId() {

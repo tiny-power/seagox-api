@@ -5,14 +5,26 @@ import com.seagox.lowcode.business.entity.ProjectStage;
 import com.seagox.lowcode.business.entity.StageInspectionItem;
 import java.util.List;
 
+/**
+ * 项目阶段保存请求
+ */
 public class ProjectStageSaveRequest extends ProjectStage {
 
+    /**
+     * 前端阶段临时标识
+     */
     @TableField(exist = false)
     private String key;
 
+    /**
+     * 前置阶段临时标识列表
+     */
     @TableField(exist = false)
     private List<String> predecessorKeys;
 
+    /**
+     * 阶段验收条目
+     */
     @TableField(exist = false)
     private List<StageInspectionItem> inspectionItems;
 

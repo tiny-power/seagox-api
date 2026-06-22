@@ -11,52 +11,109 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Project {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 项目编号
+     */
     private String code;
 
+    /**
+     * 项目封面
+     */
     private String cover;
 
+    /**
+     * 项目名称
+     */
     private String name;
 
+    /**
+     * 项目地址
+     */
     private String address;
 
+    /**
+     * 预算金额
+     */
     private BigDecimal budgetAmount;
 
+    /**
+     * 项目状态
+     */
     private Integer status;
 
+    /**
+     * 当前阶段
+     */
     private Integer currentPhase;
 
+    /**
+     * 健康状态
+     */
     private Integer healthStatus;
 
+    /**
+     * 暂停原因
+     */
     private String pauseReason;
 
+    /**
+     * 取消原因
+     */
     private String cancelReason;
 
+    /**
+     * 计划开始日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedStartDate;
 
+    /**
+     * 计划结束日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedEndDate;
 
+    /**
+     * 实际开始日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualStartDate;
 
+    /**
+     * 实际结束日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualEndDate;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

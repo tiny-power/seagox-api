@@ -17,9 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/materialArrival")
 public class MaterialArrivalController {
 
+    /**
+     * 材料到场记录服务
+     */
     @Autowired
     private IMaterialArrivalService materialArrivalService;
 
+    /**
+     * 分页查询材料到场记录
+     *
+     * @param pageNo 页码
+     * @param pageSize 每页条数
+     * @param params 查询条件
+     * @return 查询结果
+     */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -27,6 +38,12 @@ public class MaterialArrivalController {
         return materialArrivalService.queryByPage(pageNo, pageSize, params);
     }
 
+    /**
+     * 查询材料到场记录详情
+     *
+     * @param id 材料到场记录ID
+     * @return 查询结果
+     */
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return materialArrivalService.queryById(id);

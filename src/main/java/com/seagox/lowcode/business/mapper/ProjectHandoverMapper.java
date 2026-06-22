@@ -11,7 +11,19 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ProjectHandoverMapper extends BaseMapper<ProjectHandover> {
 
+    /**
+     * 查询交接单列表
+     *
+     * @param params 查询条件
+     * @return 交接单列表
+     */
     List<Map<String, Object>> queryProjectHandovers(@Param("params") Map<String, Object> params);
 
+    /**
+     * 查询交接单详情
+     *
+     * @param id 交接单ID
+     * @return 交接单详情
+     */
     Map<String, Object> queryProjectHandoverById(@Param("id") Long id);
 }

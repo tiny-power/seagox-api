@@ -29,9 +29,15 @@ import javax.validation.Valid;
 @RequestMapping("/leave")
 public class LeaveRequestController {
 
+    /**
+     * 请假单服务
+     */
     @Autowired
     private ILeaveRequestService leaveRequestService;
 
+    /**
+     * 请假单导入校验器
+     */
     @Autowired
     private LeaveRequestExcelVerifyHandler leaveRequestExcelVerifyHandler;
 

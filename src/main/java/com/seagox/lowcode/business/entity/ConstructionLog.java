@@ -9,48 +9,102 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ConstructionLog {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 项目阶段ID
+     */
     private Long stageId;
 
+    /**
+     * 日志日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date logDate;
 
+    /**
+     * 填写人用户ID
+     */
     private Long filledBy;
 
+    /**
+     * 今日工作内容
+     */
     private String currentProgressSummary;
 
+    /**
+     * 预计完成时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date expectedCompletionAt;
 
+    /**
+     * 明日计划
+     */
     private String nextDayPlan;
 
+    /**
+     * 需要协调事项
+     */
     private String siteIssues;
 
+    /**
+     * 是否存在现场问题
+     */
     private Integer hasIssue;
 
+    /**
+     * 配合人员
+     */
     private String assistants;
 
+    /**
+     * 提交时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date submittedAt;
 
+    /**
+     * 附件
+     */
     private String attachments;
 
+    /**
+     * 状态
+     */
     private Integer status;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

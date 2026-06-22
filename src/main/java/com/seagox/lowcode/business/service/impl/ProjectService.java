@@ -29,24 +29,45 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+/**
+ * 项目管理服务实现
+ */
 @Service
 public class ProjectService implements IProjectService {
 
+    /**
+     * 项目数据访问对象
+     */
     @Autowired
     private ProjectMapper projectMapper;
 
+    /**
+     * 项目成员数据访问对象
+     */
     @Autowired
     private ProjectMemberMapper memberMapper;
 
+    /**
+     * 项目阶段数据访问对象
+     */
     @Autowired
     private ProjectStageMapper stageMapper;
 
+    /**
+     * 阶段依赖数据访问对象
+     */
     @Autowired
     private ProjectStageDependencyMapper dependencyMapper;
 
+    /**
+     * 阶段验收条目数据访问对象
+     */
     @Autowired
     private StageInspectionItemMapper inspectionMapper;
 
+    /**
+     * 分页查询项目
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, String code, String name, String status) {
         PageHelper.startPage(pageNo, pageSize);
@@ -64,6 +85,9 @@ public class ProjectService implements IProjectService {
         return ResultData.success(new PageInfo<>(projectMapper.selectList(query)));
     }
 
+    /**
+     * 查询项目详情
+     */
     @Override
     public ResultData queryById(Long id) {
         Project project = projectMapper.selectById(id);
@@ -104,6 +128,9 @@ public class ProjectService implements IProjectService {
         return ResultData.success(data);
     }
 
+    /**
+     * 新增项目及其关联数据
+     */
     @Transactional
     @Override
     public ResultData insert(ProjectSaveRequest request, Long userId) {
@@ -130,6 +157,9 @@ public class ProjectService implements IProjectService {
         return ResultData.success(project.getId());
     }
 
+    /**
+     * 修改项目及其关联数据
+     */
     @Transactional
     @Override
     public ResultData update(ProjectSaveRequest request, Long userId) {
@@ -159,6 +189,9 @@ public class ProjectService implements IProjectService {
         return ResultData.success(null);
     }
 
+    /**
+     * 删除项目及其关联数据
+     */
     @Transactional
     @Override
     public ResultData delete(Long id) {
@@ -170,6 +203,9 @@ public class ProjectService implements IProjectService {
         return ResultData.success(null);
     }
 
+    /**
+     * 校验项目保存请求
+     */
     private ResultData validate(ProjectSaveRequest request, boolean update) {
         if (request == null || request.getProject() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目基本信息不能为空");
@@ -205,6 +241,9 @@ public class ProjectService implements IProjectService {
         return null;
     }
 
+    /**
+     * 保存项目成员和阶段数据
+     */
     private void saveChildren(Long projectId, ProjectSaveRequest request, Long userId, Date now) {
         if (request.getMembers() != null) {
             for (ProjectMember member : request.getMembers()) {
@@ -238,6 +277,9 @@ public class ProjectService implements IProjectService {
         }
     }
 
+    /**
+     * 保存项目阶段前置依赖
+     */
     private void saveStageDependencies(Long projectId, List<ProjectStageSaveRequest> stages,
                                        Map<String, Long> stageIdMap) {
         for (ProjectStageSaveRequest stage : stages) {
@@ -259,6 +301,9 @@ public class ProjectService implements IProjectService {
         }
     }
 
+    /**
+     * 保存阶段验收条目
+     */
     private void saveInspectionItems(Long projectId, ProjectStageSaveRequest stage) {
         if (stage.getInspectionItems() == null) {
             return;
@@ -276,6 +321,9 @@ public class ProjectService implements IProjectService {
         }
     }
 
+    /**
+     * 清理项目关联数据
+     */
     private void clearChildren(Long projectId) {
         inspectionMapper.delete(new LambdaQueryWrapper<StageInspectionItem>()
                 .eq(StageInspectionItem::getProjectId, projectId));

@@ -9,42 +9,90 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Inspection {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 项目阶段ID
+     */
     private Long stageId;
 
+    /**
+     * 验收条目
+     */
     private String inspectionItems;
 
+    /**
+     * 计划验收时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date planInspectionTime;
 
+    /**
+     * 现场照片
+     */
     private String sitePhotos;
 
+    /**
+     * 参与人员
+     */
     private String participants;
 
+    /**
+     * 签字信息
+     */
     private String signatures;
 
+    /**
+     * 验收通过时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date passedAt;
 
+    /**
+     * 验收意见
+     */
     private String acceptanceComments;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 状态
+     */
     private Integer status;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

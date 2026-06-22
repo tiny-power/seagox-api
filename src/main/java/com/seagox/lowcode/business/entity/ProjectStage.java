@@ -9,52 +9,106 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ProjectStage {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 流程类型
+     */
     private Integer flowType;
 
+    /**
+     * 阶段名称
+     */
     private String stageName;
 
+    /**
+     * 阶段状态
+     */
     private Integer status;
 
+    /**
+     * 负责人用户ID
+     */
     private Long managerUserId;
 
+    /**
+     * 计划开始日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedStartDate;
 
+    /**
+     * 计划结束日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date plannedEndDate;
 
+    /**
+     * 计划工期天数
+     */
     private Integer plannedDays;
 
+    /**
+     * 实际开始日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualStartDate;
 
+    /**
+     * 实际结束日期
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date actualEndDate;
 
+    /**
+     * 完成人用户ID
+     */
     private Long completedBy;
 
+    /**
+     * 完成时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date completedAt;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

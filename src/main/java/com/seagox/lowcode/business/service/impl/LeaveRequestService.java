@@ -34,31 +34,70 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 请假单服务实现
+ */
 @Service
 public class LeaveRequestService implements ILeaveRequestService {
 
+    /**
+     * 请假单流程业务类型
+     */
     public static final String BUSINESS_TYPE = "leave_request";
+    /**
+     * 草稿状态
+     */
     public static final int STATUS_DRAFT = 0;
+    /**
+     * 审批中状态
+     */
     public static final int STATUS_APPROVING = 1;
+    /**
+     * 已撤销状态
+     */
     public static final int STATUS_CANCELED = 2;
+    /**
+     * 已通过状态
+     */
     public static final int STATUS_APPROVED = 3;
+    /**
+     * 已驳回状态
+     */
     public static final int STATUS_REJECTED = 4;
 
+    /**
+     * 请假单数据访问对象
+     */
     @Autowired
     private LeaveRequestMapper leaveRequestMapper;
 
+    /**
+     * 用户数据访问对象
+     */
     @Autowired
     private AccountMapper accountMapper;
 
+    /**
+     * 公司数据访问对象
+     */
     @Autowired
     private CompanyMapper companyMapper;
 
+    /**
+     * 流程定义服务
+     */
     @Autowired
     private RepositoryService repositoryService;
 
+    /**
+     * 流程运行服务
+     */
     @Autowired
     private RuntimeService runtimeService;
 
+    /**
+     * 分页查询请假单
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long applicantId,
                                   String applicantName, Integer leaveType, Integer status, String startTime,
@@ -70,6 +109,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(pageInfo);
     }
 
+    /**
+     * 查询请假单详情
+     */
     @Override
     public ResultData queryById(Long id) {
         LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
@@ -93,6 +135,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(data);
     }
 
+    /**
+     * 新增请假单
+     */
     @Override
     public ResultData insert(LeaveRequest leaveRequest) {
         ResultData verifyResult = verify(leaveRequest);
@@ -104,6 +149,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(null);
     }
 
+    /**
+     * 修改请假单
+     */
     @Override
     public ResultData update(LeaveRequest leaveRequest) {
         LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
@@ -125,6 +173,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(null);
     }
 
+    /**
+     * 删除请假单
+     */
     @Transactional
     @Override
     public ResultData delete(Long id) {
@@ -143,6 +194,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(null);
     }
 
+    /**
+     * 提交请假单审批
+     */
     @Transactional
     @Override
     public ResultData submit(Long id) {
@@ -175,6 +229,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(null);
     }
 
+    /**
+     * 撤销请假单审批
+     */
     @Transactional
     @Override
     public ResultData cancel(Long id) {
@@ -191,6 +248,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return ResultData.success(null);
     }
 
+    /**
+     * 导入请假单
+     */
     @Transactional
     @Override
     public void importHandle(List<LeaveRequestModel> resultList) {
@@ -210,6 +270,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         }
     }
 
+    /**
+     * 导出请假单
+     */
     @Override
     public void export(HttpServletRequest request, HttpServletResponse response, Long exportCompanyId,
                        String exportApplicantName, Integer exportLeaveType, Integer exportStatus,
@@ -221,6 +284,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         ExportUtils.exportExcelTemplate("leaveExport.xlsx", "请假单列表", resultData, request, response);
     }
 
+    /**
+     * 校验请假单
+     */
     private ResultData verify(LeaveRequest leaveRequest) {
         if (leaveRequest.getCompanyId() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请选择公司");
@@ -246,6 +312,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return null;
     }
 
+    /**
+     * 构建请假流程标题
+     */
     private String buildFlowTitle(LeaveRequest leaveRequest) {
         SysAccount applicant = accountMapper.selectById(leaveRequest.getApplicantId());
         if (applicant != null && !StringUtils.isEmpty(applicant.getName())) {
@@ -254,6 +323,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return "请假单-" + leaveRequest.getApplicantId();
     }
 
+    /**
+     * 构建请假流程变量
+     */
     private Map<String, Object> buildFlowVariables(LeaveRequest leaveRequest) {
         Map<String, Object> variables = new HashMap<>();
         variables.put("id", leaveRequest.getId());
@@ -267,6 +339,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return variables;
     }
 
+    /**
+     * 格式化日期时间
+     */
     private String formatDate(Date date) {
         if (date == null) {
             return "";
@@ -274,6 +349,9 @@ public class LeaveRequestService implements ILeaveRequestService {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
 
+    /**
+     * 解析日期时间
+     */
     private Date parseDate(String value) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         simpleDateFormat.setLenient(false);
@@ -284,22 +362,34 @@ public class LeaveRequestService implements ILeaveRequestService {
         }
     }
 
+    /**
+     * 根据名称查询公司
+     */
     private Company queryCompany(String companyName) {
         LambdaQueryWrapper<Company> companyQw = new LambdaQueryWrapper<>();
         companyQw.eq(Company::getName, companyName);
         return companyMapper.selectOne(companyQw);
     }
 
+    /**
+     * 根据账号查询申请人
+     */
     private SysAccount queryApplicant(String applicantAccount) {
         LambdaQueryWrapper<SysAccount> accountQw = new LambdaQueryWrapper<>();
         accountQw.eq(SysAccount::getAccount, applicantAccount);
         return accountMapper.selectOne(accountQw);
     }
 
+    /**
+     * 清理已有流程实例
+     */
     private void clearProcess(Long companyId, String businessType, String businessKey) {
         runtimeService.deleteProcessInstanceByBusinessKey(businessType, businessKey, companyId);
     }
 
+    /**
+     * 终止流程实例
+     */
     private void terminateProcess(Long companyId, String businessType, String businessKey) {
         runtimeService.terminateProcessInstanceByBusinessKey(businessType, businessKey, companyId, "流程撤销");
     }

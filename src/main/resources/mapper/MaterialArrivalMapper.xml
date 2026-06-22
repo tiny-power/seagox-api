@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.MaterialArrivalMapper">
+    <!-- 查询材料到场记录列表 -->
     <select id="queryMaterialArrivals" resultType="camelKeyMap">
         SELECT a.*,
                p.code AS "projectCode",
@@ -27,6 +28,7 @@
         </where>
         ORDER BY a.arrival_at DESC, a.id DESC
     </select>
+    <!-- 查询材料到场记录详情 -->
     <select id="queryMaterialArrivalById" resultType="camelKeyMap">
         SELECT a.*,
                p.code AS "projectCode",

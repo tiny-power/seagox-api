@@ -17,9 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/constructionLog")
 public class ConstructionLogController {
 
+    /**
+     * 施工日志服务
+     */
     @Autowired
     private IConstructionLogService constructionLogService;
 
+    /**
+     * 分页查询施工日志
+     *
+     * @param pageNo 页码
+     * @param pageSize 每页条数
+     * @param params 查询条件
+     * @return 查询结果
+     */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -27,6 +38,12 @@ public class ConstructionLogController {
         return constructionLogService.queryByPage(pageNo, pageSize, params);
     }
 
+    /**
+     * 查询施工日志详情
+     *
+     * @param id 施工日志ID
+     * @return 查询结果
+     */
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return constructionLogService.queryById(id);

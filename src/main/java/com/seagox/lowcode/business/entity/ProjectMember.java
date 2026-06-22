@@ -9,32 +9,65 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ProjectMember {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 用户ID
+     */
     private Long userId;
 
+    /**
+     * 项目角色编码
+     */
     private Integer roleCode;
 
+    /**
+     * 加入时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date joinedAt;
 
+    /**
+     * 退出时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date leftAt;
 
+    /**
+     * 成员状态
+     */
     private Integer status;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

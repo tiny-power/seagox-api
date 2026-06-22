@@ -9,44 +9,92 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class ProjectHandover {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 交接类型
+     */
     private Integer handoverType;
 
+    /**
+     * 交接时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date handoverTime;
 
+    /**
+     * 交接内容
+     */
     private String handoverContent;
 
+    /**
+     * 移交负责人用户ID
+     */
     private Long handoverUserId;
 
+    /**
+     * 接收负责人用户ID
+     */
     private Long receiverUserId;
 
+    /**
+     * 移交方签字文件地址
+     */
     private String handoverSignatureUrl;
 
+    /**
+     * 接收方签字文件地址
+     */
     private String receiverSignatureUrl;
 
+    /**
+     * 移交方签字时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date handoverSignedAt;
 
+    /**
+     * 接收方签字时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date receiverSignedAt;
 
+    /**
+     * 附件
+     */
     private String attachment;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

@@ -4,10 +4,22 @@ import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.ProjectMember;
 import java.util.List;
 
+/**
+ * 项目保存请求
+ */
 public class ProjectSaveRequest {
 
+    /**
+     * 项目基本信息
+     */
     private Project project;
+    /**
+     * 项目成员
+     */
     private List<ProjectMember> members;
+    /**
+     * 项目阶段
+     */
     private List<ProjectStageSaveRequest> stages;
 
     public Project getProject() {

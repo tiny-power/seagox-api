@@ -17,9 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/inspection")
 public class InspectionController {
 
+    /**
+     * 验收单服务
+     */
     @Autowired
     private IInspectionService inspectionService;
 
+    /**
+     * 分页查询验收单
+     *
+     * @param pageNo 页码
+     * @param pageSize 每页条数
+     * @param params 查询条件
+     * @return 查询结果
+     */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -27,6 +38,12 @@ public class InspectionController {
         return inspectionService.queryByPage(pageNo, pageSize, params);
     }
 
+    /**
+     * 查询验收单详情
+     *
+     * @param id 验收单ID
+     * @return 查询结果
+     */
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return inspectionService.queryById(id);

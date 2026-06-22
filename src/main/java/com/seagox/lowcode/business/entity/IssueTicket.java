@@ -9,76 +9,163 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class IssueTicket {
 
+    /**
+     * 主键
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 问题来源类型
+     */
     private Integer sourceType;
 
+    /**
+     * 来源单据ID
+     */
     private Long sourceId;
 
+    /**
+     * 问题标题
+     */
     private String title;
 
+    /**
+     * 问题描述
+     */
     private String description;
 
+    /**
+     * 问题附件
+     */
     private String issueAttachments;
 
+    /**
+     * 问题发现人用户ID
+     */
     private Long reportedBy;
 
+    /**
+     * 问题发现时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date reportedAt;
 
+    /**
+     * 分配人用户ID
+     */
     private Long assignedBy;
 
+    /**
+     * 分配时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date assignedAt;
 
+    /**
+     * 整改截止时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rectificationDeadline;
 
+    /**
+     * 整改提交次数
+     */
     private Integer rectificationCount;
 
+    /**
+     * 整改说明
+     */
     private String rectificationDescription;
 
+    /**
+     * 整改附件
+     */
     private String rectificationAttachments;
 
+    /**
+     * 整改责任人用户ID
+     */
     private Long rectificationUserId;
 
+    /**
+     * 整改提交时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rectificationSubmittedAt;
 
+    /**
+     * 复验人用户ID
+     */
     private Long reviewUserId;
 
+    /**
+     * 复验结果
+     */
     private Integer reviewResult;
 
+    /**
+     * 复验说明
+     */
     private String reviewRemark;
 
+    /**
+     * 复验附件
+     */
     private String reviewAttachments;
 
+    /**
+     * 复验时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date reviewedAt;
 
+    /**
+     * 关闭人用户ID
+     */
     private Long closedBy;
 
+    /**
+     * 关闭时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date closedAt;
 
+    /**
+     * 状态
+     */
     private Integer status;
 
+    /**
+     * 创建人
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 修改人
+     */
     private Long updatedBy;
 
+    /**
+     * 修改时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

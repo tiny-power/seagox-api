@@ -9,6 +9,9 @@ import com.seagox.lowcode.common.ResultData;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 请假单服务
+ */
 public interface ILeaveRequestService {
 
     /**
