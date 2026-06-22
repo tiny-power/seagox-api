@@ -2,27 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.MaterialArrivalMapper">
 
-    <sql id="projectNameCondition">
-        <if test="params.projectName != null and params.projectName != ''">
-            <choose>
-                <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
-                <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
-            </choose>
-        </if>
-    </sql>
-
-    <sql id="materialArrivalColumns">
+    <select id="queryMaterialArrivals" resultType="camelKeyMap">
         SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
                creator.name AS "createdByName"
         FROM material_arrival a
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
-    </sql>
-
-    <select id="queryMaterialArrivals" resultType="camelKeyMap">
-        <include refid="materialArrivalColumns"/>
         <where>
-            <include refid="projectNameCondition"/>
+            <if test="params.projectName != null and params.projectName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                </choose>
+            </if>
             <if test="params.startDate != null and params.startDate != ''">AND a.arrival_at &gt;= #{params.startDate}</if>
             <if test="params.endDate != null and params.endDate != ''">AND a.arrival_at &lt;= #{params.endDate}</if>
         </where>
@@ -30,7 +22,11 @@
     </select>
 
     <select id="queryMaterialArrivalById" resultType="camelKeyMap">
-        <include refid="materialArrivalColumns"/>
+        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
+               creator.name AS "createdByName"
+        FROM material_arrival a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
         WHERE a.id = #{id}
     </select>
 
