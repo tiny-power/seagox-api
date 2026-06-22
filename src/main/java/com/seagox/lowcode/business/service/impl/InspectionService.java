@@ -1,7 +1,7 @@
 package com.seagox.lowcode.business.service.impl;
 
+import com.seagox.lowcode.business.mapper.InspectionMapper;
 import com.seagox.lowcode.business.service.IInspectionService;
-import com.seagox.lowcode.business.mapper.BusinessDocumentMapper;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Service;
 public class InspectionService extends AbstractReadOnlyBusinessService implements IInspectionService {
 
     @Autowired
-    private BusinessDocumentMapper documentMapper;
+    private InspectionMapper inspectionMapper;
 
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
-        return queryByPage(pageNo, pageSize, () -> documentMapper.queryInspections(params));
+        return queryByPage(pageNo, pageSize, () -> inspectionMapper.queryInspections(params));
     }
 
     @Override
     public ResultData queryById(Long id) {
-        return queryById(documentMapper.queryInspectionById(id), "验收单");
+        return queryById(inspectionMapper.queryInspectionById(id), "验收单");
     }
 }

@@ -2,4 +2,52 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.ProjectHandoverMapper">
 
+    <sql id="projectNameCondition">
+        <if test="params.projectName != null and params.projectName != ''">
+            <choose>
+                <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+            </choose>
+        </if>
+    </sql>
+
+    <sql id="projectHandoverColumns">
+        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
+               fs.stage_name AS "fromStageName", ts.stage_name AS "toStageName",
+               hu.name AS "handoverUserName", ru.name AS "receiverUserName"
+        FROM project_handover a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN project_stage fs ON fs.id = a.from_stage_id
+        LEFT JOIN project_stage ts ON ts.id = a.to_stage_id
+        LEFT JOIN sys_account hu ON hu.id = a.handover_user_id
+        LEFT JOIN sys_account ru ON ru.id = a.receiver_user_id
+    </sql>
+
+    <select id="queryProjectHandovers" resultType="camelKeyMap">
+        <include refid="projectHandoverColumns"/>
+        <where>
+            <include refid="projectNameCondition"/>
+            <if test="params.keyword != null and params.keyword != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">
+                        AND (a.handover_code LIKE CONCAT('%', #{params.keyword}, '%')
+                        OR a.handover_name LIKE CONCAT('%', #{params.keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        AND (a.handover_code LIKE '%' || #{params.keyword} || '%'
+                        OR a.handover_name LIKE '%' || #{params.keyword} || '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="params.handoverType != null and params.handoverType != ''">AND a.handover_type = #{params.handoverType}</if>
+            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+        </where>
+        ORDER BY a.created_at DESC, a.id DESC
+    </select>
+
+    <select id="queryProjectHandoverById" resultType="camelKeyMap">
+        <include refid="projectHandoverColumns"/>
+        WHERE a.id = #{id}
+    </select>
+
 </mapper>

@@ -2,4 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.InspectionMapper">
 
+    <sql id="projectNameCondition">
+        <if test="params.projectName != null and params.projectName != ''">
+            <choose>
+                <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+            </choose>
+        </if>
+    </sql>
+
+    <sql id="inspectionColumns">
+        SELECT a.*, p.code AS "projectCode", p.name AS "projectName",
+               s.stage_name AS "stageName", qc.name AS "qcUserName",
+               pm.name AS "projectManagerUserName"
+        FROM inspection a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN project_stage s ON s.id = a.stage_id
+        LEFT JOIN sys_account qc ON qc.id = a.qc_user_id
+        LEFT JOIN sys_account pm ON pm.id = a.project_manager_user_id
+    </sql>
+
+    <select id="queryInspections" resultType="camelKeyMap">
+        <include refid="inspectionColumns"/>
+        <where>
+            <include refid="projectNameCondition"/>
+            <if test="params.inspectionName != null and params.inspectionName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND a.inspection_name LIKE CONCAT('%', #{params.inspectionName}, '%')</when>
+                    <otherwise>AND a.inspection_name LIKE '%' || #{params.inspectionName} || '%'</otherwise>
+                </choose>
+            </if>
+            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.startDate != null and params.startDate != ''">AND a.inspection_date &gt;= #{params.startDate}</if>
+            <if test="params.endDate != null and params.endDate != ''">AND a.inspection_date &lt;= #{params.endDate}</if>
+        </where>
+        ORDER BY a.inspection_date DESC, a.id DESC
+    </select>
+
+    <select id="queryInspectionById" resultType="camelKeyMap">
+        <include refid="inspectionColumns"/>
+        WHERE a.id = #{id}
+    </select>
+
 </mapper>
