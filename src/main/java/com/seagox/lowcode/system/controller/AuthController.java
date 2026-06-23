@@ -6,7 +6,9 @@ import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.mapper.DicDetailMapper;
 import com.seagox.lowcode.system.service.IAuthService;
+import com.seagox.lowcode.system.service.IPhoneCodeService;
 import com.seagox.lowcode.system.service.IUploadService;
+import com.seagox.lowcode.util.ValidatorUtils;
 import com.seagox.lowcode.util.WeiChatUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class AuthController {
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private IPhoneCodeService phoneCodeService;
 	
 	
 	/**
@@ -113,6 +118,18 @@ public class AuthController {
     @GetMapping("/preview")
     public void preview(String url, String fileName, HttpServletResponse response) {
         uploadService.preview(url, fileName, response);
+    }
+    
+    /**
+     * 发送手机验证码
+     */
+    @GetMapping("/sendTextCode/{phone}")
+    public ResultData sendTextCode(@PathVariable String phone) {
+    	if (!ValidatorUtils.isMobile(phone)) {
+    		return ResultData.warn(ResultCode.PARAMETER_ERROR, "手机号格式不对");
+    	} else {
+    		return phoneCodeService.sendTextCode(phone);
+    	}
     }
 
 }
