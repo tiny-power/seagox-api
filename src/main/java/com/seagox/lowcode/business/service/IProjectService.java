@@ -32,4 +32,9 @@ public interface IProjectService {
      * 删除项目及其关联数据
      */
     ResultData delete(Long id);
+
+    /**
+     * 启动项目
+     */
+    ResultData start(Long id, Long userId);
 }

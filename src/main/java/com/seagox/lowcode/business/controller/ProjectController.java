@@ -70,4 +70,13 @@ public class ProjectController {
     public ResultData delete(@PathVariable Long id) {
         return projectService.delete(id);
     }
+
+    /**
+     * 启动项目
+     */
+    @PostMapping("/start/{id}")
+    @LogPoint("启动项目")
+    public ResultData start(@PathVariable Long id, Long userId) {
+        return projectService.start(id, userId);
+    }
 }

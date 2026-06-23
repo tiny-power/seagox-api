@@ -204,6 +204,26 @@ public class ProjectService implements IProjectService {
     }
 
     /**
+     * 启动项目
+     */
+    @Transactional
+    @Override
+    public ResultData start(Long id, Long userId) {
+        Project project = projectMapper.selectById(id);
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
+        if (!Integer.valueOf(1).equals(project.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅待启动项目可以启动");
+        }
+        project.setStatus(2);
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(new Date());
+        projectMapper.updateById(project);
+        return ResultData.success(null);
+    }
+
+    /**
      * 校验项目保存请求
      */
     private ResultData validate(ProjectSaveRequest request, boolean update) {
