@@ -16,8 +16,9 @@ public class SmsUtils {
 			System.setProperty("sun.net.client.defaultReadTimeout", "10000");
 			final String product = "Dysmsapi";// 短信API产品名称（短信产品名固定，无需修改）
 			final String domain = "dysmsapi.aliyuncs.com";// 短信API产品域名（接口地址固定，无需修改）
-			
-			IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", "123", "123");
+			final String accessKeyId = "123";
+			final String accessKeySecret = "123";
+			IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
 			DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
 			IAcsClient acsClient = new DefaultAcsClient(profile);
 			// 组装请求对象
