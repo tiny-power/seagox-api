@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.mapper.IssueTicketMapper;
 import com.seagox.lowcode.business.service.IIssueTicketService;
+import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import java.util.List;
@@ -30,6 +31,7 @@ public class IssueTicketService implements IIssueTicketService {
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = issueTicketMapper.queryIssueTickets(params);
+        MapDateFormatUtils.formatDateValues(list);
         return ResultData.success(new PageInfo<>(list));
     }
 
@@ -42,6 +44,7 @@ public class IssueTicketService implements IIssueTicketService {
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
+        MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
 }

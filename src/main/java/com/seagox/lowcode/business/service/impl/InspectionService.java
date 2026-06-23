@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.mapper.InspectionMapper;
 import com.seagox.lowcode.business.service.IInspectionService;
+import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import java.util.List;
@@ -30,6 +31,7 @@ public class InspectionService implements IInspectionService {
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = inspectionMapper.queryInspections(params);
+        MapDateFormatUtils.formatDateValues(list);
         return ResultData.success(new PageInfo<>(list));
     }
 
@@ -42,6 +44,7 @@ public class InspectionService implements IInspectionService {
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
+        MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
 }

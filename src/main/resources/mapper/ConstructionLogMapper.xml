@@ -3,7 +3,24 @@
 <mapper namespace="com.seagox.lowcode.business.mapper.ConstructionLogMapper">
     <!-- 查询施工日志列表 -->
     <select id="queryConstructionLogs" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.stage_id AS "stageId",
+               a.log_date AS "logDate",
+               a.filled_by AS "filledBy",
+               a.current_progress_summary AS "currentProgressSummary",
+               a.expected_completion_at AS "expectedCompletionAt",
+               a.next_day_plan AS "nextDayPlan",
+               a.site_issues AS "siteIssues",
+               a.has_issue AS "hasIssue",
+               a.assistants,
+               a.submitted_at AS "submittedAt",
+               a.attachments,
+               a.status,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                s.stage_name AS "stageName",
@@ -13,6 +30,7 @@
         LEFT JOIN project_stage s ON s.id = a.stage_id
         LEFT JOIN sys_account u ON u.id = a.filled_by
         <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
@@ -27,7 +45,24 @@
     </select>
     <!-- 查询施工日志详情 -->
     <select id="queryConstructionLogById" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.stage_id AS "stageId",
+               a.log_date AS "logDate",
+               a.filled_by AS "filledBy",
+               a.current_progress_summary AS "currentProgressSummary",
+               a.expected_completion_at AS "expectedCompletionAt",
+               a.next_day_plan AS "nextDayPlan",
+               a.site_issues AS "siteIssues",
+               a.has_issue AS "hasIssue",
+               a.assistants,
+               a.submitted_at AS "submittedAt",
+               a.attachments,
+               a.status,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                s.stage_name AS "stageName",

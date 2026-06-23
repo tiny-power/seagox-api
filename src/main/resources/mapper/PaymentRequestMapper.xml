@@ -3,7 +3,19 @@
 <mapper namespace="com.seagox.lowcode.business.mapper.PaymentRequestMapper">
     <!-- 查询请款单列表 -->
     <select id="queryPaymentRequests" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.company_id AS "companyId",
+               a.applicant_id AS "applicantId",
+               a.amount,
+               a.reason,
+               a.attachments,
+               a.status,
+               a.submit_time AS "submitTime",
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                applicant.name AS "applicantName",
@@ -13,6 +25,7 @@
         LEFT JOIN sys_account applicant ON applicant.id = a.applicant_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
@@ -31,7 +44,19 @@
     </select>
     <!-- 查询请款单详情 -->
     <select id="queryPaymentRequestById" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.company_id AS "companyId",
+               a.applicant_id AS "applicantId",
+               a.amount,
+               a.reason,
+               a.attachments,
+               a.status,
+               a.submit_time AS "submitTime",
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                applicant.name AS "applicantName",

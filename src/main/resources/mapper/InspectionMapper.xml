@@ -3,7 +3,22 @@
 <mapper namespace="com.seagox.lowcode.business.mapper.InspectionMapper">
     <!-- 查询验收单列表 -->
     <select id="queryInspections" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.stage_id AS "stageId",
+               a.inspection_items AS "inspectionItems",
+               a.plan_inspection_time AS "planInspectionTime",
+               a.site_photos AS "sitePhotos",
+               a.participants,
+               a.signatures,
+               a.passed_at AS "passedAt",
+               a.acceptance_comments AS "acceptanceComments",
+               a.remark,
+               a.status,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                s.stage_name AS "stageName"
@@ -11,6 +26,7 @@
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN project_stage s ON s.id = a.stage_id
         <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
@@ -25,7 +41,22 @@
     </select>
     <!-- 查询验收单详情 -->
     <select id="queryInspectionById" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.stage_id AS "stageId",
+               a.inspection_items AS "inspectionItems",
+               a.plan_inspection_time AS "planInspectionTime",
+               a.site_photos AS "sitePhotos",
+               a.participants,
+               a.signatures,
+               a.passed_at AS "passedAt",
+               a.acceptance_comments AS "acceptanceComments",
+               a.remark,
+               a.status,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                s.stage_name AS "stageName"

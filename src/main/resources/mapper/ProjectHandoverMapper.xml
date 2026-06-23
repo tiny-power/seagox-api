@@ -3,7 +3,22 @@
 <mapper namespace="com.seagox.lowcode.business.mapper.ProjectHandoverMapper">
     <!-- 查询交接单列表 -->
     <select id="queryProjectHandovers" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.handover_type AS "handoverType",
+               a.handover_time AS "handoverTime",
+               a.handover_content AS "handoverContent",
+               a.handover_user_id AS "handoverUserId",
+               a.receiver_user_id AS "receiverUserId",
+               a.handover_signature_url AS "handoverSignatureUrl",
+               a.receiver_signature_url AS "receiverSignatureUrl",
+               a.handover_signed_at AS "handoverSignedAt",
+               a.receiver_signed_at AS "receiverSignedAt",
+               a.attachment,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                hu.name AS "handoverUserName",
@@ -13,6 +28,7 @@
         LEFT JOIN sys_account hu ON hu.id = a.handover_user_id
         LEFT JOIN sys_account ru ON ru.id = a.receiver_user_id
         <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
@@ -27,7 +43,22 @@
     </select>
     <!-- 查询交接单详情 -->
     <select id="queryProjectHandoverById" resultType="camelKeyMap">
-        SELECT a.*,
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.handover_type AS "handoverType",
+               a.handover_time AS "handoverTime",
+               a.handover_content AS "handoverContent",
+               a.handover_user_id AS "handoverUserId",
+               a.receiver_user_id AS "receiverUserId",
+               a.handover_signature_url AS "handoverSignatureUrl",
+               a.receiver_signature_url AS "receiverSignatureUrl",
+               a.handover_signed_at AS "handoverSignedAt",
+               a.receiver_signed_at AS "receiverSignedAt",
+               a.attachment,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
                hu.name AS "handoverUserName",
