@@ -539,6 +539,20 @@ COMMENT ON COLUMN "public"."notification"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."notification"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."notification" IS '提醒/通知';
 
+CREATE TABLE IF NOT EXISTS "public"."phone_code" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"phone" VARCHAR(100) NOT NULL,
+	"code" VARCHAR(30) NOT NULL,
+	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"expire_time" TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."phone_code"."id" IS '主键';
+COMMENT ON COLUMN "public"."phone_code"."phone" IS '手机号';
+COMMENT ON COLUMN "public"."phone_code"."code" IS '验证码';
+COMMENT ON COLUMN "public"."phone_code"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."phone_code"."expire_time" IS '过期时间';
+COMMENT ON TABLE "public"."phone_code" IS '手机验证码';
+
 CREATE TABLE IF NOT EXISTS "public"."sys_account" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"avatar" VARCHAR(800) DEFAULT NULL,
