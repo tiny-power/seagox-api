@@ -22,7 +22,27 @@
                p.code AS "projectCode",
                p.name AS "projectName",
                hu.name AS "handoverUserName",
-               ru.name AS "receiverUserName"
+               ru.name AS "receiverUserName",
+               CASE a.handover_type
+                    WHEN 1 THEN '设计'
+                    WHEN 2 THEN '设计'
+                    WHEN 3 THEN '土建'
+                    ELSE ''
+               END AS "from",
+               CASE a.handover_type
+                    WHEN 1 THEN '土建'
+                    WHEN 2 THEN '精装'
+                    WHEN 3 THEN '精装'
+                    ELSE ''
+               END AS "to",
+               CASE a.handover_type
+                    WHEN 1 THEN '设计-土建交接'
+                    WHEN 2 THEN '设计-精装交接'
+                    WHEN 3 THEN '土建-精装交接'
+                    ELSE ''
+               END AS "type",
+               CASE WHEN a.receiver_signed_at IS NULL THEN 'pending' ELSE 'completed' END AS "status",
+               CASE WHEN a.receiver_signed_at IS NULL THEN '待确认' ELSE '已完成' END AS "statusText"
         FROM project_handover a
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account hu ON hu.id = a.handover_user_id
@@ -38,6 +58,16 @@
             <if test="params.handoverType != null and params.handoverType != ''">AND a.handover_type = #{params.handoverType}</if>
             <if test="params.startDate != null and params.startDate != ''">AND a.handover_time &gt;= #{params.startDate}</if>
             <if test="params.endDate != null and params.endDate != ''">AND a.handover_time &lt;= #{params.endDate}</if>
+            <if test="params.userId != null and params.userId != '' and params.role == 'mine'">
+                AND a.handover_user_id = #{params.userId}
+            </if>
+            <if test="params.userId != null and params.userId != '' and params.role == 'pending'">
+                AND a.receiver_user_id = #{params.userId}
+                AND a.receiver_signed_at IS NULL
+            </if>
+            <if test="params.role == 'completed'">
+                AND a.receiver_signed_at IS NOT NULL
+            </if>
         </where>
         ORDER BY a.handover_time DESC, a.id DESC
     </select>
@@ -62,7 +92,27 @@
                p.code AS "projectCode",
                p.name AS "projectName",
                hu.name AS "handoverUserName",
-               ru.name AS "receiverUserName"
+               ru.name AS "receiverUserName",
+               CASE a.handover_type
+                    WHEN 1 THEN '设计'
+                    WHEN 2 THEN '设计'
+                    WHEN 3 THEN '土建'
+                    ELSE ''
+               END AS "from",
+               CASE a.handover_type
+                    WHEN 1 THEN '土建'
+                    WHEN 2 THEN '精装'
+                    WHEN 3 THEN '精装'
+                    ELSE ''
+               END AS "to",
+               CASE a.handover_type
+                    WHEN 1 THEN '设计-土建交接'
+                    WHEN 2 THEN '设计-精装交接'
+                    WHEN 3 THEN '土建-精装交接'
+                    ELSE ''
+               END AS "type",
+               CASE WHEN a.receiver_signed_at IS NULL THEN 'pending' ELSE 'completed' END AS "status",
+               CASE WHEN a.receiver_signed_at IS NULL THEN '待确认' ELSE '已完成' END AS "statusText"
         FROM project_handover a
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account hu ON hu.id = a.handover_user_id

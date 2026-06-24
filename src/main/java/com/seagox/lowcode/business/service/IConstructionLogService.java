@@ -1,5 +1,6 @@
 package com.seagox.lowcode.business.service;
 
+import com.seagox.lowcode.business.entity.ConstructionLog;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
 
@@ -25,5 +26,31 @@ public interface IConstructionLogService {
      * @return 查询结果
      */
     ResultData queryById(Long id);
+
+    /**
+     * 新增施工日志
+     *
+     * @param constructionLog 施工日志
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    ResultData insert(ConstructionLog constructionLog, Long userId);
+
+    /**
+     * 修改施工日志
+     *
+     * @param constructionLog 施工日志
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    ResultData update(ConstructionLog constructionLog, Long userId);
+
+    /**
+     * 删除施工日志
+     *
+     * @param id 施工日志ID
+     * @return 操作结果
+     */
+    ResultData delete(Long id);
 
 }

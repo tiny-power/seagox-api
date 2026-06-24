@@ -22,6 +22,41 @@ public interface ILeaveRequestService {
                                   String endTime);
 
     /**
+     * 小程序分页查询
+     */
+    public ResultData miniQueryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status);
+
+    /**
+     * 小程序查询详情
+     */
+    public ResultData miniQueryById(Long id, Long userId);
+
+    /**
+     * 小程序保存草稿
+     */
+    public ResultData miniSaveDraft(LeaveRequest leaveRequest, Long userId);
+
+    /**
+     * 小程序修改草稿
+     */
+    public ResultData miniUpdateDraft(LeaveRequest leaveRequest, Long userId);
+
+    /**
+     * 小程序提交
+     */
+    public ResultData miniSubmit(LeaveRequest leaveRequest, Long userId);
+
+    /**
+     * 小程序删除草稿
+     */
+    public ResultData miniDelete(Long id, Long userId);
+
+    /**
+     * 小程序撤销审批
+     */
+    public ResultData miniCancel(Long id, Long userId);
+
+    /**
      * 查询详情
      */
     public ResultData queryById(Long id);

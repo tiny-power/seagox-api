@@ -1,11 +1,15 @@
 package com.seagox.lowcode.business.controller;
 
+import com.seagox.lowcode.annotation.LogPoint;
+import com.seagox.lowcode.business.entity.PaymentRequest;
 import com.seagox.lowcode.business.service.IPaymentRequestService;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +51,65 @@ public class PaymentRequestController {
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return paymentRequestService.queryById(id);
+    }
+
+    /**
+     * 新增请款单
+     *
+     * @param paymentRequest 请款单
+     * @return 操作结果
+     */
+    @PostMapping("/insert")
+    @LogPoint("新增请款单")
+    public ResultData insert(@Valid PaymentRequest paymentRequest) {
+        return paymentRequestService.insert(paymentRequest);
+    }
+
+    /**
+     * 修改请款单
+     *
+     * @param paymentRequest 请款单
+     * @return 操作结果
+     */
+    @PostMapping("/update")
+    @LogPoint("修改请款单")
+    public ResultData update(@Valid PaymentRequest paymentRequest) {
+        return paymentRequestService.update(paymentRequest);
+    }
+
+    /**
+     * 删除请款单
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    @PostMapping("/delete/{id}")
+    @LogPoint("删除请款单")
+    public ResultData delete(@PathVariable Long id) {
+        return paymentRequestService.delete(id);
+    }
+
+    /**
+     * 提交请款单
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    @PostMapping("/submit/{id}")
+    @LogPoint("提交请款单")
+    public ResultData submit(@PathVariable Long id) {
+        return paymentRequestService.submit(id);
+    }
+
+    /**
+     * 撤销请款单
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    @PostMapping("/cancel/{id}")
+    @LogPoint("撤销请款单")
+    public ResultData cancel(@PathVariable Long id) {
+        return paymentRequestService.cancel(id);
     }
 }

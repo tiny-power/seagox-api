@@ -12,6 +12,7 @@
             a.leave_type as "leaveType",
             a.duration,
             a.reason,
+            a.attachments,
             a.status,
             <if test="_databaseId == 'mysql'">
                 DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s') AS "startTime",
@@ -122,6 +123,7 @@
             END as "leaveTypeName",
             a.duration,
             a.reason,
+            a.attachments,
             CASE a.status
                 WHEN 0 THEN '草稿'
                 WHEN 1 THEN '审批中'

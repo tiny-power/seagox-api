@@ -1,6 +1,16 @@
 package com.seagox.lowcode.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.seagox.lowcode.business.entity.Project;
+import com.seagox.lowcode.business.entity.ProjectMember;
+import com.seagox.lowcode.business.entity.ProjectStage;
+import com.seagox.lowcode.business.entity.ProjectStageDependency;
+import com.seagox.lowcode.business.entity.StageInspectionItem;
+import com.seagox.lowcode.business.mapper.ProjectMapper;
+import com.seagox.lowcode.business.mapper.ProjectMemberMapper;
+import com.seagox.lowcode.business.mapper.ProjectStageDependencyMapper;
+import com.seagox.lowcode.business.mapper.ProjectStageMapper;
+import com.seagox.lowcode.business.mapper.StageInspectionItemMapper;
 import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.entity.SysMenu;
 import com.seagox.lowcode.system.entity.SysRole;
@@ -40,6 +50,41 @@ public class AuthService implements IAuthService {
 	
 	@Autowired
 	private DeptUserMapper deptUserMapper;
+
+	@Autowired
+	private PhoneCodeMapper phoneCodeMapper;
+
+	@Autowired
+	private ProjectMapper projectMapper;
+
+	@Autowired
+	private ProjectMemberMapper projectMemberMapper;
+
+	@Autowired
+	private ProjectStageMapper projectStageMapper;
+
+	@Autowired
+	private ProjectStageDependencyMapper projectStageDependencyMapper;
+
+	@Autowired
+	private StageInspectionItemMapper stageInspectionItemMapper;
+
+	private static final Map<Integer, String> PROJECT_ROLE_MAP = new HashMap<Integer, String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			put(1, "设计师");
+			put(2, "设计助理");
+			put(3, "土建项目经理");
+			put(4, "精装项目经理");
+			put(5, "施工员");
+			put(6, "质检员");
+			put(7, "成控人员");
+			put(8, "财务人员");
+			put(9, "管理层");
+			put(10, "业主");
+			put(11, "业主家属");
+		}
+	};
 
 	@Override
 	public ResultData login(String account, String password, String openid, String avatar) {
@@ -176,6 +221,60 @@ public class AuthService implements IAuthService {
 	}
 
 	@Override
+	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar) {
+		if (StringUtils.isEmpty(phone)) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "请输入手机号");
+		}
+		if (StringUtils.isEmpty(credential)) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "请输入登录凭证");
+		}
+
+		LambdaQueryWrapper<SysAccount> queryWrapper = new LambdaQueryWrapper<SysAccount>();
+		queryWrapper.eq(SysAccount::getStatus, 1)
+				.and(wrapper -> wrapper.eq(SysAccount::getPhone, phone).or().eq(SysAccount::getAccount, phone));
+		SysAccount queryUser = userMapper.selectOne(queryWrapper);
+		if (queryUser == null) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号不存在或已禁用");
+		}
+
+		List<ProjectMember> projectMembers = queryMiniProjectMembers(queryUser.getId());
+		if (projectMembers.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未加入项目角色");
+		}
+
+		if ("password".equals(loginMode)) {
+			boolean result = EncryptUtils.checkpw(credential, queryUser.getPassword());
+			if (!result) {
+				return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号或密码错误");
+			}
+		} else {
+			PhoneCode phoneCode = phoneCodeMapper.queryLastPhone(phone);
+			if (phoneCode == null || !credential.equals(phoneCode.getCode())) {
+				return ResultData.warn(ResultCode.PARAMETER_ERROR, "验证码错误");
+			}
+			if (phoneCode.getExpireTime() == null || phoneCode.getExpireTime().before(new Date())) {
+				return ResultData.warn(ResultCode.PARAMETER_ERROR, "验证码已过期");
+			}
+		}
+
+		if (!StringUtils.isEmpty(openid)) {
+			SysAccount openidUser = userMapper.selectOne(new LambdaQueryWrapper<SysAccount>()
+					.eq(SysAccount::getOpenid, openid)
+					.eq(SysAccount::getStatus, 1));
+			if (openidUser != null && !openidUser.getId().equals(queryUser.getId())) {
+				return ResultData.warn(ResultCode.PARAMETER_ERROR, "当前微信已绑定其他账号");
+			}
+			queryUser.setOpenid(openid);
+			if (!StringUtils.isEmpty(avatar)) {
+				queryUser.setAvatar(avatar);
+			}
+			userMapper.updateById(queryUser);
+		}
+
+		return buildMiniLoginClaims(queryUser, openid, projectMembers);
+	}
+
+	@Override
 	public ResultData verifyLogin(String orgstr, String account, String noncestr, String timestamp, String sign) {
 		String key = "yVwlsbIrY3q22EnoYYM4nR5zqTmqed05";
 		String ratioSign = EncryptUtils.md5Encode("account=" + account + "&noncestr=" + noncestr + "&org=" + orgstr
@@ -271,44 +370,152 @@ public class AuthService implements IAuthService {
 		queryWrapper.eq(SysAccount::getOpenid, openid).eq(SysAccount::getStatus, 1);
 		SysAccount queryUser = userMapper.selectOne(queryWrapper);
 		if (queryUser == null) {
-			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号或密码错误");
-		} else {
 			Map<String, Object> claims = new HashMap<String, Object>();
-			Map<String, Object> payload = new HashMap<String, Object>();
-			claims.put("userId", queryUser.getId());
-			payload.put("userId", queryUser.getId());
-			
-			LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
-			deptUserQw.eq(DeptUser::getUserId, queryUser.getId())
-			.orderByDesc(DeptUser::getUpdateTime);
-			List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
-			List<String> companyIds = new ArrayList<>();
-			for(int i=0;i<deptUserList.size();i++) {
-				DeptUser deptUser = deptUserList.get(i);
-				companyIds.add(String.valueOf(deptUser.getCompanyId()));
-				if(i == 0) {
-					claims.put("departmentId", deptUser.getDepartmentId());
+			claims.put("openid", openid);
+			claims.put("bindFlag", false);
+			return ResultData.success(claims);
+		} else {
+			return buildMiniLoginClaims(queryUser, openid);
+		}
+	}
+
+	/**
+	 * 组装小程序登录返回数据
+	 */
+	private ResultData buildMiniLoginClaims(SysAccount queryUser, String openid) {
+		return buildMiniLoginClaims(queryUser, openid, queryMiniProjectMembers(queryUser.getId()));
+	}
+
+	/**
+	 * 查询小程序可登录的项目角色
+	 */
+	private List<ProjectMember> queryMiniProjectMembers(Long userId) {
+		return projectMemberMapper.selectList(new LambdaQueryWrapper<ProjectMember>()
+				.eq(ProjectMember::getUserId, userId)
+				.eq(ProjectMember::getStatus, 1)
+				.orderByAsc(ProjectMember::getProjectId)
+				.orderByAsc(ProjectMember::getId));
+	}
+
+	/**
+	 * 组装小程序登录返回数据
+	 */
+	private ResultData buildMiniLoginClaims(SysAccount queryUser, String openid, List<ProjectMember> projectMembers) {
+		if (projectMembers.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未加入项目角色");
+		}
+
+		Map<String, Object> claims = new HashMap<String, Object>();
+		Map<String, Object> payload = new HashMap<String, Object>();
+		claims.put("bindFlag", true);
+		claims.put("openid", openid);
+		claims.put("userId", queryUser.getId());
+		payload.put("userId", queryUser.getId());
+
+		ResultData orgResult = fillOrganizationClaims(queryUser, claims, payload);
+		if (orgResult != null) {
+			return orgResult;
+		}
+		claims.remove("company");
+
+		String accessToken = JwtTokenUtils.sign(payload, JwtTokenUtils.SECRET, JwtTokenUtils.EXPIRATION);
+		claims.put("accessToken", JwtTokenUtils.TOKENHEAD + accessToken);
+		claims.put("account", queryUser.getAccount());
+		claims.put("name", queryUser.getName());
+		claims.put("avatar", queryUser.getAvatar());
+		claims.put("phone", queryUser.getPhone());
+		claims.put("position", queryUser.getPosition());
+		claims.put("sex", queryUser.getSex());
+		claims.put("projects", buildProjectRows(projectMembers));
+		return ResultData.success(claims);
+	}
+
+	/**
+	 * 组装组织信息与token载荷
+	 */
+	private ResultData fillOrganizationClaims(SysAccount queryUser, Map<String, Object> claims,
+			Map<String, Object> payload) {
+		LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
+		deptUserQw.eq(DeptUser::getUserId, queryUser.getId()).orderByDesc(DeptUser::getUpdateTime);
+		List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
+		if (deptUserList.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未绑定部门");
+		}
+
+		List<String> companyIds = new ArrayList<>();
+		for (int i = 0; i < deptUserList.size(); i++) {
+			DeptUser deptUser = deptUserList.get(i);
+			companyIds.add(String.valueOf(deptUser.getCompanyId()));
+			if (i == 0) {
+				claims.put("departmentId", deptUser.getDepartmentId());
+			}
+		}
+		List<Map<String, Object>> companyList = companyMapper.queryByIds(companyIds.toArray(new String[] {}),
+				StringUtils.join(companyIds, ","), false);
+		if (companyList.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未绑定公司");
+		}
+
+		Map<String, Object> company = companyList.get(0);
+		claims.put("companyId", company.get("id"));
+		payload.put("companyId", company.get("id"));
+		payload.put("mark", company.get("mark"));
+		claims.put("mark", company.get("mark"));
+		claims.put("company", companyList);
+		claims.put("logo", company.get("logo"));
+		claims.put("alias", company.get("alias"));
+		return null;
+	}
+
+	/**
+	 * 组装项目、项目角色和阶段信息
+	 */
+	private List<Map<String, Object>> buildProjectRows(List<ProjectMember> projectMembers) {
+		List<Map<String, Object>> rows = new ArrayList<>();
+		for (ProjectMember projectMember : projectMembers) {
+			Project project = projectMapper.selectById(projectMember.getProjectId());
+			if (project == null) {
+				continue;
+			}
+
+			Map<String, Object> row = new HashMap<String, Object>();
+			row.put("project", project);
+			row.put("member", projectMember);
+			row.put("roleCode", projectMember.getRoleCode());
+			row.put("roleName", PROJECT_ROLE_MAP.get(projectMember.getRoleCode()));
+			row.put("stages", buildStageRows(project.getId()));
+			rows.add(row);
+		}
+		return rows;
+	}
+
+	/**
+	 * 组装项目阶段、前置依赖和验收项
+	 */
+	private List<Map<String, Object>> buildStageRows(Long projectId) {
+		List<ProjectStage> stages = projectStageMapper.selectList(new LambdaQueryWrapper<ProjectStage>()
+				.eq(ProjectStage::getProjectId, projectId)
+				.orderByAsc(ProjectStage::getId));
+		List<ProjectStageDependency> dependencies = projectStageDependencyMapper.selectList(
+				new LambdaQueryWrapper<ProjectStageDependency>()
+						.eq(ProjectStageDependency::getProjectId, projectId));
+		List<Map<String, Object>> stageRows = new ArrayList<>();
+		for (ProjectStage stage : stages) {
+			Map<String, Object> stageRow = new HashMap<String, Object>();
+			stageRow.put("stage", stage);
+			List<Long> predecessorStageIds = new ArrayList<>();
+			for (ProjectStageDependency dependency : dependencies) {
+				if (stage.getId().equals(dependency.getStageId())) {
+					predecessorStageIds.add(dependency.getPredecessorStageId());
 				}
 			}
-			List<Map<String, Object>> companyList = companyMapper.queryByIds(companyIds.toArray(new String[] {}),
-					StringUtils.join(companyIds, ","), false);
-			Map<String, Object> company = companyList.get(0);
-			claims.put("companyId", company.get("id"));
-			payload.put("companyId", company.get("id"));
-			payload.put("mark", company.get("mark"));
-			claims.put("company", companyList);
-			claims.put("logo", company.get("logo"));
-			claims.put("alias", company.get("alias"));
-			
-			String accessToken = JwtTokenUtils.sign(payload, JwtTokenUtils.SECRET, JwtTokenUtils.EXPIRATION);
-			claims.put("accessToken", JwtTokenUtils.TOKENHEAD + accessToken);
-			claims.put("account", queryUser.getAccount());
-			claims.put("name", queryUser.getName());
-			claims.put("avatar", queryUser.getAvatar());
-			claims.put("phone", queryUser.getPhone());
-			claims.put("position", queryUser.getPosition());
-			claims.put("sex", queryUser.getSex());
-			return ResultData.success(claims);
+			stageRow.put("predecessorStageIds", predecessorStageIds);
+			stageRow.put("inspectionItems", stageInspectionItemMapper.selectList(
+					new LambdaQueryWrapper<StageInspectionItem>()
+							.eq(StageInspectionItem::getStageId, stage.getId())
+							.orderByAsc(StageInspectionItem::getId)));
+			stageRows.add(stageRow);
 		}
+		return stageRows;
 	}
 }

@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS "public"."leave_request" (
 	"end_time" TIMESTAMP NOT NULL,
 	"duration" NUMERIC(10,2) NOT NULL,
 	"reason" VARCHAR(500) NOT NULL,
+    "attachments" JSONB DEFAULT NULL,
 	"status" INTEGER DEFAULT 0,
 	"submit_time" TIMESTAMP,
 	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -143,6 +144,7 @@ COMMENT ON COLUMN "public"."leave_request"."start_time" IS '开始时间';
 COMMENT ON COLUMN "public"."leave_request"."end_time" IS '结束时间';
 COMMENT ON COLUMN "public"."leave_request"."duration" IS '请假时长';
 COMMENT ON COLUMN "public"."leave_request"."reason" IS '请假事由';
+COMMENT ON COLUMN "public"."leave_request"."attachments" IS '附件';
 COMMENT ON COLUMN "public"."leave_request"."status" IS '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)';
 COMMENT ON COLUMN "public"."leave_request"."submit_time" IS '提交时间';
 COMMENT ON COLUMN "public"."leave_request"."create_time" IS '创建时间';

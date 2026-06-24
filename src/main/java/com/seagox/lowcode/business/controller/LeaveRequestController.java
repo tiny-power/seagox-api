@@ -62,6 +62,69 @@ public class LeaveRequestController {
     }
 
     /**
+     * 小程序分页查询
+     */
+    @GetMapping("/mini/queryByPage")
+    public ResultData miniQueryByPage(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+                                      @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                      Long companyId, Long userId, Integer status) {
+        return leaveRequestService.miniQueryByPage(pageNo, pageSize, companyId, userId, status);
+    }
+
+    /**
+     * 小程序查询详情
+     */
+    @GetMapping("/mini/queryById/{id}")
+    public ResultData miniQueryById(@PathVariable Long id, Long userId) {
+        return leaveRequestService.miniQueryById(id, userId);
+    }
+
+    /**
+     * 小程序保存草稿
+     */
+    @PostMapping("/mini/saveDraft")
+    @LogPoint("小程序保存请假单草稿")
+    public ResultData miniSaveDraft(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.miniSaveDraft(leaveRequest, userId);
+    }
+
+    /**
+     * 小程序修改草稿
+     */
+    @PostMapping("/mini/updateDraft")
+    @LogPoint("小程序修改请假单草稿")
+    public ResultData miniUpdateDraft(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.miniUpdateDraft(leaveRequest, userId);
+    }
+
+    /**
+     * 小程序提交
+     */
+    @PostMapping("/mini/submit")
+    @LogPoint("小程序提交请假单")
+    public ResultData miniSubmit(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.miniSubmit(leaveRequest, userId);
+    }
+
+    /**
+     * 小程序删除
+     */
+    @PostMapping("/mini/delete/{id}")
+    @LogPoint("小程序删除请假单")
+    public ResultData miniDelete(@PathVariable Long id, Long userId) {
+        return leaveRequestService.miniDelete(id, userId);
+    }
+
+    /**
+     * 小程序撤销
+     */
+    @PostMapping("/mini/cancel/{id}")
+    @LogPoint("小程序撤销请假单")
+    public ResultData miniCancel(@PathVariable Long id, Long userId) {
+        return leaveRequestService.miniCancel(id, userId);
+    }
+
+    /**
      * 新增
      */
     @PostMapping("/insert")

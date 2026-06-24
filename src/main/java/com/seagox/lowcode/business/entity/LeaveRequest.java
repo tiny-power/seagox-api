@@ -57,6 +57,11 @@ public class LeaveRequest {
     private String reason;
 
     /**
+     * 附件
+     */
+    private String attachments;
+
+    /**
      * 状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)
      */
     private Integer status;
@@ -144,6 +149,14 @@ public class LeaveRequest {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
     }
 
     public Integer getStatus() {

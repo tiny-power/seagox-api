@@ -12,10 +12,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.seagox.lowcode.business.entity.PaymentRequest;
 import com.seagox.lowcode.business.entity.LeaveRequest;
 import com.seagox.lowcode.business.mapper.LeaveRequestMapper;
+import com.seagox.lowcode.business.mapper.PaymentRequestMapper;
 import com.seagox.lowcode.business.service.ILeaveRequestService;
+import com.seagox.lowcode.business.service.IPaymentRequestService;
 import com.seagox.lowcode.business.service.impl.LeaveRequestService;
+import com.seagox.lowcode.business.service.impl.PaymentRequestService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysMessage;
@@ -59,7 +63,13 @@ public class FlowService implements IFlowService {
     private LeaveRequestMapper leaveRequestMapper;
 
     @Autowired
+    private PaymentRequestMapper paymentRequestMapper;
+
+    @Autowired
     private ILeaveRequestService leaveRequestService;
+
+    @Autowired
+    private IPaymentRequestService paymentRequestService;
 
     @Autowired
     private MessageMapper messageMapper;
@@ -143,10 +153,13 @@ public class FlowService implements IFlowService {
             String businessType = item.getString("businessType");
             String businessKey = item.getString("businessKey");
             try {
-                if (!LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+                if (!LeaveRequestService.BUSINESS_TYPE.equals(businessType)
+                        && !PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
                     throw new IllegalArgumentException("暂不支持该类别提交");
                 }
-                ResultData submitResult = leaveRequestService.submit(Long.valueOf(businessKey));
+                ResultData submitResult = LeaveRequestService.BUSINESS_TYPE.equals(businessType)
+                        ? leaveRequestService.submit(Long.valueOf(businessKey))
+                        : paymentRequestService.submit(Long.valueOf(businessKey));
                 if (submitResult.getCode() != ResultCode.SUCCESS.getCode()) {
                     throw new IllegalArgumentException(submitResult.getMessage());
                 }
@@ -301,6 +314,17 @@ public class FlowService implements IFlowService {
                 variables.put("duration", leaveRequest.getDuration());
                 variables.put("reason", leaveRequest.getReason());
             }
+        } else if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+            PaymentRequest paymentRequest = paymentRequestMapper.selectById(Long.valueOf(businessKey));
+            if (paymentRequest != null) {
+                variables.put("id", paymentRequest.getId());
+                variables.put("projectId", paymentRequest.getProjectId());
+                variables.put("companyId", paymentRequest.getCompanyId());
+                variables.put("applicantId", paymentRequest.getApplicantId());
+                variables.put("amount", paymentRequest.getAmount());
+                variables.put("reason", paymentRequest.getReason());
+                variables.put("attachments", paymentRequest.getAttachments());
+            }
         }
         return variables;
     }
@@ -350,6 +374,17 @@ public class FlowService implements IFlowService {
                 return;
             }
             leaveRequestMapper.updateById(leaveRequest);
+        } else if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+            PaymentRequest paymentRequest = new PaymentRequest();
+            paymentRequest.setId(Long.valueOf(businessKey));
+            if (processStatus == INSTANCE_COMPLETED) {
+                paymentRequest.setStatus(PaymentRequestService.STATUS_APPROVED);
+            } else if (!approved && processStatus == INSTANCE_TERMINATED) {
+                paymentRequest.setStatus(PaymentRequestService.STATUS_REJECTED);
+            } else {
+                return;
+            }
+            paymentRequestMapper.updateById(paymentRequest);
         }
     }
 

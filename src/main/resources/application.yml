@@ -53,10 +53,10 @@ logging:
 # minio、aliyun、ecloud、aws
 oss:
   type: minio
-  endpoint: http://127.0.0.1:9000
+  endpoint: http://192.168.31.52:9000
   access-key: admin
   secret-key: Tiny_minio_4512
-  url: http://127.0.0.1:9000
+  url: http://192.168.31.52:9000
   accept:
     - png
     - jpeg
@@ -84,8 +84,8 @@ jodconverter:
 
 third-party:
   applets:
-    appid: 123
-    sercret: 123
+    appid: wx7b1133ed2456302b
+    sercret: 03e4abfbffd42571ce56470c01511980
 
 ignore:
   token: /auth

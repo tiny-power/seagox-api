@@ -1,8 +1,10 @@
 package com.seagox.lowcode.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -51,7 +53,7 @@ public class WeiChatUtils {
             String url = MINIPROGRAM_LOGIN_CERTIFICATE.replace("APPID", appletsAppid).replace("SECRET", appletsSercret)
                     .replace("CODE", code);
             RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.getForObject(url, JSONObject.class);
+            return parseJson(restTemplate.getForObject(url, String.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,11 +67,21 @@ public class WeiChatUtils {
         try {
             String url = ACCESS_TOKEN.replace("APPID", appletsAppid).replace("SECRET", appletsSercret);
             RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.getForObject(url, JSONObject.class);
+            return parseJson(restTemplate.getForObject(url, String.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 解析微信返回的JSON字符串
+     */
+    private JSONObject parseJson(String response) {
+        if (StringUtils.isEmpty(response)) {
+            return null;
+        }
+        return JSON.parseObject(response);
     }
 
     /**

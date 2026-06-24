@@ -18,6 +18,9 @@ public class CamelKeyMap extends HashMap<String, Object> {
 //		if(key.contains("_")) {
 //			key = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, key);
 //		}
+		if (value == null) {
+			return super.put(key, null);
+		}
 		if ("CLOB".equals(value.getClass().getSimpleName())){
 			try {
 				value = ClobToString((Clob) value);

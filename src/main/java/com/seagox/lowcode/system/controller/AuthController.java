@@ -70,6 +70,29 @@ public class AuthController {
 	}
 
 	/**
+	 * 小程序账号登录
+	 *
+	 * @param phone      手机号或账号
+	 * @param credential 密码或验证码
+	 * @param loginMode  登录方式(code:验证码;password:密码;)
+	 * @param code       微信临时登录凭证
+	 * @param avatar     头像地址
+	 */
+	@PostMapping("/miniLogin")
+	@LogPoint("小程序登录")
+	public ResultData miniLogin(String phone, String credential, String loginMode, String code, String avatar) {
+		String openid = null;
+		if (!org.springframework.util.StringUtils.isEmpty(code)) {
+			JSONObject jsonObject = weiChatUtils.getAppletsLoginCertificate(code);
+			if (jsonObject == null || !jsonObject.containsKey("openid")) {
+				return ResultData.warn(ResultCode.INVALID_CODE);
+			}
+			openid = jsonObject.getString("openid");
+		}
+		return authService.miniLogin(phone, credential, loginMode, openid, avatar);
+	}
+
+	/**
 	 * 验证登陆
 	 *
 	 * @param org          组织
@@ -93,7 +116,7 @@ public class AuthController {
 		JSONObject jsonObject = weiChatUtils.getAppletsLoginCertificate(code);
 		if (jsonObject != null) {
 			if (jsonObject.containsKey("openid")) {
-				return authService.verifyByOpenid(jsonObject.getString("openid"));
+				return authService.loginByOpenid(jsonObject.getString("openid"));
 			} else {
 				return ResultData.warn(ResultCode.INVALID_CODE);
 			}

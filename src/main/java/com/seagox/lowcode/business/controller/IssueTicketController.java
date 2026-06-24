@@ -1,11 +1,14 @@
 package com.seagox.lowcode.business.controller;
 
+import com.seagox.lowcode.annotation.LogPoint;
+import com.seagox.lowcode.business.entity.IssueTicket;
 import com.seagox.lowcode.business.service.IIssueTicketService;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +50,88 @@ public class IssueTicketController {
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return issueTicketService.queryById(id);
+    }
+
+    /**
+     * 新增问题单
+     *
+     * @param issueTicket 问题单
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    @PostMapping("/insert")
+    @LogPoint("新增问题单")
+    public ResultData insert(IssueTicket issueTicket, Long userId) {
+        return issueTicketService.insert(issueTicket, userId);
+    }
+
+    /**
+     * 修改问题单
+     *
+     * @param issueTicket 问题单
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    @PostMapping("/update")
+    @LogPoint("修改问题单")
+    public ResultData update(IssueTicket issueTicket, Long userId) {
+        return issueTicketService.update(issueTicket, userId);
+    }
+
+    /**
+     * 指派整改人
+     *
+     * @param id 问题单ID
+     * @param issueTicket 问题单
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    @PostMapping("/assign/{id}")
+    @LogPoint("指派问题单整改")
+    public ResultData assign(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
+        issueTicket.setId(id);
+        return issueTicketService.assign(issueTicket, userId);
+    }
+
+    /**
+     * 提交整改
+     *
+     * @param id 问题单ID
+     * @param issueTicket 问题单
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    @PostMapping("/rectify/{id}")
+    @LogPoint("提交问题单整改")
+    public ResultData rectify(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
+        issueTicket.setId(id);
+        return issueTicketService.rectify(issueTicket, userId);
+    }
+
+    /**
+     * 复验问题单
+     *
+     * @param id 问题单ID
+     * @param issueTicket 问题单
+     * @param userId 当前用户ID
+     * @return 操作结果
+     */
+    @PostMapping("/review/{id}")
+    @LogPoint("复验问题单")
+    public ResultData review(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
+        issueTicket.setId(id);
+        return issueTicketService.review(issueTicket, userId);
+    }
+
+    /**
+     * 删除问题单
+     *
+     * @param id 问题单ID
+     * @return 操作结果
+     */
+    @PostMapping("/delete/{id}")
+    @LogPoint("删除问题单")
+    public ResultData delete(@PathVariable Long id) {
+        return issueTicketService.delete(id);
     }
 }

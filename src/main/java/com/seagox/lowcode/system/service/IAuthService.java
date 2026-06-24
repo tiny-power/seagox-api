@@ -26,6 +26,17 @@ public interface IAuthService {
 	public ResultData loginConsole(String account, String password);
 
 	/**
+	 * 登录（小程序）
+	 *
+	 * @param phone      手机号或账号
+	 * @param credential 密码或验证码
+	 * @param loginMode  登录方式
+	 * @param openid     小程序openid
+	 * @param avatar     头像
+	 */
+	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar);
+
+	/**
 	 * 验证登陆
 	 *
 	 * @param org       组织

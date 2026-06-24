@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS `leave_request` (
     `end_time` datetime NOT NULL COMMENT '结束时间',
     `duration` decimal(10,2) NOT NULL COMMENT '请假时长',
     `reason` varchar(500) NOT NULL COMMENT '请假事由',
+    `attachments` JSON DEFAULT NULL COMMENT '附件',
     `status` int(4) DEFAULT 0 COMMENT '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)',
     `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

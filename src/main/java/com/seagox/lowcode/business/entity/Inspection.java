@@ -1,7 +1,7 @@
 package com.seagox.lowcode.business.entity;
 
-import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -25,7 +25,7 @@ public class Inspection {
     private Long stageId;
 
     /**
-     * 验收条目
+     * 项目阶段条目
      */
     private String inspectionItems;
 
@@ -37,7 +37,7 @@ public class Inspection {
     private Date planInspectionTime;
 
     /**
-     * 现场照片
+     * 验收现场总体照片
      */
     private String sitePhotos;
 

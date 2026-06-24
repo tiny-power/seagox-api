@@ -1,5 +1,6 @@
 package com.seagox.lowcode.business.service;
 
+import com.seagox.lowcode.business.entity.ProjectHandover;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
 
@@ -25,5 +26,24 @@ public interface IProjectHandoverService {
      * @return 查询结果
      */
     ResultData queryById(Long id);
+
+    /**
+     * 新增交接单
+     *
+     * @param projectHandover 交接单
+     * @param userId 当前用户ID
+     * @return 保存结果
+     */
+    ResultData insert(ProjectHandover projectHandover, Long userId);
+
+    /**
+     * 确认交接单
+     *
+     * @param id 交接单ID
+     * @param receiverSignatureUrl 接收方签字文件url
+     * @param userId 当前用户ID
+     * @return 确认结果
+     */
+    ResultData confirm(Long id, String receiverSignatureUrl, Long userId);
 
 }

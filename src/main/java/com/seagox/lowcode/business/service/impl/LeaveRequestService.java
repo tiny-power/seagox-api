@@ -2,8 +2,10 @@ package com.seagox.lowcode.business.service.impl;
 
 import app.tinybrief.weave.api.RepositoryService;
 import app.tinybrief.weave.api.RuntimeService;
+import app.tinybrief.weave.api.TaskService;
 import app.tinybrief.weave.api.dto.WeaveDefinition;
 import app.tinybrief.weave.api.dto.WeaveInstance;
+import app.tinybrief.weave.api.dto.WeaveTask;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +99,12 @@ public class LeaveRequestService implements ILeaveRequestService {
     private RuntimeService runtimeService;
 
     /**
+     * 流程任务服务
+     */
+    @Autowired
+    private TaskService taskService;
+
+    /**
      * 分页查询请假单
      */
     @Override
@@ -107,6 +116,152 @@ public class LeaveRequestService implements ILeaveRequestService {
                 leaveType, status, startTime, endTime);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
         return ResultData.success(pageInfo);
+    }
+
+    /**
+     * 小程序分页查询请假单
+     */
+    @Override
+    public ResultData miniQueryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status) {
+        List<Map<String, Object>> source = leaveRequestMapper.queryByPage(companyId, null, null, null, status, null, null);
+        Map<String, String> todoNodeMap = queryTodoNodeMap(companyId, userId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> item : source) {
+            String id = String.valueOf(item.get("id"));
+            Long applicantId = toLong(item.get("applicantId"));
+            boolean applicant = userId != null && userId.equals(applicantId);
+            boolean reviewer = todoNodeMap.containsKey(id);
+            if (!applicant && !reviewer) {
+                continue;
+            }
+            item.put("role", applicant ? "applicant" : "reviewer");
+            item.put("currentNode", todoNodeMap.get(id));
+            result.add(item);
+        }
+        return ResultData.success(page(result, pageNo, pageSize));
+    }
+
+    /**
+     * 小程序查询请假单详情
+     */
+    @Override
+    public ResultData miniQueryById(Long id, Long userId) {
+        ResultData result = queryById(id);
+        if (result.getCode() != ResultCode.SUCCESS.getCode()) {
+            return result;
+        }
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        Long applicantId = toLong(data.get("applicantId"));
+        Map<String, String> todoNodeMap = queryTodoNodeMap(toLong(data.get("companyId")), userId);
+        boolean applicant = userId != null && userId.equals(applicantId);
+        boolean reviewer = todoNodeMap.containsKey(String.valueOf(id));
+        if (!applicant && !reviewer) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "无权查看请假单");
+        }
+        data.put("role", applicant ? "applicant" : "reviewer");
+        data.put("currentNode", todoNodeMap.get(String.valueOf(id)));
+        return ResultData.success(data);
+    }
+
+    /**
+     * 小程序保存草稿
+     */
+    @Override
+    public ResultData miniSaveDraft(LeaveRequest leaveRequest, Long userId) {
+        leaveRequest.setApplicantId(userId);
+        ResultData verifyResult = verify(leaveRequest);
+        if (verifyResult != null) {
+            return verifyResult;
+        }
+        leaveRequest.setStatus(STATUS_DRAFT);
+        leaveRequestMapper.insert(leaveRequest);
+        return ResultData.success(leaveRequest.getId());
+    }
+
+    /**
+     * 小程序修改草稿
+     */
+    @Override
+    public ResultData miniUpdateDraft(LeaveRequest leaveRequest, Long userId) {
+        LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
+        ResultData ownerResult = verifyOwner(original, userId);
+        if (ownerResult != null) {
+            return ownerResult;
+        }
+        if (!Integer.valueOf(STATUS_DRAFT).equals(original.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "只有草稿可以修改");
+        }
+        leaveRequest.setCompanyId(original.getCompanyId());
+        leaveRequest.setApplicantId(userId);
+        leaveRequest.setStatus(original.getStatus());
+        ResultData verifyResult = verify(leaveRequest);
+        if (verifyResult != null) {
+            return verifyResult;
+        }
+        leaveRequestMapper.updateById(leaveRequest);
+        return ResultData.success(leaveRequest.getId());
+    }
+
+    /**
+     * 小程序提交请假单
+     */
+    @Transactional
+    @Override
+    public ResultData miniSubmit(LeaveRequest leaveRequest, Long userId) {
+        if (leaveRequest.getId() == null) {
+            ResultData saveResult = miniSaveDraft(leaveRequest, userId);
+            if (saveResult.getCode() != ResultCode.SUCCESS.getCode()) {
+                return saveResult;
+            }
+            leaveRequest.setId((Long) saveResult.getData());
+        } else {
+            LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
+            ResultData ownerResult = verifyOwner(original, userId);
+            if (ownerResult != null) {
+                return ownerResult;
+            }
+            if (Integer.valueOf(STATUS_APPROVING).equals(original.getStatus())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单正在审批中");
+            }
+            if (Integer.valueOf(STATUS_APPROVED).equals(original.getStatus())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单已经审批通过");
+            }
+            leaveRequest.setCompanyId(original.getCompanyId());
+            leaveRequest.setApplicantId(userId);
+            leaveRequest.setStatus(original.getStatus());
+            ResultData verifyResult = verify(leaveRequest);
+            if (verifyResult != null) {
+                return verifyResult;
+            }
+            leaveRequestMapper.updateById(leaveRequest);
+        }
+        return submit(leaveRequest.getId());
+    }
+
+    /**
+     * 小程序删除草稿
+     */
+    @Override
+    public ResultData miniDelete(Long id, Long userId) {
+        LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
+        ResultData ownerResult = verifyOwner(leaveRequest, userId);
+        if (ownerResult != null) {
+            return ownerResult;
+        }
+        return delete(id);
+    }
+
+    /**
+     * 小程序撤销审批
+     */
+    @Override
+    public ResultData miniCancel(Long id, Long userId) {
+        LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
+        ResultData ownerResult = verifyOwner(leaveRequest, userId);
+        if (ownerResult != null) {
+            return ownerResult;
+        }
+        return cancel(id);
     }
 
     /**
@@ -129,6 +284,7 @@ public class LeaveRequestService implements ILeaveRequestService {
         data.put("endTime", formatDate(leaveRequest.getEndTime()));
         data.put("duration", leaveRequest.getDuration());
         data.put("reason", leaveRequest.getReason());
+        data.put("attachments", leaveRequest.getAttachments());
         data.put("status", leaveRequest.getStatus());
         data.put("submitTime", formatDate(leaveRequest.getSubmitTime()));
         data.put("createTime", formatDate(leaveRequest.getCreateTime()));
@@ -310,6 +466,68 @@ public class LeaveRequestService implements ILeaveRequestService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请填写请假事由");
         }
         return null;
+    }
+
+    /**
+     * 校验请假单归属
+     */
+    private ResultData verifyOwner(LeaveRequest leaveRequest, Long userId) {
+        if (leaveRequest == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+        }
+        if (userId == null || !userId.equals(leaveRequest.getApplicantId())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "无权操作请假单");
+        }
+        return null;
+    }
+
+    /**
+     * 查询当前用户待审批请假单节点
+     */
+    private Map<String, String> queryTodoNodeMap(Long companyId, Long userId) {
+        Map<String, String> result = new HashMap<>();
+        if (companyId == null || userId == null) {
+            return result;
+        }
+        List<WeaveTask> tasks = taskService.createTaskQuery()
+                .companyId(companyId)
+                .taskAssignee(String.valueOf(userId))
+                .list();
+        for (WeaveTask task : tasks) {
+            if (BUSINESS_TYPE.equals(task.getBusinessType())) {
+                result.put(task.getBusinessKey(), "待审批");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 手动分页
+     */
+    private PageInfo<Map<String, Object>> page(List<Map<String, Object>> list, Integer pageNo, Integer pageSize) {
+        int current = pageNo == null || pageNo < 1 ? 1 : pageNo;
+        int size = pageSize == null || pageSize < 1 ? 10 : pageSize;
+        int fromIndex = Math.min((current - 1) * size, list.size());
+        int toIndex = Math.min(fromIndex + size, list.size());
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list.subList(fromIndex, toIndex));
+        pageInfo.setPageNum(current);
+        pageInfo.setPageSize(size);
+        pageInfo.setTotal(list.size());
+        pageInfo.setPages((list.size() + size - 1) / size);
+        return pageInfo;
+    }
+
+    /**
+     * 转换Long
+     */
+    private Long toLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return Long.valueOf(String.valueOf(value));
     }
 
     /**

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Locale;
 import java.util.List;
 
 /**
@@ -35,9 +36,10 @@ public class UploadController {
     @PostMapping("/putObject/{bucketName}")
     public ResultData putObject(@RequestParam("file") MultipartFile file, @PathVariable String bucketName) throws IOException {
     	List<String> accept = ossConfig.getAccept();
-    	String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+    	String suffix = getSuffix(file);
     	if(accept.contains(suffix)) {
-    		String address = uploadService.uploadByInputStream(bucketName, file.getOriginalFilename(),
+            String originalFilename = fillFilenameSuffix(file.getOriginalFilename(), suffix);
+    		String address = uploadService.uploadByInputStream(bucketName, originalFilename,
                     file.getContentType(), file.getSize(), file.getInputStream());
             if (StringUtils.isEmpty(address)) {
                 return ResultData.warn(ResultCode.OTHER_ERROR, "文件服务器配置有误");
@@ -47,6 +49,27 @@ public class UploadController {
     	} else {
     		return ResultData.warn(ResultCode.OTHER_ERROR, "文件类型不支持");
     	}
+    }
+
+    private String getSuffix(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (!StringUtils.isEmpty(originalFilename) && originalFilename.lastIndexOf(".") > -1) {
+            return originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT);
+        }
+        String contentType = file.getContentType();
+        if (!StringUtils.isEmpty(contentType) && contentType.startsWith("image/")) {
+            String imageType = contentType.substring(contentType.indexOf("/") + 1).toLowerCase(Locale.ROOT);
+            return "pjpeg".equals(imageType) ? "jpg" : imageType;
+        }
+        return "";
+    }
+
+    private String fillFilenameSuffix(String originalFilename, String suffix) {
+        String filename = StringUtils.isEmpty(originalFilename) ? "upload" : originalFilename;
+        if (filename.lastIndexOf(".") > -1) {
+            return filename;
+        }
+        return filename + "." + suffix;
     }
 
     /**

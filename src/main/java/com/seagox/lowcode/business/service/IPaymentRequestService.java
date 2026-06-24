@@ -1,5 +1,6 @@
 package com.seagox.lowcode.business.service;
 
+import com.seagox.lowcode.business.entity.PaymentRequest;
 import com.seagox.lowcode.common.ResultData;
 import java.util.Map;
 
@@ -25,5 +26,45 @@ public interface IPaymentRequestService {
      * @return 查询结果
      */
     ResultData queryById(Long id);
+
+    /**
+     * 新增请款单
+     *
+     * @param paymentRequest 请款单
+     * @return 操作结果
+     */
+    ResultData insert(PaymentRequest paymentRequest);
+
+    /**
+     * 修改请款单
+     *
+     * @param paymentRequest 请款单
+     * @return 操作结果
+     */
+    ResultData update(PaymentRequest paymentRequest);
+
+    /**
+     * 删除请款单
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    ResultData delete(Long id);
+
+    /**
+     * 提交请款单审批
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    ResultData submit(Long id);
+
+    /**
+     * 撤销请款单审批
+     *
+     * @param id 请款单ID
+     * @return 操作结果
+     */
+    ResultData cancel(Long id);
 
 }
