@@ -40,6 +40,7 @@
         LEFT JOIN project_stage s ON s.id = a.stage_id
         LEFT JOIN sys_account u ON u.id = a.filled_by
         <where>
+            AND a.status = 1
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
@@ -47,7 +48,12 @@
                     <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
                 </choose>
             </if>
-            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.filledByName != null and params.filledByName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND u.name LIKE CONCAT('%', #{params.filledByName}, '%')</when>
+                    <otherwise>AND u.name LIKE '%' || #{params.filledByName} || '%'</otherwise>
+                </choose>
+            </if>
             <if test="params.startDate != null and params.startDate != ''">AND a.log_date &gt;= #{params.startDate}</if>
             <if test="params.endDate != null and params.endDate != ''">AND a.log_date &lt;= #{params.endDate}</if>
         </where>
