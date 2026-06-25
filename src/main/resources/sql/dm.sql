@@ -1,3 +1,29 @@
+CREATE TABLE IF NOT EXISTS "public"."disk" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"company_id" BIGINT NOT NULL,
+	"parent_id" BIGINT,
+	"name" VARCHAR(255) NOT NULL,
+	"url" VARCHAR(500) NOT NULL,
+	"path" VARCHAR(1000) NOT NULL,
+	"level" INTEGER DEFAULT 1 NOT NULL,
+	"size" BIGINT DEFAULT 0 NOT NULL,
+	"type" INTEGER DEFAULT 1,
+	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."disk"."id" IS '主键';
+COMMENT ON COLUMN "public"."disk"."company_id" IS '公司id';
+COMMENT ON COLUMN "public"."disk"."parent_id" IS '上级id';
+COMMENT ON COLUMN "public"."disk"."name" IS '名称';
+COMMENT ON COLUMN "public"."disk"."url" IS '链接';
+COMMENT ON COLUMN "public"."disk"."path" IS '完整节点路径，例如 /1/5/12/';
+COMMENT ON COLUMN "public"."disk"."level" IS '目录层级';
+COMMENT ON COLUMN "public"."disk"."size" IS '大小';
+COMMENT ON COLUMN "public"."disk"."type" IS '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)';
+COMMENT ON COLUMN "public"."disk"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."disk"."update_time" IS '更新时间';
+COMMENT ON TABLE "public"."disk" IS '网盘';
+
 CREATE TABLE IF NOT EXISTS "public"."company" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"parent_id" BIGINT,
@@ -763,9 +789,14 @@ INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name"
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (34, 1, 27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (35, 1, 27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
 INSERT INTO "public"."sys_menu" VALUES (36,1,NULL,1,'工程管理','iconfont icon-xihuan','engineering',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (37,1,36,2,'项目管理','iconfont icon-xihuan','business/project/project',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (37,1,36,2,'项目管理','iconfont icon-xihuan','project',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (38,1,37,3,'新增','iconfont icon-xihuan','project:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (39,1,37,3,'编辑','iconfont icon-xihuan','project:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (40,1,37,3,'删除','iconfont icon-xihuan','project:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40' WHERE "id"=1;
+INSERT INTO "public"."sys_menu" VALUES (41,1,20,2,'知识库','iconfont icon-xihuan','disk',1,6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (42,1,41,3,'新增文件夹','iconfont icon-xihuan','disk:addFolder',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (43,1,41,3,'上传文件','iconfont icon-xihuan','disk:upload',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (44,1,41,3,'重命名','iconfont icon-xihuan','disk:edit',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (45,1,41,3,'删除','iconfont icon-xihuan','disk:delete',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45' WHERE "id"=1;
 COMMIT;
