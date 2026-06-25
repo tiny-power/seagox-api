@@ -30,8 +30,8 @@ public class DiskController {
      */
     @PostMapping("/insertFolder")
     @LogPoint("新增文件夹")
-    public ResultData insertFolder(Long companyId, Disk disk) {
-        return diskService.insertFolder(companyId, disk);
+    public ResultData insertFolder(Long companyId, Long userId, Disk disk) {
+        return diskService.insertFolder(companyId, userId, disk);
     }
 
     /**
@@ -39,8 +39,8 @@ public class DiskController {
      */
     @PostMapping("/insertFile")
     @LogPoint("新增文件")
-    public ResultData insertFile(Long companyId, Disk disk) {
-        return diskService.insertFile(companyId, disk);
+    public ResultData insertFile(Long companyId, Long userId, Disk disk) {
+        return diskService.insertFile(companyId, userId, disk);
     }
 
     /**
@@ -48,8 +48,8 @@ public class DiskController {
      */
     @PostMapping("/update")
     @LogPoint("更新网盘")
-    public ResultData update(Long companyId, Disk disk) {
-        return diskService.update(companyId, disk);
+    public ResultData update(Long companyId, Long userId, Disk disk) {
+        return diskService.update(companyId, userId, disk);
     }
 
     /**

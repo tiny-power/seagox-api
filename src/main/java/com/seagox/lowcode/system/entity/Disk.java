@@ -59,18 +59,28 @@ public class Disk {
     private Integer type;
 
     /**
+     * 创建人
+     */
+    private Long createdBy;
+
+    /**
+     * 修改人
+     */
+    private Long updatedBy;
+
+    /**
      * 创建时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
 
     /**
-     * 更新时间
+     * 修改时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 
     public Long getId() {
         return id;
@@ -144,20 +154,36 @@ public class Disk {
         this.type = type;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Long getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Long getUpdatedBy() {
+        return updatedBy;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }

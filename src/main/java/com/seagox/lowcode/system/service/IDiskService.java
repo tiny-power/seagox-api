@@ -16,17 +16,17 @@ public interface IDiskService {
     /**
      * 新增文件夹
      */
-    public ResultData insertFolder(Long companyId, Disk disk);
+    public ResultData insertFolder(Long companyId, Long userId, Disk disk);
 
     /**
      * 新增文件
      */
-    public ResultData insertFile(Long companyId, Disk disk);
+    public ResultData insertFile(Long companyId, Long userId, Disk disk);
 
     /**
      * 更新
      */
-    public ResultData update(Long companyId, Disk disk);
+    public ResultData update(Long companyId, Long userId, Disk disk);
 
     /**
      * 删除

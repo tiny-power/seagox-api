@@ -34,15 +34,21 @@ public class DiskService implements IDiskService {
         } else {
             qw.eq(Disk::getParentId, parentId);
         }
-        qw.orderByAsc(Disk::getType).orderByDesc(Disk::getUpdateTime);
+        qw.orderByAsc(Disk::getType).orderByDesc(Disk::getUpdatedAt);
         List<Disk> list = diskMapper.selectList(qw);
         return ResultData.success(list);
     }
 
     @Transactional
     @Override
-    public ResultData insertFolder(Long companyId, Disk disk) {
+    public ResultData insertFolder(Long companyId, Long userId, Disk disk) {
+        ResultData userResult = checkUserId(userId);
+        if (userResult != null) {
+            return userResult;
+        }
         disk.setCompanyId(companyId);
+        disk.setCreatedBy(userId);
+        disk.setUpdatedBy(userId);
         disk.setType(1);
         disk.setUrl("");
         disk.setSize(0L);
@@ -64,8 +70,14 @@ public class DiskService implements IDiskService {
 
     @Transactional
     @Override
-    public ResultData insertFile(Long companyId, Disk disk) {
+    public ResultData insertFile(Long companyId, Long userId, Disk disk) {
+        ResultData userResult = checkUserId(userId);
+        if (userResult != null) {
+            return userResult;
+        }
         disk.setCompanyId(companyId);
+        disk.setCreatedBy(userId);
+        disk.setUpdatedBy(userId);
         ResultData checkResult = checkName(companyId, disk.getParentId(), disk.getName(), null);
         if (checkResult != null) {
             return checkResult;
@@ -93,7 +105,11 @@ public class DiskService implements IDiskService {
 
     @Transactional
     @Override
-    public ResultData update(Long companyId, Disk disk) {
+    public ResultData update(Long companyId, Long userId, Disk disk) {
+        ResultData userResult = checkUserId(userId);
+        if (userResult != null) {
+            return userResult;
+        }
         Disk original = diskMapper.selectById(disk.getId());
         if (original == null || !companyId.equals(original.getCompanyId())) {
             return ResultData.warn(ResultCode.PARAMETER_ERROR, "文件不存在");
@@ -103,6 +119,7 @@ public class DiskService implements IDiskService {
             return checkResult;
         }
         original.setName(disk.getName());
+        original.setUpdatedBy(userId);
         diskMapper.updateById(original);
         return ResultData.success(original);
     }
@@ -122,6 +139,13 @@ public class DiskService implements IDiskService {
         }
         diskMapper.deleteById(id);
         return ResultData.success(null);
+    }
+
+    private ResultData checkUserId(Long userId) {
+        if (userId == null) {
+            return ResultData.warn(ResultCode.PARAMETER_ERROR, "用户不能为空");
+        }
+        return null;
     }
 
     private Disk getParent(Long companyId, Long parentId) {

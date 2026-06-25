@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.LeaveMessageMapper">
+    <select id="queryLeaveMessages" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.project_member_id AS "projectMemberId",
+               a.type,
+               a.remark,
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.name AS "projectName",
+               pm.role_code AS "roleCode",
+               CASE pm.role_code
+                    WHEN 1 THEN '设计师'
+                    WHEN 2 THEN '设计助理'
+                    WHEN 3 THEN '土建项目经理'
+                    WHEN 4 THEN '精装项目经理'
+                    WHEN 5 THEN '施工员'
+                    WHEN 6 THEN '质检员'
+                    WHEN 7 THEN '成控人员'
+                    WHEN 8 THEN '财务人员'
+                    WHEN 9 THEN '老板/管理层'
+                    WHEN 10 THEN '业主'
+                    WHEN 11 THEN '业主家属'
+                    ELSE ''
+               END AS "roleName",
+               u.name AS "userName"
+        FROM leave_message a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN project_member pm ON pm.id = a.project_member_id
+        LEFT JOIN sys_account u ON u.id = a.created_by
+        <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.type != null and params.type != ''">AND a.type = #{params.type}</if>
+        </where>
+        ORDER BY a.created_at ASC, a.id ASC
+    </select>
+</mapper>

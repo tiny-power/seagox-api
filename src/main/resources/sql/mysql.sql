@@ -8,10 +8,62 @@ CREATE TABLE IF NOT EXISTS `disk`  (
     `level` INT NOT NULL DEFAULT 1 COMMENT '目录层级',
     `size` BIGINT NOT NULL DEFAULT 0 COMMENT '大小',
     `type` int(4) DEFAULT 1 COMMENT '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '网盘';
+
+CREATE TABLE IF NOT EXISTS `requirement`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `style` varchar(255) NOT NULL COMMENT '风格偏好',
+    `budget` varchar(255) NOT NULL COMMENT '预算范围接',
+    `member` VARCHAR(255) NOT NULL COMMENT '家庭成员',
+    `mark` VARCHAR(500) DEFAULT NULL COMMENT '特殊需求',
+    `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
+    `signed_at` DATETIME DEFAULT NULL COMMENT '签字时间',
+    `status` int(4) DEFAULT 1 COMMENT '状态(1:待提交;2:待审核;3:已完成;)',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '需求沟通表';
+
+
+CREATE TABLE IF NOT EXISTS `leave_message`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `project_member_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目角色ID',
+    `type` int(4) DEFAULT 1 COMMENT '类型(1:方案设计;2:施工图出图;)',
+    `remark` VARCHAR(500) NOT NULL COMMENT '说明',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '留言表';
+
+CREATE TABLE IF NOT EXISTS `solution_design`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `version` varchar(255) NOT NULL COMMENT '版本',
+    `attachments` JSON NOT NULL COMMENT '效果图',
+    `solution_explanation` VARCHAR(1000) NOT NULL COMMENT '方案说明',
+    `annotation` VARCHAR(1000) DEFAULT NULL COMMENT '修改注释',
+    `defrost_explanation` VARCHAR(1000) DEFAULT NULL COMMENT '解冻说明',
+    `apply_defrost_at` DATETIME DEFAULT NULL COMMENT '申请解冻时间',
+    `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
+    `signed_at` DATETIME DEFAULT NULL COMMENT '签字时间',
+    `status` int(4) DEFAULT 1 COMMENT '状态(1:待提交;2:待确认;3:已确认;4:已冻结;5:解冻中;6:已完成;)',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '方案设计';
 
 CREATE TABLE IF NOT EXISTS `company`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -477,5 +529,16 @@ INSERT INTO sys_menu VALUES (42,1,41,3,'新增文件夹','iconfont icon-xihuan',
 INSERT INTO sys_menu VALUES (43,1,41,3,'上传文件','iconfont icon-xihuan','disk:upload',1,2,now(),now());
 INSERT INTO sys_menu VALUES (44,1,41,3,'重命名','iconfont icon-xihuan','disk:edit',1,3,now(),now());
 INSERT INTO sys_menu VALUES (45,1,41,3,'删除','iconfont icon-xihuan','disk:delete',1,4,now(),now());
-UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45' WHERE id=1;
+INSERT INTO sys_menu VALUES (46,1,36,2,'需求沟通','iconfont icon-xihuan','requirement',1,2,now(),now());
+INSERT INTO sys_menu VALUES (47,1,46,3,'新增','iconfont icon-xihuan','requirement:add',1,1,now(),now());
+INSERT INTO sys_menu VALUES (48,1,46,3,'编辑','iconfont icon-xihuan','requirement:edit',1,2,now(),now());
+INSERT INTO sys_menu VALUES (49,1,46,3,'删除','iconfont icon-xihuan','requirement:delete',1,3,now(),now());
+INSERT INTO sys_menu VALUES (50,1,46,3,'提交/签字','iconfont icon-xihuan','requirement:submit',1,4,now(),now());
+INSERT INTO sys_menu VALUES (51,1,36,2,'方案设计','iconfont icon-xihuan','solutionDesign',1,3,now(),now());
+INSERT INTO sys_menu VALUES (52,1,51,3,'新增','iconfont icon-xihuan','solutionDesign:add',1,1,now(),now());
+INSERT INTO sys_menu VALUES (53,1,51,3,'编辑','iconfont icon-xihuan','solutionDesign:edit',1,2,now(),now());
+INSERT INTO sys_menu VALUES (54,1,51,3,'删除','iconfont icon-xihuan','solutionDesign:delete',1,3,now(),now());
+INSERT INTO sys_menu VALUES (55,1,51,3,'提交','iconfont icon-xihuan','solutionDesign:submit',1,4,now(),now());
+INSERT INTO sys_menu VALUES (56,1,51,3,'确认/冻结','iconfont icon-xihuan','solutionDesign:confirm',1,5,now(),now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56' WHERE id=1;
 COMMIT;

@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS "public"."disk" (
 	"level" INTEGER DEFAULT 1 NOT NULL,
 	"size" BIGINT DEFAULT 0 NOT NULL,
 	"type" INTEGER DEFAULT 1,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 COMMENT ON COLUMN "public"."disk"."id" IS '主键';
 COMMENT ON COLUMN "public"."disk"."company_id" IS '公司id';
@@ -20,9 +22,97 @@ COMMENT ON COLUMN "public"."disk"."path" IS '完整节点路径，例如 /1/5/12
 COMMENT ON COLUMN "public"."disk"."level" IS '目录层级';
 COMMENT ON COLUMN "public"."disk"."size" IS '大小';
 COMMENT ON COLUMN "public"."disk"."type" IS '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)';
-COMMENT ON COLUMN "public"."disk"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."disk"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."disk"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."disk"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."disk"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."disk"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."disk" IS '网盘';
+
+CREATE TABLE IF NOT EXISTS "public"."requirement" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"project_id" BIGINT NOT NULL,
+	"style" VARCHAR(255) NOT NULL,
+	"budget" VARCHAR(255) NOT NULL,
+	"member" VARCHAR(255) NOT NULL,
+	"mark" VARCHAR(500),
+	"signature_url" VARCHAR(500),
+	"signed_at" TIMESTAMP,
+	"status" INTEGER DEFAULT 1,
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."requirement"."id" IS '主键';
+COMMENT ON COLUMN "public"."requirement"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."requirement"."style" IS '风格偏好';
+COMMENT ON COLUMN "public"."requirement"."budget" IS '预算范围接';
+COMMENT ON COLUMN "public"."requirement"."member" IS '家庭成员';
+COMMENT ON COLUMN "public"."requirement"."mark" IS '特殊需求';
+COMMENT ON COLUMN "public"."requirement"."signature_url" IS '签字文件url';
+COMMENT ON COLUMN "public"."requirement"."signed_at" IS '签字时间';
+COMMENT ON COLUMN "public"."requirement"."status" IS '状态(1:待提交;2:待审核;3:已完成;)';
+COMMENT ON COLUMN "public"."requirement"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."requirement"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."requirement"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."requirement"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."requirement" IS '需求沟通表';
+
+CREATE TABLE IF NOT EXISTS "public"."leave_message" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"project_id" BIGINT NOT NULL,
+	"project_member_id" BIGINT NOT NULL,
+	"type" INTEGER DEFAULT 1,
+	"remark" VARCHAR(500) NOT NULL,
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."leave_message"."id" IS '主键';
+COMMENT ON COLUMN "public"."leave_message"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."leave_message"."project_member_id" IS '所属项目角色ID';
+COMMENT ON COLUMN "public"."leave_message"."type" IS '类型(1:方案设计;2:施工图出图;)';
+COMMENT ON COLUMN "public"."leave_message"."remark" IS '说明';
+COMMENT ON COLUMN "public"."leave_message"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."leave_message"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."leave_message"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."leave_message"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."leave_message" IS '留言表';
+
+CREATE TABLE IF NOT EXISTS "public"."solution_design" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"project_id" BIGINT NOT NULL,
+	"version" VARCHAR(255) NOT NULL,
+	"attachments" TEXT NOT NULL,
+	"solution_explanation" VARCHAR(1000) NOT NULL,
+	"annotation" VARCHAR(1000),
+	"defrost_explanation" VARCHAR(1000),
+	"apply_defrost_at" TIMESTAMP,
+	"signature_url" VARCHAR(500),
+	"signed_at" TIMESTAMP,
+	"status" INTEGER DEFAULT 1,
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."solution_design"."id" IS '主键';
+COMMENT ON COLUMN "public"."solution_design"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."solution_design"."version" IS '版本';
+COMMENT ON COLUMN "public"."solution_design"."attachments" IS '效果图';
+COMMENT ON COLUMN "public"."solution_design"."solution_explanation" IS '方案说明';
+COMMENT ON COLUMN "public"."solution_design"."annotation" IS '修改注释';
+COMMENT ON COLUMN "public"."solution_design"."defrost_explanation" IS '解冻说明';
+COMMENT ON COLUMN "public"."solution_design"."apply_defrost_at" IS '申请解冻时间';
+COMMENT ON COLUMN "public"."solution_design"."signature_url" IS '签字文件url';
+COMMENT ON COLUMN "public"."solution_design"."signed_at" IS '签字时间';
+COMMENT ON COLUMN "public"."solution_design"."status" IS '状态(1:待提交;2:待确认;3:已确认;4:已冻结;5:解冻中;6:已完成;)';
+COMMENT ON COLUMN "public"."solution_design"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."solution_design"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."solution_design"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."solution_design"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."solution_design" IS '方案设计';
 
 CREATE TABLE IF NOT EXISTS "public"."company" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -798,5 +888,16 @@ INSERT INTO "public"."sys_menu" VALUES (42,1,41,3,'新增文件夹','iconfont ic
 INSERT INTO "public"."sys_menu" VALUES (43,1,41,3,'上传文件','iconfont icon-xihuan','disk:upload',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (44,1,41,3,'重命名','iconfont icon-xihuan','disk:edit',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (45,1,41,3,'删除','iconfont icon-xihuan','disk:delete',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45' WHERE "id"=1;
+INSERT INTO "public"."sys_menu" VALUES (46,1,36,2,'需求沟通','iconfont icon-xihuan','requirement',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (47,1,46,3,'新增','iconfont icon-xihuan','requirement:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (48,1,46,3,'编辑','iconfont icon-xihuan','requirement:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (49,1,46,3,'删除','iconfont icon-xihuan','requirement:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (50,1,46,3,'提交/签字','iconfont icon-xihuan','requirement:submit',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (51,1,36,2,'方案设计','iconfont icon-xihuan','solutionDesign',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (52,1,51,3,'新增','iconfont icon-xihuan','solutionDesign:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (53,1,51,3,'编辑','iconfont icon-xihuan','solutionDesign:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (54,1,51,3,'删除','iconfont icon-xihuan','solutionDesign:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (55,1,51,3,'提交','iconfont icon-xihuan','solutionDesign:submit',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (56,1,51,3,'确认/冻结','iconfont icon-xihuan','solutionDesign:confirm',1,5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56' WHERE "id"=1;
 COMMIT;

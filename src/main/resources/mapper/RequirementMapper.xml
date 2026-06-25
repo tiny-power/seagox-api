@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.RequirementMapper">
+    <!-- 查询需求沟通列表 -->
+    <select id="queryRequirements" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.style,
+               a.budget,
+               a.member,
+               a.mark,
+               a.signature_url AS "signatureUrl",
+               a.signed_at AS "signedAt",
+               a.status,
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               CASE a.status
+                    WHEN 1 THEN '待提交'
+                    WHEN 2 THEN '待审核'
+                    WHEN 3 THEN '已完成'
+                    ELSE ''
+               END AS "statusText"
+        FROM requirement a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.projectName != null and params.projectName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                </choose>
+            </if>
+            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+        </where>
+        ORDER BY a.updated_at DESC, a.id DESC
+    </select>
+    <!-- 查询需求沟通详情 -->
+    <select id="queryRequirementById" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.style,
+               a.budget,
+               a.member,
+               a.mark,
+               a.signature_url AS "signatureUrl",
+               a.signed_at AS "signedAt",
+               a.status,
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               CASE a.status
+                    WHEN 1 THEN '待提交'
+                    WHEN 2 THEN '待审核'
+                    WHEN 3 THEN '已完成'
+                    ELSE ''
+               END AS "statusText"
+        FROM requirement a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        WHERE a.id = #{id}
+    </select>
+</mapper>
