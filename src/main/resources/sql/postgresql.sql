@@ -83,14 +83,6 @@ COMMENT ON TABLE "public"."leave_message" IS '留言表';
 CREATE TABLE IF NOT EXISTS "public"."solution_design" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,
 	"project_id" BIGINT NOT NULL,
-	"version" VARCHAR(255) NOT NULL,
-	"attachments" TEXT NOT NULL,
-	"solution_explanation" VARCHAR(1000) NOT NULL,
-	"annotation" VARCHAR(1000),
-	"defrost_explanation" VARCHAR(1000),
-	"apply_defrost_at" TIMESTAMP,
-	"signature_url" VARCHAR(500),
-	"signed_at" TIMESTAMP,
 	"status" INTEGER DEFAULT 1,
 	"created_by" BIGINT NOT NULL,
 	"updated_by" BIGINT NOT NULL,
@@ -99,20 +91,44 @@ CREATE TABLE IF NOT EXISTS "public"."solution_design" (
 );
 COMMENT ON COLUMN "public"."solution_design"."id" IS '主键';
 COMMENT ON COLUMN "public"."solution_design"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "public"."solution_design"."version" IS '版本';
-COMMENT ON COLUMN "public"."solution_design"."attachments" IS '效果图';
-COMMENT ON COLUMN "public"."solution_design"."solution_explanation" IS '方案说明';
-COMMENT ON COLUMN "public"."solution_design"."annotation" IS '修改注释';
-COMMENT ON COLUMN "public"."solution_design"."defrost_explanation" IS '解冻说明';
-COMMENT ON COLUMN "public"."solution_design"."apply_defrost_at" IS '申请解冻时间';
-COMMENT ON COLUMN "public"."solution_design"."signature_url" IS '签字文件url';
-COMMENT ON COLUMN "public"."solution_design"."signed_at" IS '签字时间';
 COMMENT ON COLUMN "public"."solution_design"."status" IS '状态(1:待提交;2:待确认;3:已确认;4:已冻结;5:解冻中;6:已完成;)';
 COMMENT ON COLUMN "public"."solution_design"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."solution_design"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."solution_design"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."solution_design"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."solution_design" IS '方案设计';
+
+CREATE TABLE IF NOT EXISTS "public"."solution_design_detail" (
+	"id" BIGSERIAL PRIMARY KEY NOT NULL,
+	"solution_design_id" BIGINT NOT NULL,
+	"version" INTEGER DEFAULT 1,
+	"attachments" TEXT NOT NULL,
+	"solution_explanation" VARCHAR(1000) NOT NULL,
+	"annotation" VARCHAR(1000),
+	"defrost_explanation" VARCHAR(1000),
+	"apply_defrost_at" TIMESTAMP,
+	"signature_url" VARCHAR(500),
+	"signed_at" TIMESTAMP,
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."solution_design_detail"."id" IS '主键';
+COMMENT ON COLUMN "public"."solution_design_detail"."solution_design_id" IS '方案设计ID';
+COMMENT ON COLUMN "public"."solution_design_detail"."version" IS '版本';
+COMMENT ON COLUMN "public"."solution_design_detail"."attachments" IS '效果图';
+COMMENT ON COLUMN "public"."solution_design_detail"."solution_explanation" IS '方案说明';
+COMMENT ON COLUMN "public"."solution_design_detail"."annotation" IS '修改注释';
+COMMENT ON COLUMN "public"."solution_design_detail"."defrost_explanation" IS '解冻说明';
+COMMENT ON COLUMN "public"."solution_design_detail"."apply_defrost_at" IS '申请解冻时间';
+COMMENT ON COLUMN "public"."solution_design_detail"."signature_url" IS '签字文件url';
+COMMENT ON COLUMN "public"."solution_design_detail"."signed_at" IS '签字时间';
+COMMENT ON COLUMN "public"."solution_design_detail"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."solution_design_detail"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."solution_design_detail"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."solution_design_detail"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."solution_design_detail" IS '方案设计详情';
 
 CREATE TABLE IF NOT EXISTS "public"."company" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,

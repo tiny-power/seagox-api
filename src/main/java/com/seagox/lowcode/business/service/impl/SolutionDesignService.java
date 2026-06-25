@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.SolutionDesign;
+import com.seagox.lowcode.business.entity.SolutionDesignDetail;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
 import com.seagox.lowcode.business.mapper.SolutionDesignMapper;
 import com.seagox.lowcode.business.service.ISolutionDesignService;
@@ -52,6 +53,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "方案设计不存在");
         }
+        List<Map<String, Object>> details = solutionDesignMapper.querySolutionDesignDetails(id);
+        MapDateFormatUtils.formatDateValues(details);
+        data.put("details", details);
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
@@ -94,21 +98,32 @@ public class SolutionDesignService implements ISolutionDesignService {
 
         if (original == null) {
             solutionDesign.setStatus(solutionDesign.getStatus() == null ? STATUS_DRAFT : solutionDesign.getStatus());
-            solutionDesign.setSignatureUrl(solutionDesign.getSignatureUrl() == null ? "" : solutionDesign.getSignatureUrl());
             solutionDesign.setCreatedBy(userId);
             solutionDesign.setUpdatedBy(userId);
             solutionDesign.setCreatedAt(now);
             solutionDesign.setUpdatedAt(now);
             solutionDesignMapper.insert(solutionDesign);
+            SolutionDesignDetail detail = buildDetail(solutionDesign, solutionDesign.getId(), userId, now);
+            solutionDesignMapper.insertDetail(detail);
             return ResultData.success(solutionDesign.getId());
         }
         if (Integer.valueOf(STATUS_COMPLETED).equals(original.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的方案设计不可以修改");
         }
-        original.setVersion(solutionDesign.getVersion());
-        original.setAttachments(solutionDesign.getAttachments());
-        original.setSolutionExplanation(solutionDesign.getSolutionExplanation());
-        original.setAnnotation(solutionDesign.getAnnotation());
+        SolutionDesignDetail latestDetail = solutionDesignMapper.queryLatestDetail(original.getId());
+        SolutionDesignDetail detail = buildDetail(solutionDesign, original.getId(), userId, now);
+        if (latestDetail != null && shouldUpdateLatestDetail(latestDetail, detail)) {
+            detail.setId(latestDetail.getId());
+            detail.setCreatedBy(latestDetail.getCreatedBy());
+            detail.setCreatedAt(latestDetail.getCreatedAt());
+            detail.setSignatureUrl(defaultString(solutionDesign.getSignatureUrl(), latestDetail.getSignatureUrl()));
+            detail.setSignedAt(solutionDesign.getSignedAt() == null ? latestDetail.getSignedAt() : solutionDesign.getSignedAt());
+            detail.setDefrostExplanation(defaultString(solutionDesign.getDefrostExplanation(), latestDetail.getDefrostExplanation()));
+            detail.setApplyDefrostAt(solutionDesign.getApplyDefrostAt() == null ? latestDetail.getApplyDefrostAt() : solutionDesign.getApplyDefrostAt());
+            solutionDesignMapper.updateDetailById(detail);
+        } else {
+            solutionDesignMapper.insertDetail(detail);
+        }
         original.setStatus(solutionDesign.getStatus() == null ? original.getStatus() : solutionDesign.getStatus());
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
@@ -143,8 +158,15 @@ public class SolutionDesignService implements ISolutionDesignService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "只有已确认的方案可以冻结");
         }
         Date now = new Date();
-        solutionDesign.setSignatureUrl(signatureUrl);
-        solutionDesign.setSignedAt(now);
+        SolutionDesignDetail detail = solutionDesignMapper.queryLatestDetail(id);
+        if (detail == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "方案设计详情不存在");
+        }
+        detail.setSignatureUrl(signatureUrl);
+        detail.setSignedAt(now);
+        detail.setUpdatedBy(userId);
+        detail.setUpdatedAt(now);
+        solutionDesignMapper.updateDetailById(detail);
         solutionDesign.setStatus(STATUS_FROZEN);
         solutionDesign.setUpdatedBy(userId);
         solutionDesign.setUpdatedAt(now);
@@ -169,8 +191,15 @@ public class SolutionDesignService implements ISolutionDesignService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "只有已冻结的方案可以申请解冻");
         }
         Date now = new Date();
-        solutionDesign.setDefrostExplanation(defrostExplanation);
-        solutionDesign.setApplyDefrostAt(now);
+        SolutionDesignDetail detail = solutionDesignMapper.queryLatestDetail(id);
+        if (detail == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "方案设计详情不存在");
+        }
+        detail.setDefrostExplanation(defrostExplanation);
+        detail.setApplyDefrostAt(now);
+        detail.setUpdatedBy(userId);
+        detail.setUpdatedAt(now);
+        solutionDesignMapper.updateDetailById(detail);
         solutionDesign.setStatus(STATUS_DEFROSTING);
         solutionDesign.setUpdatedBy(userId);
         solutionDesign.setUpdatedAt(now);
@@ -217,6 +246,7 @@ public class SolutionDesignService implements ISolutionDesignService {
         if (Integer.valueOf(STATUS_COMPLETED).equals(solutionDesign.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的方案设计不可以删除");
         }
+        solutionDesignMapper.deleteDetailsBySolutionDesignId(id);
         solutionDesignMapper.deleteById(id);
         return ResultData.success(null);
     }
@@ -274,5 +304,48 @@ public class SolutionDesignService implements ISolutionDesignService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请填写方案说明");
         }
         return null;
+    }
+
+    private SolutionDesignDetail buildDetail(SolutionDesign solutionDesign, Long solutionDesignId, Long userId, Date now) {
+        SolutionDesignDetail detail = new SolutionDesignDetail();
+        detail.setSolutionDesignId(solutionDesignId);
+        detail.setVersion(parseVersion(solutionDesign.getVersion()));
+        detail.setAttachments(solutionDesign.getAttachments());
+        detail.setSolutionExplanation(solutionDesign.getSolutionExplanation());
+        detail.setAnnotation(solutionDesign.getAnnotation());
+        detail.setDefrostExplanation(solutionDesign.getDefrostExplanation());
+        detail.setApplyDefrostAt(solutionDesign.getApplyDefrostAt());
+        detail.setSignatureUrl(defaultString(solutionDesign.getSignatureUrl(), ""));
+        detail.setSignedAt(solutionDesign.getSignedAt());
+        detail.setCreatedBy(userId);
+        detail.setUpdatedBy(userId);
+        detail.setCreatedAt(now);
+        detail.setUpdatedAt(now);
+        return detail;
+    }
+
+    private boolean shouldUpdateLatestDetail(SolutionDesignDetail latestDetail, SolutionDesignDetail detail) {
+        return latestDetail.getVersion() != null
+                && latestDetail.getVersion().equals(detail.getVersion());
+    }
+
+    private Integer parseVersion(String version) {
+        if (StringUtils.isEmpty(version)) {
+            return 1;
+        }
+        String value = version.trim().replaceAll("^[vV]", "");
+        int dotIndex = value.indexOf(".");
+        if (dotIndex > -1) {
+            value = value.substring(0, dotIndex);
+        }
+        value = value.replaceAll("[^0-9]", "");
+        if (StringUtils.isEmpty(value)) {
+            return 1;
+        }
+        return Integer.valueOf(value);
+    }
+
+    private String defaultString(String value, String defaultValue) {
+        return value == null ? defaultValue : value;
     }
 }

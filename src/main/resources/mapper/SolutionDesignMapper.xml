@@ -4,14 +4,15 @@
     <select id="querySolutionDesigns" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
-               a.version,
-               a.attachments,
-               a.solution_explanation AS "solutionExplanation",
-               a.annotation,
-               a.defrost_explanation AS "defrostExplanation",
-               a.apply_defrost_at AS "applyDefrostAt",
-               a.signature_url AS "signatureUrl",
-               a.signed_at AS "signedAt",
+               d.id AS "detailId",
+               d.version,
+               d.attachments,
+               d.solution_explanation AS "solutionExplanation",
+               d.annotation,
+               d.defrost_explanation AS "defrostExplanation",
+               d.apply_defrost_at AS "applyDefrostAt",
+               d.signature_url AS "signatureUrl",
+               d.signed_at AS "signedAt",
                a.status,
                a.created_by AS "createdBy",
                a.updated_by AS "updatedBy",
@@ -31,6 +32,8 @@
                     ELSE ''
                END AS "statusText"
         FROM solution_design a
+        LEFT JOIN solution_design_detail d ON d.solution_design_id = a.id
+            AND d.version = (SELECT MAX(sd.version) FROM solution_design_detail sd WHERE sd.solution_design_id = a.id)
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
@@ -49,14 +52,15 @@
     <select id="querySolutionDesignById" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
-               a.version,
-               a.attachments,
-               a.solution_explanation AS "solutionExplanation",
-               a.annotation,
-               a.defrost_explanation AS "defrostExplanation",
-               a.apply_defrost_at AS "applyDefrostAt",
-               a.signature_url AS "signatureUrl",
-               a.signed_at AS "signedAt",
+               d.id AS "detailId",
+               d.version,
+               d.attachments,
+               d.solution_explanation AS "solutionExplanation",
+               d.annotation,
+               d.defrost_explanation AS "defrostExplanation",
+               d.apply_defrost_at AS "applyDefrostAt",
+               d.signature_url AS "signatureUrl",
+               d.signed_at AS "signedAt",
                a.status,
                a.created_by AS "createdBy",
                a.updated_by AS "updatedBy",
@@ -76,9 +80,109 @@
                     ELSE ''
                END AS "statusText"
         FROM solution_design a
+        LEFT JOIN solution_design_detail d ON d.solution_design_id = a.id
+            AND d.version = (SELECT MAX(sd.version) FROM solution_design_detail sd WHERE sd.solution_design_id = a.id)
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
         WHERE a.id = #{id}
     </select>
+    <select id="querySolutionDesignDetails" resultType="camelKeyMap">
+        SELECT d.id,
+               d.solution_design_id AS "solutionDesignId",
+               d.version,
+               d.attachments,
+               d.solution_explanation AS "solutionExplanation",
+               d.annotation,
+               d.defrost_explanation AS "defrostExplanation",
+               d.apply_defrost_at AS "applyDefrostAt",
+               d.signature_url AS "signatureUrl",
+               d.signed_at AS "signedAt",
+               d.created_by AS "createdBy",
+               d.updated_by AS "updatedBy",
+               d.created_at AS "createdAt",
+               d.updated_at AS "updatedAt",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName"
+        FROM solution_design_detail d
+        LEFT JOIN sys_account creator ON creator.id = d.created_by
+        LEFT JOIN sys_account updater ON updater.id = d.updated_by
+        WHERE d.solution_design_id = #{solutionDesignId}
+        ORDER BY d.version DESC, d.id DESC
+    </select>
+    <select id="queryLatestDetail" resultType="com.seagox.lowcode.business.entity.SolutionDesignDetail">
+        SELECT id,
+               solution_design_id AS "solutionDesignId",
+               version,
+               attachments,
+               solution_explanation AS "solutionExplanation",
+               annotation,
+               defrost_explanation AS "defrostExplanation",
+               apply_defrost_at AS "applyDefrostAt",
+               signature_url AS "signatureUrl",
+               signed_at AS "signedAt",
+               created_by AS "createdBy",
+               updated_by AS "updatedBy",
+               created_at AS "createdAt",
+               updated_at AS "updatedAt"
+        FROM solution_design_detail
+        WHERE id = (
+            SELECT MAX(sdd.id)
+            FROM solution_design_detail sdd
+            WHERE sdd.solution_design_id = #{solutionDesignId}
+              AND sdd.version = (
+                  SELECT MAX(sddv.version)
+                  FROM solution_design_detail sddv
+                  WHERE sddv.solution_design_id = #{solutionDesignId}
+              )
+        )
+    </select>
+    <insert id="insertDetail" parameterType="com.seagox.lowcode.business.entity.SolutionDesignDetail" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO solution_design_detail (
+            solution_design_id,
+            version,
+            attachments,
+            solution_explanation,
+            annotation,
+            defrost_explanation,
+            apply_defrost_at,
+            signature_url,
+            signed_at,
+            created_by,
+            updated_by,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{solutionDesignId},
+            #{version},
+            #{attachments},
+            #{solutionExplanation},
+            #{annotation},
+            #{defrostExplanation},
+            #{applyDefrostAt},
+            #{signatureUrl},
+            #{signedAt},
+            #{createdBy},
+            #{updatedBy},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    <update id="updateDetailById" parameterType="com.seagox.lowcode.business.entity.SolutionDesignDetail">
+        UPDATE solution_design_detail
+        SET version = #{version},
+            attachments = #{attachments},
+            solution_explanation = #{solutionExplanation},
+            annotation = #{annotation},
+            defrost_explanation = #{defrostExplanation},
+            apply_defrost_at = #{applyDefrostAt},
+            signature_url = #{signatureUrl},
+            signed_at = #{signedAt},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteDetailsBySolutionDesignId">
+        DELETE FROM solution_design_detail WHERE solution_design_id = #{solutionDesignId}
+    </delete>
 </mapper>

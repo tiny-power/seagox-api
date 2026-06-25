@@ -1,50 +1,44 @@
 package com.seagox.lowcode.business.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * 方案设计
+ * 方案设计详情
  */
-public class SolutionDesign {
+public class SolutionDesignDetail {
 
     private Long id;
 
     /**
-     * 所属项目ID
+     * 方案设计ID
      */
-    private Long projectId;
+    private Long solutionDesignId;
 
     /**
      * 版本
      */
-    @TableField(exist = false)
-    private String version;
+    private Integer version;
 
     /**
      * 效果图
      */
-    @TableField(exist = false)
     private String attachments;
 
     /**
      * 方案说明
      */
-    @TableField(exist = false)
     private String solutionExplanation;
 
     /**
      * 修改注释
      */
-    @TableField(exist = false)
     private String annotation;
 
     /**
      * 解冻说明
      */
-    @TableField(exist = false)
     private String defrostExplanation;
 
     /**
@@ -52,13 +46,11 @@ public class SolutionDesign {
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField(exist = false)
     private Date applyDefrostAt;
 
     /**
      * 签字文件url
      */
-    @TableField(exist = false)
     private String signatureUrl;
 
     /**
@@ -66,19 +58,7 @@ public class SolutionDesign {
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField(exist = false)
     private Date signedAt;
-
-    /**
-     * 当前版本详情ID
-     */
-    @TableField(exist = false)
-    private Long detailId;
-
-    /**
-     * 状态(1:待提交;2:待确认;3:已确认;4:已冻结;5:解冻中;6:已完成;)
-     */
-    private Integer status;
 
     private Long createdBy;
 
@@ -100,19 +80,19 @@ public class SolutionDesign {
         this.id = id;
     }
 
-    public Long getProjectId() {
-        return projectId;
+    public Long getSolutionDesignId() {
+        return solutionDesignId;
     }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
+    public void setSolutionDesignId(Long solutionDesignId) {
+        this.solutionDesignId = solutionDesignId;
     }
 
-    public String getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 
@@ -170,22 +150,6 @@ public class SolutionDesign {
 
     public void setSignedAt(Date signedAt) {
         this.signedAt = signedAt;
-    }
-
-    public Long getDetailId() {
-        return detailId;
-    }
-
-    public void setDetailId(Long detailId) {
-        this.detailId = detailId;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public Long getCreatedBy() {

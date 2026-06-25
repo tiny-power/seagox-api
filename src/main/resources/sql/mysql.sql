@@ -49,14 +49,6 @@ CREATE TABLE IF NOT EXISTS `leave_message`  (
 CREATE TABLE IF NOT EXISTS `solution_design`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `version` varchar(255) NOT NULL COMMENT '版本',
-    `attachments` JSON NOT NULL COMMENT '效果图',
-    `solution_explanation` VARCHAR(1000) NOT NULL COMMENT '方案说明',
-    `annotation` VARCHAR(1000) DEFAULT NULL COMMENT '修改注释',
-    `defrost_explanation` VARCHAR(1000) DEFAULT NULL COMMENT '解冻说明',
-    `apply_defrost_at` DATETIME DEFAULT NULL COMMENT '申请解冻时间',
-    `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
-    `signed_at` DATETIME DEFAULT NULL COMMENT '签字时间',
     `status` int(4) DEFAULT 1 COMMENT '状态(1:待提交;2:待确认;3:已确认;4:已冻结;5:解冻中;6:已完成;)',
     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
@@ -64,6 +56,24 @@ CREATE TABLE IF NOT EXISTS `solution_design`  (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '方案设计';
+
+CREATE TABLE IF NOT EXISTS `solution_design_detail`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `solution_design_id` BIGINT UNSIGNED NOT NULL COMMENT '方案设计ID',
+    `version` int(4) DEFAULT 1 COMMENT '版本',
+    `attachments` JSON NOT NULL COMMENT '效果图',
+    `solution_explanation` VARCHAR(1000) NOT NULL COMMENT '方案说明',
+    `annotation` VARCHAR(1000) DEFAULT NULL COMMENT '修改注释',
+    `defrost_explanation` VARCHAR(1000) DEFAULT NULL COMMENT '解冻说明',
+    `apply_defrost_at` DATETIME DEFAULT NULL COMMENT '申请解冻时间',
+    `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
+    `signed_at` DATETIME DEFAULT NULL COMMENT '签字时间',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '方案设计详情';
 
 CREATE TABLE IF NOT EXISTS `company`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
