@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.ConstructionDrawingMapper">
+    <select id="queryConstructionDrawings" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               d.id AS "detailId",
+               d.version,
+               d.architecture_attachments AS "architectureAttachments",
+               d.structure_attachments AS "structureAttachments",
+               d.decoration_attachments AS "decorationAttachments",
+               d.procurement_attachments AS "procurementAttachments",
+               d.solution_explanation AS "solutionExplanation",
+               d.confirm_members AS "confirmMembers",
+               a.status,
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               CASE a.status
+                    WHEN 1 THEN '待提交'
+                    WHEN 2 THEN '待确认'
+                    WHEN 3 THEN '已归档'
+                    ELSE ''
+               END AS "statusText"
+        FROM construction_drawing a
+        LEFT JOIN construction_drawing_detail d ON d.construction_drawing_id = a.id
+            AND d.version = (SELECT MAX(cd.version) FROM construction_drawing_detail cd WHERE cd.construction_drawing_id = a.id)
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.projectName != null and params.projectName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                </choose>
+            </if>
+            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+        </where>
+        ORDER BY a.updated_at DESC, a.id DESC
+    </select>
+    <select id="queryConstructionDrawingById" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               d.id AS "detailId",
+               d.version,
+               d.architecture_attachments AS "architectureAttachments",
+               d.structure_attachments AS "structureAttachments",
+               d.decoration_attachments AS "decorationAttachments",
+               d.procurement_attachments AS "procurementAttachments",
+               d.solution_explanation AS "solutionExplanation",
+               d.confirm_members AS "confirmMembers",
+               a.status,
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               CASE a.status
+                    WHEN 1 THEN '待提交'
+                    WHEN 2 THEN '待确认'
+                    WHEN 3 THEN '已归档'
+                    ELSE ''
+               END AS "statusText"
+        FROM construction_drawing a
+        LEFT JOIN construction_drawing_detail d ON d.construction_drawing_id = a.id
+            AND d.version = (SELECT MAX(cd.version) FROM construction_drawing_detail cd WHERE cd.construction_drawing_id = a.id)
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        WHERE a.id = #{id}
+    </select>
+    <select id="queryConstructionDrawingDetails" resultType="camelKeyMap">
+        SELECT d.id,
+               d.construction_drawing_id AS "constructionDrawingId",
+               d.version,
+               d.architecture_attachments AS "architectureAttachments",
+               d.structure_attachments AS "structureAttachments",
+               d.decoration_attachments AS "decorationAttachments",
+               d.procurement_attachments AS "procurementAttachments",
+               d.solution_explanation AS "solutionExplanation",
+               d.confirm_members AS "confirmMembers",
+               d.created_by AS "createdBy",
+               d.updated_by AS "updatedBy",
+               d.created_at AS "createdAt",
+               d.updated_at AS "updatedAt",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName"
+        FROM construction_drawing_detail d
+        LEFT JOIN sys_account creator ON creator.id = d.created_by
+        LEFT JOIN sys_account updater ON updater.id = d.updated_by
+        WHERE d.construction_drawing_id = #{constructionDrawingId}
+        ORDER BY d.version DESC, d.id DESC
+    </select>
+    <select id="queryLatestDetail" resultType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail">
+        SELECT id,
+               construction_drawing_id AS "constructionDrawingId",
+               version,
+               architecture_attachments AS "architectureAttachments",
+               structure_attachments AS "structureAttachments",
+               decoration_attachments AS "decorationAttachments",
+               procurement_attachments AS "procurementAttachments",
+               solution_explanation AS "solutionExplanation",
+               confirm_members AS "confirmMembers",
+               created_by AS "createdBy",
+               updated_by AS "updatedBy",
+               created_at AS "createdAt",
+               updated_at AS "updatedAt"
+        FROM construction_drawing_detail
+        WHERE id = (
+            SELECT MAX(cdd.id)
+            FROM construction_drawing_detail cdd
+            WHERE cdd.construction_drawing_id = #{constructionDrawingId}
+              AND cdd.version = (
+                  SELECT MAX(cddv.version)
+                  FROM construction_drawing_detail cddv
+                  WHERE cddv.construction_drawing_id = #{constructionDrawingId}
+              )
+        )
+    </select>
+    <insert id="insertDetail" parameterType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO construction_drawing_detail (
+            construction_drawing_id,
+            version,
+            architecture_attachments,
+            structure_attachments,
+            decoration_attachments,
+            procurement_attachments,
+            solution_explanation,
+            confirm_members,
+            created_by,
+            updated_by,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{constructionDrawingId},
+            #{version},
+            #{architectureAttachments},
+            #{structureAttachments},
+            #{decorationAttachments},
+            #{procurementAttachments},
+            #{solutionExplanation},
+            #{confirmMembers},
+            #{createdBy},
+            #{updatedBy},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    <update id="updateDetailById" parameterType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail">
+        UPDATE construction_drawing_detail
+        SET version = #{version},
+            architecture_attachments = #{architectureAttachments},
+            structure_attachments = #{structureAttachments},
+            decoration_attachments = #{decorationAttachments},
+            procurement_attachments = #{procurementAttachments},
+            solution_explanation = #{solutionExplanation},
+            confirm_members = #{confirmMembers},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteDetailsByConstructionDrawingId">
+        DELETE FROM construction_drawing_detail WHERE construction_drawing_id = #{constructionDrawingId}
+    </delete>
+</mapper>

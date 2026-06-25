@@ -75,6 +75,55 @@ CREATE TABLE IF NOT EXISTS `solution_design_detail`  (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '方案设计详情';
 
+CREATE TABLE IF NOT EXISTS `construction_drawing`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `status` int(4) DEFAULT 1 COMMENT '状态(1:待提交;2:待确认;3:已归档;)',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '施工图出图';
+
+CREATE TABLE IF NOT EXISTS `construction_drawing_detail`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `construction_drawing_id` BIGINT UNSIGNED NOT NULL COMMENT '施工图出图ID',
+    `version` int(4) DEFAULT 1 COMMENT '版本',
+    `architecture_attachments` JSON NOT NULL COMMENT '建设设计附件',
+    `structure_attachments` JSON NOT NULL COMMENT '结构设计附件',
+    `decoration_attachments` JSON NOT NULL COMMENT '精装图纸附件',
+    `procurement_attachments` JSON NOT NULL COMMENT '主材及软装采购方案附件',
+    `solution_explanation` VARCHAR(1000) DEFAULT NULL COMMENT '修改说明',
+    `confirm_members` JSON COMMENT '成员确认',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '施工图出图详情';
+
+CREATE TABLE IF NOT EXISTS `repair`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `type` VARCHAR(200) NOT NULL COMMENT '报修类型(水电维修、电路维修、门窗维修、家电维修、墙面地面、管道疏通、卫浴洁具、家具维修、其他问题)',
+    `location` VARCHAR(200) NOT NULL COMMENT '报修位置(卫生间、客厅、卧室、厨房、阳台、其他位置)',
+    `description` VARCHAR(1000) NOT NULL COMMENT '问题描述',
+    `before_attachments` JSON COMMENT '维修前附件',
+    `contact` VARCHAR(100) NOT NULL COMMENT '联系人',
+    `contact_number` VARCHAR(200) NOT NULL COMMENT '联系电话',
+    `status` int(4) DEFAULT 1 COMMENT '状态(1:已提交;2:处理中;3:待确认;4:已完成;)',
+    `repair_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '报修时间',
+    `after_attachments` JSON COMMENT '维修后附件',
+    `repair_member_id` BIGINT UNSIGNED COMMENT '维修人员ID',
+    `complete_at` DATETIME COMMENT '完成时间',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '报修单';
+
 CREATE TABLE IF NOT EXISTS `company`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `parent_id` bigint(20) DEFAULT NULL COMMENT '上级id',

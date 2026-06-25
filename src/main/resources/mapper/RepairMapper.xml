@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.RepairMapper">
+    <select id="queryRepairs" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.type,
+               a.location,
+               a.description,
+               a.before_attachments AS "beforeAttachments",
+               a.contact,
+               a.contact_number AS "contactNumber",
+               a.status,
+               a.repair_at AS "repairAt",
+               a.after_attachments AS "afterAttachments",
+               a.repair_member_id AS "repairMemberId",
+               a.complete_at AS "completeAt",
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               member.name AS "repairMemberName",
+               CASE a.status
+                    WHEN 1 THEN '已提交'
+                    WHEN 2 THEN '处理中'
+                    WHEN 3 THEN '待确认'
+                    WHEN 4 THEN '已完成'
+                    ELSE ''
+               END AS "statusText"
+        FROM repair a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        LEFT JOIN sys_account member ON member.id = a.repair_member_id
+        <where>
+            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.projectName != null and params.projectName != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
+                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                </choose>
+            </if>
+            <if test="params.keyword != null and params.keyword != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND (a.description LIKE CONCAT('%', #{params.keyword}, '%') OR a.type LIKE CONCAT('%', #{params.keyword}, '%'))</when>
+                    <otherwise>AND (a.description LIKE '%' || #{params.keyword} || '%' OR a.type LIKE '%' || #{params.keyword} || '%')</otherwise>
+                </choose>
+            </if>
+            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.createdBy != null and params.createdBy != ''">AND a.created_by = #{params.createdBy}</if>
+        </where>
+        ORDER BY a.repair_at DESC, a.id DESC
+    </select>
+    <select id="queryRepairById" resultType="camelKeyMap">
+        SELECT a.id,
+               a.project_id AS "projectId",
+               a.type,
+               a.location,
+               a.description,
+               a.before_attachments AS "beforeAttachments",
+               a.contact,
+               a.contact_number AS "contactNumber",
+               a.status,
+               a.repair_at AS "repairAt",
+               a.after_attachments AS "afterAttachments",
+               a.repair_member_id AS "repairMemberId",
+               a.complete_at AS "completeAt",
+               a.created_by AS "createdBy",
+               a.updated_by AS "updatedBy",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt",
+               p.code AS "projectCode",
+               p.name AS "projectName",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName",
+               member.name AS "repairMemberName",
+               CASE a.status
+                    WHEN 1 THEN '已提交'
+                    WHEN 2 THEN '处理中'
+                    WHEN 3 THEN '待确认'
+                    WHEN 4 THEN '已完成'
+                    ELSE ''
+               END AS "statusText"
+        FROM repair a
+        LEFT JOIN project p ON p.id = a.project_id
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account updater ON updater.id = a.updated_by
+        LEFT JOIN sys_account member ON member.id = a.repair_member_id
+        WHERE a.id = #{id}
+    </select>
+</mapper>
