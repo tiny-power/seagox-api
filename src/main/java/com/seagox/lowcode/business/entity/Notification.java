@@ -9,30 +9,66 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Notification {
 
+    /**
+     * 主键ID
+     */
     private Long id;
 
+    /**
+     * 所属项目ID
+     */
     private Long projectId;
 
+    /**
+     * 发送人用户ID
+     */
     private Long senderUserId;
 
+    /**
+     * 接收人用户ID
+     */
     private Long recipientUserId;
 
+    /**
+     * 通知类型
+     */
     private Integer type;
 
+    /**
+     * 通知标题
+     */
     private String title;
 
+    /**
+     * 通知内容
+     */
     private String content;
 
+    /**
+     * 状态
+     */
     private Integer status;
 
+    /**
+     * 创建人ID
+     */
     private Long createdBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 更新人ID
+     */
     private Long updatedBy;
 
+    /**
+     * 更新时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

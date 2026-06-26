@@ -9,9 +9,18 @@ import java.util.Map;
  */
 public interface ILeaveMessageService {
 
+    /**
+     * 分页查询留言
+     */
     ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params);
 
+    /**
+     * 新增留言
+     */
     ResultData insert(LeaveMessage leaveMessage, Long userId);
 
+    /**
+     * 删除留言
+     */
     ResultData delete(Long id);
 }

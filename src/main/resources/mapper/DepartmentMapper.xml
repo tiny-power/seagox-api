@@ -45,6 +45,7 @@
         order by a.sort
     </select>
     
+    <!-- 查询最大部门编码 -->
     <select id="queryMaxCode" resultType="string">
         SELECT MAX(code) FROM department
         <where>

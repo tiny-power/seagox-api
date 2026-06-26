@@ -33,6 +33,9 @@ public class RepairService implements IRepairService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
@@ -41,6 +44,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(new PageInfo<>(list));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryById(Long id) {
         Map<String, Object> data = repairMapper.queryRepairById(id);
@@ -51,6 +57,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(data);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData insert(Repair repair, Long userId) {
         ResultData verifyResult = verify(repair);
@@ -75,6 +84,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(repair.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData update(Repair repair, Long userId) {
         if (repair == null || repair.getId() == null) {
@@ -105,6 +117,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData assign(Long id, Long repairMemberId, Long userId) {
         if (repairMemberId == null) {
@@ -125,6 +140,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData complete(Long id, Repair repair, Long userId) {
         Repair original = repairMapper.selectById(id);
@@ -144,6 +162,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData confirm(Long id, Long userId) {
         Repair repair = repairMapper.selectById(id);
@@ -160,6 +181,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData delete(Long id) {
         Repair repair = repairMapper.selectById(id);
@@ -173,6 +197,9 @@ public class RepairService implements IRepairService {
         return ResultData.success(null);
     }
 
+    /**
+     * 校验报修单保存参数
+     */
     private ResultData verify(Repair repair) {
         if (repair == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "报修单不能为空");

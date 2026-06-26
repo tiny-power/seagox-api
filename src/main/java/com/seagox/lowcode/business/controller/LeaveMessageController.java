@@ -23,6 +23,9 @@ public class LeaveMessageController {
     @Autowired
     private ILeaveMessageService leaveMessageService;
 
+    /**
+     * 分页查询留言
+     */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "20") Integer pageSize,
@@ -30,12 +33,18 @@ public class LeaveMessageController {
         return leaveMessageService.queryByPage(pageNo, pageSize, params);
     }
 
+    /**
+     * 新增留言
+     */
     @PostMapping("/insert")
     @LogPoint("新增留言")
     public ResultData insert(LeaveMessage leaveMessage, Long userId) {
         return leaveMessageService.insert(leaveMessage, userId);
     }
 
+    /**
+     * 删除留言
+     */
     @PostMapping("/delete/{id}")
     @LogPoint("删除留言")
     public ResultData delete(@PathVariable Long id) {

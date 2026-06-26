@@ -24,6 +24,9 @@ public class LeaveMessageService implements ILeaveMessageService {
     @Autowired
     private LeaveMessageMapper leaveMessageMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
@@ -32,6 +35,9 @@ public class LeaveMessageService implements ILeaveMessageService {
         return ResultData.success(new PageInfo<>(list));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData insert(LeaveMessage leaveMessage, Long userId) {
         if (leaveMessage == null) {
@@ -61,6 +67,9 @@ public class LeaveMessageService implements ILeaveMessageService {
         return ResultData.success(leaveMessage.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData delete(Long id) {
         LeaveMessage leaveMessage = leaveMessageMapper.selectById(id);

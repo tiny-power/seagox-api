@@ -39,6 +39,9 @@ public class SolutionDesignService implements ISolutionDesignService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
@@ -47,6 +50,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(new PageInfo<>(list));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryById(Long id) {
         Map<String, Object> data = solutionDesignMapper.querySolutionDesignById(id);
@@ -60,6 +66,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(data);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByProjectId(Long projectId) {
         if (projectId == null) {
@@ -72,6 +81,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return queryById(solutionDesign.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public ResultData save(SolutionDesign solutionDesign, Long userId) {
@@ -131,16 +143,25 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(original.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData submit(Long id, Long userId) {
         return updateStatus(id, userId, STATUS_PENDING, "方案设计不存在", null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData confirm(Long id, Long userId) {
         return updateStatus(id, userId, STATUS_CONFIRMED, "方案设计不存在", STATUS_PENDING);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData freeze(Long id, String signatureUrl, Long userId) {
         if (StringUtils.isEmpty(signatureUrl)) {
@@ -174,6 +195,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData applyDefrost(Long id, String defrostExplanation, Long userId) {
         if (StringUtils.isEmpty(defrostExplanation)) {
@@ -207,16 +231,25 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData approveDefrost(Long id, Long userId) {
         return updateStatus(id, userId, STATUS_DRAFT, "方案设计不存在", STATUS_DEFROSTING);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData rejectDefrost(Long id, Long userId) {
         return updateStatus(id, userId, STATUS_FROZEN, "方案设计不存在", STATUS_DEFROSTING);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData complete(Long id, Long userId) {
         ResultData userResult = checkUserId(userId);
@@ -237,6 +270,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData delete(Long id) {
         SolutionDesign solutionDesign = solutionDesignMapper.selectById(id);
@@ -251,6 +287,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(null);
     }
 
+    /**
+     * 更新方案设计状态并校验当前状态
+     */
     private ResultData updateStatus(Long id, Long userId, Integer status, String notFoundMessage, Integer requiredStatus) {
         ResultData userResult = checkUserId(userId);
         if (userResult != null) {
@@ -273,6 +312,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return ResultData.success(null);
     }
 
+    /**
+     * 通过项目ID查询最新方案设计记录
+     */
     private SolutionDesign findByProjectId(Long projectId) {
         LambdaQueryWrapper<SolutionDesign> qw = new LambdaQueryWrapper<>();
         qw.eq(SolutionDesign::getProjectId, projectId).orderByDesc(SolutionDesign::getUpdatedAt);
@@ -280,6 +322,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    /**
+     * 校验当前用户ID
+     */
     private ResultData checkUserId(Long userId) {
         if (userId == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "当前用户不能为空");
@@ -287,6 +332,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return null;
     }
 
+    /**
+     * 校验方案设计保存参数
+     */
     private ResultData verify(SolutionDesign solutionDesign) {
         if (solutionDesign == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "方案设计不能为空");
@@ -306,6 +354,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return null;
     }
 
+    /**
+     * 构建方案设计版本明细
+     */
     private SolutionDesignDetail buildDetail(SolutionDesign solutionDesign, Long solutionDesignId, Long userId, Date now) {
         SolutionDesignDetail detail = new SolutionDesignDetail();
         detail.setSolutionDesignId(solutionDesignId);
@@ -324,11 +375,17 @@ public class SolutionDesignService implements ISolutionDesignService {
         return detail;
     }
 
+    /**
+     * 判断是否更新最新版本明细
+     */
     private boolean shouldUpdateLatestDetail(SolutionDesignDetail latestDetail, SolutionDesignDetail detail) {
         return latestDetail.getVersion() != null
                 && latestDetail.getVersion().equals(detail.getVersion());
     }
 
+    /**
+     * 解析版本号
+     */
     private Integer parseVersion(String version) {
         if (StringUtils.isEmpty(version)) {
             return 1;
@@ -345,6 +402,9 @@ public class SolutionDesignService implements ISolutionDesignService {
         return Integer.valueOf(value);
     }
 
+    /**
+     * 返回默认字符串值
+     */
     private String defaultString(String value, String defaultValue) {
         return value == null ? defaultValue : value;
     }

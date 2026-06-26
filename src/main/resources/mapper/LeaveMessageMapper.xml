@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.LeaveMessageMapper">
+    <!-- 留言查询 SQL -->
     <select id="queryLeaveMessages" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",

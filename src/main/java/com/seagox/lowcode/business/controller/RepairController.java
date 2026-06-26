@@ -23,6 +23,9 @@ public class RepairController {
     @Autowired
     private IRepairService repairService;
 
+    /**
+     * 分页查询报修单
+     */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -30,41 +33,62 @@ public class RepairController {
         return repairService.queryByPage(pageNo, pageSize, params);
     }
 
+    /**
+     * 通过ID查询报修单
+     */
     @GetMapping("/queryById/{id}")
     public ResultData queryById(@PathVariable Long id) {
         return repairService.queryById(id);
     }
 
+    /**
+     * 新增报修单
+     */
     @PostMapping("/insert")
     @LogPoint("新增报修单")
     public ResultData insert(Repair repair, Long userId) {
         return repairService.insert(repair, userId);
     }
 
+    /**
+     * 修改报修单
+     */
     @PostMapping("/update")
     @LogPoint("修改报修单")
     public ResultData update(Repair repair, Long userId) {
         return repairService.update(repair, userId);
     }
 
+    /**
+     * 指派报修单处理人
+     */
     @PostMapping("/assign/{id}")
     @LogPoint("指派报修维修人员")
     public ResultData assign(@PathVariable Long id, Long repairMemberId, Long userId) {
         return repairService.assign(id, repairMemberId, userId);
     }
 
+    /**
+     * 完成报修单
+     */
     @PostMapping("/complete/{id}")
     @LogPoint("提交报修维修完成")
     public ResultData complete(@PathVariable Long id, Repair repair, Long userId) {
         return repairService.complete(id, repair, userId);
     }
 
+    /**
+     * 确认报修单
+     */
     @PostMapping("/confirm/{id}")
     @LogPoint("确认报修完成")
     public ResultData confirm(@PathVariable Long id, Long userId) {
         return repairService.confirm(id, userId);
     }
 
+    /**
+     * 删除报修单
+     */
     @PostMapping("/delete/{id}")
     @LogPoint("删除报修单")
     public ResultData delete(@PathVariable Long id) {

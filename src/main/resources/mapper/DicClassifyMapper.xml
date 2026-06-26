@@ -11,6 +11,7 @@
         </where>
     </select>
     
+    <!-- 通过名称查询最后阶段 -->
     <select id="queryLastStageByName" resultType="string">
         SELECT b.name
         FROM dic_classify a 
@@ -22,6 +23,7 @@
         </where>
     </select>
     
+    <!-- 通过名称列表查询字典分类 -->
     <select id="queryByNameList" resultMap="tableField">
 		SELECT * FROM dic_classify
 		<where>
@@ -38,6 +40,7 @@
 			javaType="List" select="selectDicDetailByClassifyId"></collection>
 	</resultMap>
 	
+	<!-- 通过分类ID查询字典明细 -->
 	<select id="selectDicDetailByClassifyId" resultType="DicDetail">
 		SELECT * FROM dic_detail
 		<where>

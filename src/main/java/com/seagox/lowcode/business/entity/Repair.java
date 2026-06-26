@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class Repair {
 
+    /**
+     * 主键ID
+     */
     private Long id;
 
     /**
@@ -75,14 +78,26 @@ public class Repair {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date completeAt;
 
+    /**
+     * 创建人ID
+     */
     private Long createdBy;
 
+    /**
+     * 更新人ID
+     */
     private Long updatedBy;
 
+    /**
+     * 创建时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdAt;
 
+    /**
+     * 更新时间
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;

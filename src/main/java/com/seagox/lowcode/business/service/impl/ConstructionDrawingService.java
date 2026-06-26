@@ -39,6 +39,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
@@ -47,6 +50,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(new PageInfo<>(list));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryById(Long id) {
         Map<String, Object> data = constructionDrawingMapper.queryConstructionDrawingById(id);
@@ -60,6 +66,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(data);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryByProjectId(Long projectId) {
         if (projectId == null) {
@@ -72,6 +81,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return queryById(constructionDrawing.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public ResultData save(ConstructionDrawing constructionDrawing, Long userId) {
@@ -127,6 +139,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(original.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData submit(Long id, Long userId) {
         ResultData userResult = checkUserId(userId);
@@ -156,6 +171,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData confirmRead(Long id, String roleKey, Long userId) {
         if (!"owner".equals(roleKey) && !"builder".equals(roleKey)) {
@@ -197,6 +215,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData cancelArchive(Long id, Long userId) {
         ResultData userResult = checkUserId(userId);
@@ -225,6 +246,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData delete(Long id) {
         ConstructionDrawing constructionDrawing = constructionDrawingMapper.selectById(id);
@@ -239,6 +263,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return ResultData.success(null);
     }
 
+    /**
+     * 通过项目ID查询最新施工图出图记录
+     */
     private ConstructionDrawing findByProjectId(Long projectId) {
         LambdaQueryWrapper<ConstructionDrawing> qw = new LambdaQueryWrapper<>();
         qw.eq(ConstructionDrawing::getProjectId, projectId).orderByDesc(ConstructionDrawing::getUpdatedAt);
@@ -246,6 +273,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    /**
+     * 校验当前用户ID
+     */
     private ResultData checkUserId(Long userId) {
         if (userId == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "当前用户不能为空");
@@ -253,6 +283,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return null;
     }
 
+    /**
+     * 校验施工图出图保存参数
+     */
     private ResultData verify(ConstructionDrawing constructionDrawing) {
         if (constructionDrawing == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "施工图出图不能为空");
@@ -278,6 +311,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return null;
     }
 
+    /**
+     * 构建施工图出图版本明细
+     */
     private ConstructionDrawingDetail buildDetail(ConstructionDrawing constructionDrawing, Long constructionDrawingId, Long userId, Date now) {
         ConstructionDrawingDetail detail = new ConstructionDrawingDetail();
         detail.setConstructionDrawingId(constructionDrawingId);
@@ -295,11 +331,17 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return detail;
     }
 
+    /**
+     * 判断是否更新最新版本明细
+     */
     private boolean shouldUpdateLatestDetail(ConstructionDrawingDetail latestDetail, ConstructionDrawingDetail detail) {
         return latestDetail.getVersion() != null
                 && latestDetail.getVersion().equals(detail.getVersion());
     }
 
+    /**
+     * 解析版本号
+     */
     private Integer parseVersion(String version) {
         if (StringUtils.isEmpty(version)) {
             return 1;
@@ -316,10 +358,16 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return Integer.valueOf(value);
     }
 
+    /**
+     * 判断附件内容是否为空
+     */
     private boolean isBlankAttachment(String value) {
         return StringUtils.isEmpty(value) || "[]".equals(value.trim());
     }
 
+    /**
+     * 构建默认确认成员信息
+     */
     private String defaultConfirmMembers() {
         JSONObject data = new JSONObject();
         data.put("owner", confirmation(false, ""));
@@ -327,6 +375,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return data.toJSONString();
     }
 
+    /**
+     * 解析确认成员信息
+     */
     private JSONObject parseConfirmMembers(String value) {
         if (StringUtils.isEmpty(value)) {
             return JSON.parseObject(defaultConfirmMembers());
@@ -348,6 +399,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         }
     }
 
+    /**
+     * 重置确认成员状态
+     */
     private String resetConfirmMembers(String value) {
         JSONObject data = parseConfirmMembers(value);
         resetConfirmation(data, "owner");
@@ -355,6 +409,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return data.toJSONString();
     }
 
+    /**
+     * 重置指定角色确认状态
+     */
     private void resetConfirmation(JSONObject data, String roleKey) {
         JSONObject item = data.getJSONObject(roleKey);
         if (item == null) {
@@ -365,6 +422,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         data.put(roleKey, item);
     }
 
+    /**
+     * 构建确认状态对象
+     */
     private JSONObject confirmation(boolean confirmed, String confirmedAt) {
         JSONObject item = new JSONObject();
         item.put("confirmed", confirmed);
@@ -372,6 +432,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         return item;
     }
 
+    /**
+     * 判断指定角色是否已确认
+     */
     private boolean isConfirmed(JSONObject confirmMembers, String roleKey) {
         JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
         return confirmation != null && Boolean.TRUE.equals(confirmation.getBoolean("confirmed"));

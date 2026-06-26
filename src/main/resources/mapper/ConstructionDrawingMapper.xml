@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.ConstructionDrawingMapper">
+    <!-- 施工图出图查询 SQL -->
     <select id="queryConstructionDrawings" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
@@ -45,6 +46,7 @@
         </where>
         ORDER BY a.updated_at DESC, a.id DESC
     </select>
+    <!-- 通过ID查询施工图出图 -->
     <select id="queryConstructionDrawingById" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
@@ -79,6 +81,7 @@
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
         WHERE a.id = #{id}
     </select>
+    <!-- 查询施工图出图版本明细 -->
     <select id="queryConstructionDrawingDetails" resultType="camelKeyMap">
         SELECT d.id,
                d.construction_drawing_id AS "constructionDrawingId",
@@ -101,6 +104,7 @@
         WHERE d.construction_drawing_id = #{constructionDrawingId}
         ORDER BY d.version DESC, d.id DESC
     </select>
+    <!-- 查询最新版本明细 -->
     <select id="queryLatestDetail" resultType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail">
         SELECT id,
                construction_drawing_id AS "constructionDrawingId",
@@ -127,6 +131,7 @@
               )
         )
     </select>
+    <!-- 新增版本明细 -->
     <insert id="insertDetail" parameterType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO construction_drawing_detail (
             construction_drawing_id,
@@ -156,6 +161,7 @@
             #{updatedAt}
         )
     </insert>
+    <!-- 通过ID更新版本明细 -->
     <update id="updateDetailById" parameterType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail">
         UPDATE construction_drawing_detail
         SET version = #{version},
@@ -169,6 +175,7 @@
             updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
+    <!-- 删除施工图出图版本明细 -->
     <delete id="deleteDetailsByConstructionDrawingId">
         DELETE FROM construction_drawing_detail WHERE construction_drawing_id = #{constructionDrawingId}
     </delete>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.SolutionDesignMapper">
+    <!-- 方案设计查询 SQL -->
     <select id="querySolutionDesigns" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
@@ -49,6 +50,7 @@
         </where>
         ORDER BY a.updated_at DESC, a.id DESC
     </select>
+    <!-- 通过ID查询方案设计 -->
     <select id="querySolutionDesignById" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
@@ -87,6 +89,7 @@
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
         WHERE a.id = #{id}
     </select>
+    <!-- 查询方案设计版本明细 -->
     <select id="querySolutionDesignDetails" resultType="camelKeyMap">
         SELECT d.id,
                d.solution_design_id AS "solutionDesignId",
@@ -110,6 +113,7 @@
         WHERE d.solution_design_id = #{solutionDesignId}
         ORDER BY d.version DESC, d.id DESC
     </select>
+    <!-- 查询最新版本明细 -->
     <select id="queryLatestDetail" resultType="com.seagox.lowcode.business.entity.SolutionDesignDetail">
         SELECT id,
                solution_design_id AS "solutionDesignId",
@@ -137,6 +141,7 @@
               )
         )
     </select>
+    <!-- 新增版本明细 -->
     <insert id="insertDetail" parameterType="com.seagox.lowcode.business.entity.SolutionDesignDetail" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO solution_design_detail (
             solution_design_id,
@@ -168,6 +173,7 @@
             #{updatedAt}
         )
     </insert>
+    <!-- 通过ID更新版本明细 -->
     <update id="updateDetailById" parameterType="com.seagox.lowcode.business.entity.SolutionDesignDetail">
         UPDATE solution_design_detail
         SET version = #{version},
@@ -182,6 +188,7 @@
             updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
+    <!-- 删除方案设计版本明细 -->
     <delete id="deleteDetailsBySolutionDesignId">
         DELETE FROM solution_design_detail WHERE solution_design_id = #{solutionDesignId}
     </delete>

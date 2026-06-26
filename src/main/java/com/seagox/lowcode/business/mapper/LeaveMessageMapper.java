@@ -11,5 +11,8 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface LeaveMessageMapper extends BaseMapper<LeaveMessage> {
 
+    /**
+     * 查询留言列表
+     */
     List<Map<String, Object>> queryLeaveMessages(@Param("params") Map<String, Object> params);
 }
