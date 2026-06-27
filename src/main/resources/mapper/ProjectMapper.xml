@@ -2,5 +2,49 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seagox.lowcode.business.mapper.ProjectMapper">
 
-    <!-- 项目基础数据使用 MyBatis-Plus BaseMapper -->
+    <!-- 查询项目列表，包含已通过请款金额汇总 -->
+    <select id="queryFinanceProjects" resultType="camelKeyMap">
+        SELECT p.id,
+               p.code,
+               p.cover,
+               p.name,
+               p.address,
+               p.budget_amount AS "budgetAmount",
+               COALESCE(used_amount.used_amount, 0) AS "usedAmount",
+               p.status,
+               p.current_phase AS "currentPhase",
+               p.health_status AS "healthStatus",
+               p.pause_reason AS "pauseReason",
+               p.cancel_reason AS "cancelReason",
+               p.planned_start_date AS "plannedStartDate",
+               p.planned_end_date AS "plannedEndDate",
+               p.actual_start_date AS "actualStartDate",
+               p.actual_end_date AS "actualEndDate",
+               p.created_by AS "createdBy",
+               p.updated_by AS "updatedBy",
+               p.created_at AS "createdAt",
+               p.updated_at AS "updatedAt"
+        FROM project p
+        LEFT JOIN (
+            SELECT project_id, SUM(amount) AS used_amount
+            FROM payment_request
+            WHERE status = 3
+            GROUP BY project_id
+        ) used_amount ON used_amount.project_id = p.id
+        <where>
+            <if test="params.code != null and params.code != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.code LIKE CONCAT('%', #{params.code}, '%')</when>
+                    <otherwise>AND p.code LIKE '%' || #{params.code} || '%'</otherwise>
+                </choose>
+            </if>
+            <if test="params.name != null and params.name != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.name}, '%')</when>
+                    <otherwise>AND p.name LIKE '%' || #{params.name} || '%'</otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY p.created_at DESC, p.id DESC
+    </select>
 </mapper>

@@ -86,6 +86,18 @@ public class ProjectService implements IProjectService {
     }
 
     /**
+     * 分页查询项目财务
+     */
+    @Override
+    public ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, String code, String name) {
+        PageHelper.startPage(pageNo, pageSize);
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        params.put("name", name);
+        return ResultData.success(new PageInfo<>(projectMapper.queryFinanceProjects(params)));
+    }
+
+    /**
      * 查询项目详情
      */
     @Override
