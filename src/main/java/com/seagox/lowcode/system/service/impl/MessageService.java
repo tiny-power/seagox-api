@@ -37,7 +37,8 @@ public class MessageService implements IMessageService {
     public ResultData update(Long userId, Long id) {
         SysMessage message = messageMapper.selectById(id);
         message.setStatus(1);
-        message.setUpdateTime(new Date());
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(new Date());
         messageMapper.updateById(message);
         return ResultData.success(null);
     }
@@ -46,7 +47,8 @@ public class MessageService implements IMessageService {
     public ResultData updateAll(Long userId) {
         SysMessage message = new SysMessage();
         message.setStatus(1);
-        message.setUpdateTime(new Date());
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(new Date());
         LambdaQueryWrapper<SysMessage> updateWrapper = new LambdaQueryWrapper<>();
         updateWrapper.eq(SysMessage::getStatus, 0)
                 .eq(SysMessage::getToUserId, userId);
@@ -59,7 +61,7 @@ public class MessageService implements IMessageService {
         LambdaQueryWrapper<SysMessage> qw = new LambdaQueryWrapper<>();
         qw.eq(SysMessage::getCompanyId, companyId)
                 .eq(SysMessage::getToUserId, userId).eq(SysMessage::getStatus, 0)
-                .orderByDesc(SysMessage::getCreateTime);
+                .orderByDesc(SysMessage::getCreatedAt);
         List<SysMessage> sysMessages = messageMapper.selectList(qw);
         if (sysMessages != null && sysMessages.size() > 0){
             return ResultData.success(sysMessages.get(0));

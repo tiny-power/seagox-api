@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `project` (
 CREATE TABLE IF NOT EXISTS `project_stage` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `flow_type` INT UNSIGNED DEFAULT 1 COMMENT '流程类型(1:设计;2:土建;3:精装;4:交付;5:售后)',
+    `flow_type` INT UNSIGNED DEFAULT 1 COMMENT '流程类型(1:设计;2:土建;3:精装;)',
     `stage_name` VARCHAR(100) NOT NULL COMMENT '阶段名称',
     `status` INT UNSIGNED DEFAULT 1 COMMENT '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)',
     `manager_user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '阶段负责人用户ID',
@@ -417,22 +417,6 @@ CREATE TABLE IF NOT EXISTS `project_handover` (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='交接单';
 
-CREATE TABLE IF NOT EXISTS `notification` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `sender_user_id` BIGINT UNSIGNED NOT NULL COMMENT '发送人用户ID',
-    `recipient_user_id` BIGINT UNSIGNED NOT NULL COMMENT '接收人用户ID',
-    `type` INT UNSIGNED DEFAULT 1 COMMENT '消息类型(1:AI提醒;2:管家提醒;3:节点逾期;4:请款审批;)',
-    `title` VARCHAR(200) NOT NULL COMMENT '消息标题',
-    `content` TEXT NOT NULL COMMENT '消息内容',
-    `status` INT UNSIGNED DEFAULT 1 COMMENT '阅读状态(1:未读;2:已读;)',
-    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '修改人',
-    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='提醒/通知';
-
 CREATE TABLE IF NOT EXISTS `phone_code` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `phone` varchar(30) NOT NULL COMMENT '手机号',
@@ -503,17 +487,20 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
 CREATE TABLE IF NOT EXISTS `sys_message`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `type` int(4) DEFAULT 1 COMMENT '类型(1:暂存数据;)',
+    `type` int(4) DEFAULT 1 COMMENT '类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)',
     `from_user_id` bigint(20) NOT NULL COMMENT '用户id(来自)',
     `to_user_id` bigint(20) NOT NULL COMMENT '用户id(给谁)',
     `title` varchar(50) NOT NULL COMMENT '标题',
     `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型',
     `business_key` bigint(20) DEFAULT NULL COMMENT '业务key',
     `status` int(4) DEFAULT 0 COMMENT '状态(0:未读;1:已读;)',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '修改人',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '消息表';
+
 
 CREATE TABLE IF NOT EXISTS `sys_role`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',

@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -397,6 +398,10 @@ public class FlowService implements IFlowService {
         message.setTitle(instance.getName());
         message.setToUserId(instance.getUserId());
         message.setType(1);
+        message.setCreatedBy(instance.getUserId());
+        message.setUpdatedBy(instance.getUserId());
+        message.setCreatedAt(new Date());
+        message.setUpdatedAt(new Date());
         messageMapper.insert(message);
     }
 }

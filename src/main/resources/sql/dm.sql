@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS "public"."project_stage" (
 );
 COMMENT ON COLUMN "public"."project_stage"."id" IS '主键';
 COMMENT ON COLUMN "public"."project_stage"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:设计;2:土建;3:精装;4:交付;5:售后)';
+COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:设计;2:土建;3:精装;)';
 COMMENT ON COLUMN "public"."project_stage"."stage_name" IS '阶段名称';
 COMMENT ON COLUMN "public"."project_stage"."status" IS '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)';
 COMMENT ON COLUMN "public"."project_stage"."manager_user_id" IS '阶段负责人用户ID';
@@ -645,34 +645,6 @@ COMMENT ON COLUMN "public"."project_handover"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."project_handover"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."project_handover" IS '交接单';
 
-CREATE TABLE IF NOT EXISTS "public"."notification" (
-    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    "project_id" BIGINT NOT NULL,
-    "sender_user_id" BIGINT NOT NULL,
-    "recipient_user_id" BIGINT NOT NULL,
-    "type" INTEGER DEFAULT 1,
-    "title" VARCHAR(600) NOT NULL,
-    "content" CLOB NOT NULL,
-    "status" INTEGER DEFAULT 1,
-    "created_by" BIGINT NOT NULL,
-    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_by" BIGINT DEFAULT NULL,
-    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-COMMENT ON COLUMN "public"."notification"."id" IS '主键';
-COMMENT ON COLUMN "public"."notification"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "public"."notification"."sender_user_id" IS '发送人用户ID';
-COMMENT ON COLUMN "public"."notification"."recipient_user_id" IS '接收人用户ID';
-COMMENT ON COLUMN "public"."notification"."type" IS '消息类型(1:AI提醒;2:管家提醒;3:节点逾期;4:请款审批;)';
-COMMENT ON COLUMN "public"."notification"."title" IS '消息标题';
-COMMENT ON COLUMN "public"."notification"."content" IS '消息内容';
-COMMENT ON COLUMN "public"."notification"."status" IS '阅读状态(1:未读;2:已读;)';
-COMMENT ON COLUMN "public"."notification"."created_by" IS '创建人';
-COMMENT ON COLUMN "public"."notification"."created_at" IS '创建时间';
-COMMENT ON COLUMN "public"."notification"."updated_by" IS '修改人';
-COMMENT ON COLUMN "public"."notification"."updated_at" IS '修改时间';
-COMMENT ON TABLE "public"."notification" IS '提醒/通知';
-
 CREATE TABLE IF NOT EXISTS "public"."phone_code" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"phone" VARCHAR(100) NOT NULL,
@@ -793,24 +765,28 @@ CREATE TABLE IF NOT EXISTS "public"."sys_message" (
 	"type" INTEGER DEFAULT 1,
 	"from_user_id" BIGINT NOT NULL,
 	"to_user_id" BIGINT NOT NULL,
-	"title" VARCHAR(150) NOT NULL,
-	"business_type" VARCHAR(150),
-	"business_key" BIGINT NOT NULL,
+	"title" VARCHAR(50) NOT NULL,
+	"business_type" VARCHAR(50),
+	"business_key" BIGINT,
 	"status" INTEGER DEFAULT 0,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"updated_by" BIGINT,
+	"updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."sys_message"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_message"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;)';
+COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)';
 COMMENT ON COLUMN "public"."sys_message"."from_user_id" IS '用户id(来自)';
 COMMENT ON COLUMN "public"."sys_message"."to_user_id" IS '用户id(给谁)';
 COMMENT ON COLUMN "public"."sys_message"."title" IS '标题';
 COMMENT ON COLUMN "public"."sys_message"."business_type" IS '业务类型';
 COMMENT ON COLUMN "public"."sys_message"."business_key" IS '业务key';
 COMMENT ON COLUMN "public"."sys_message"."status" IS '状态(0:未读;1:已读;)';
-COMMENT ON COLUMN "public"."sys_message"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_message"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."sys_message"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."sys_message"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_message"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."sys_message"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."sys_message" IS '消息表';
 
 CREATE TABLE IF NOT EXISTS "public"."sys_role" (

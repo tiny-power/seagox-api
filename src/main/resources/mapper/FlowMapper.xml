@@ -136,7 +136,7 @@
             title AS name,
             business_type AS businessType,
             business_key AS businessKey,
-            DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createTime
         FROM sys_message
         <where>
             type = 1
@@ -149,7 +149,7 @@
                 AND FIND_IN_SET(business_type, #{businessTypeStr})
             </if>
         </where>
-        ORDER BY create_time DESC, id DESC
+        ORDER BY created_at DESC, id DESC
     </select>
 
 </mapper>

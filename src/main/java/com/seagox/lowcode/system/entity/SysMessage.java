@@ -21,7 +21,7 @@ public class SysMessage {
     private Long companyId;
 
     /**
-     * 类型(1:暂存数据;)
+     * 类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)
      */
     private Integer type;
 
@@ -56,18 +56,28 @@ public class SysMessage {
     private Integer status;
 
     /**
+     * 创建人
+     */
+    private Long createdBy;
+
+    /**
      * 创建时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
 
     /**
-     * 更新时间
+     * 修改人
+     */
+    private Long updatedBy;
+
+    /**
+     * 修改时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 
     public Long getId() {
         return id;
@@ -141,20 +151,36 @@ public class SysMessage {
         this.status = status;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Long getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }
