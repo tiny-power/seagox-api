@@ -46,7 +46,6 @@
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.stageId != null and params.stageId != ''">AND a.stage_id = #{params.stageId}</if>
             <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
-            <if test="params.userId != null and params.userId != ''">AND a.created_by = #{params.userId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>

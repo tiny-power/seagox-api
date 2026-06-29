@@ -255,6 +255,12 @@ public class ProjectService implements IProjectService {
         if (StringUtils.isEmpty(project.getAddress())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目地址不能为空");
         }
+        if (StringUtils.isEmpty(project.getOwnerName())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "业主姓名不能为空");
+        }
+        if (StringUtils.isEmpty(project.getOwnerPhone())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "业主联系电话不能为空");
+        }
         if (project.getPlannedStartDate() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "计划开始日期不能为空");
         }

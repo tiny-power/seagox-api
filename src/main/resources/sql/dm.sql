@@ -289,6 +289,8 @@ CREATE TABLE IF NOT EXISTS "public"."project" (
     "cover" VARCHAR(600) NOT NULL,
     "name" VARCHAR(600) NOT NULL,
     "address" VARCHAR(1500) NOT NULL,
+    "owner_name" VARCHAR(300) NOT NULL,
+    "owner_phone" VARCHAR(150) NOT NULL,
     "budget_amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
     "status" INTEGER DEFAULT 1,
     "current_phase" INTEGER DEFAULT 1,
@@ -309,6 +311,8 @@ COMMENT ON COLUMN "public"."project"."code" IS '项目编号';
 COMMENT ON COLUMN "public"."project"."cover" IS '封面图';
 COMMENT ON COLUMN "public"."project"."name" IS '项目名称';
 COMMENT ON COLUMN "public"."project"."address" IS '地址';
+COMMENT ON COLUMN "public"."project"."owner_name" IS '业主姓名';
+COMMENT ON COLUMN "public"."project"."owner_phone" IS '业主联系电话';
 COMMENT ON COLUMN "public"."project"."budget_amount" IS '预算金额';
 COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)';
 COMMENT ON COLUMN "public"."project"."current_phase" IS '当前主要阶段(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)';

@@ -220,6 +220,8 @@ CREATE TABLE IF NOT EXISTS `project` (
     `cover` VARCHAR(200) NOT NULL COMMENT '封面图',
     `name` VARCHAR(200) NOT NULL COMMENT '项目名称',
     `address` VARCHAR(500) NOT NULL COMMENT '地址',
+    `owner_name` VARCHAR(100) NOT NULL COMMENT '业主姓名',
+    `owner_phone` VARCHAR(50) NOT NULL COMMENT '业主联系电话',
     `budget_amount` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '预算金额',
     `status` INT UNSIGNED DEFAULT 1 COMMENT '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)',
     `current_phase` INT UNSIGNED DEFAULT 1 COMMENT '当前主要阶段(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)',

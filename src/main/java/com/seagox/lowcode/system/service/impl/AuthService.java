@@ -483,10 +483,41 @@ public class AuthService implements IAuthService {
 			row.put("member", projectMember);
 			row.put("roleCode", projectMember.getRoleCode());
 			row.put("roleName", PROJECT_ROLE_MAP.get(projectMember.getRoleCode()));
+			row.put("members", buildProjectMembers(project.getId()));
 			row.put("stages", buildStageRows(project.getId()));
 			rows.add(row);
 		}
 		return rows;
+	}
+
+	/**
+	 * 组装项目下全部项目角色人员
+	 */
+	private List<Map<String, Object>> buildProjectMembers(Long projectId) {
+		List<ProjectMember> projectMembers = projectMemberMapper.selectList(new LambdaQueryWrapper<ProjectMember>()
+				.eq(ProjectMember::getProjectId, projectId)
+				.eq(ProjectMember::getStatus, 1)
+				.orderByAsc(ProjectMember::getId));
+		List<Map<String, Object>> members = new ArrayList<>();
+		for (ProjectMember projectMember : projectMembers) {
+			SysAccount account = userMapper.selectById(projectMember.getUserId());
+			if (account == null) {
+				continue;
+			}
+
+			Map<String, Object> member = new HashMap<String, Object>();
+			member.put("id", projectMember.getId());
+			member.put("projectMemberId", projectMember.getId());
+			member.put("projectId", projectMember.getProjectId());
+			member.put("userId", projectMember.getUserId());
+			member.put("name", account.getName());
+			member.put("avatar", account.getAvatar());
+			member.put("phone", account.getPhone());
+			member.put("roleCode", projectMember.getRoleCode());
+			member.put("role", PROJECT_ROLE_MAP.get(projectMember.getRoleCode()));
+			members.add(member);
+		}
+		return members;
 	}
 
 	/**

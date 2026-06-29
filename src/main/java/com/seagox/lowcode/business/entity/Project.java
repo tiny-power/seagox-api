@@ -37,6 +37,16 @@ public class Project {
     private String address;
 
     /**
+     * 业主姓名
+     */
+    private String ownerName;
+
+    /**
+     * 业主联系电话
+     */
+    private String ownerPhone;
+
+    /**
      * 预算金额
      */
     private BigDecimal budgetAmount;
@@ -156,6 +166,22 @@ public class Project {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public String getOwnerPhone() {
+        return ownerPhone;
+    }
+
+    public void setOwnerPhone(String ownerPhone) {
+        this.ownerPhone = ownerPhone;
     }
 
     public BigDecimal getBudgetAmount() {

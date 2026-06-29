@@ -84,8 +84,8 @@ jodconverter:
 
 third-party:
   applets:
-    appid: wx7b1133ed2456302b
-    sercret: 03e4abfbffd42571ce56470c01511980
+    appid: wx402b378a50dfb509
+    sercret: e9d81fe9578f3e7d8c9b4e0c62c20b4a
 
 ignore:
   token: /auth
