@@ -12,7 +12,6 @@
                p.budget_amount AS "budgetAmount",
                COALESCE(used_amount.used_amount, 0) AS "usedAmount",
                p.status,
-               p.current_phase AS "currentPhase",
                p.health_status AS "healthStatus",
                p.pause_reason AS "pauseReason",
                p.cancel_reason AS "cancelReason",

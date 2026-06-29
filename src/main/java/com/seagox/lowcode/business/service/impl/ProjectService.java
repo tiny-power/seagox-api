@@ -19,6 +19,7 @@ import com.seagox.lowcode.business.service.IProjectService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,11 @@ import org.springframework.util.StringUtils;
  */
 @Service
 public class ProjectService implements IProjectService {
+
+    /**
+     * 项目阶段流程类型列表
+     */
+    private static final List<Integer> STAGE_FLOW_TYPES = Arrays.asList(1, 2, 3, 4, 5, 6);
 
     /**
      * 项目数据访问对象
@@ -275,6 +281,17 @@ public class ProjectService implements IProjectService {
         }
         if (CollectionUtils.isEmpty(request.getStages())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目阶段不能为空");
+        }
+        for (ProjectStageSaveRequest stage : request.getStages()) {
+            if (StringUtils.isEmpty(stage.getStageName())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "项目阶段名称不能为空");
+            }
+            if (stage.getFlowType() == null) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "项目阶段流程类型不能为空");
+            }
+            if (!STAGE_FLOW_TYPES.contains(stage.getFlowType())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "项目阶段流程类型不正确");
+            }
         }
         return null;
     }

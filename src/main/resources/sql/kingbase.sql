@@ -292,7 +292,6 @@ CREATE TABLE IF NOT EXISTS "public"."project" (
     "owner_phone" VARCHAR(50) NOT NULL,
     "budget_amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
     "status" INTEGER DEFAULT 1,
-    "current_phase" INTEGER DEFAULT 1,
     "health_status" INTEGER DEFAULT 1,
     "pause_reason" VARCHAR(500) DEFAULT NULL,
     "cancel_reason" VARCHAR(500) DEFAULT NULL,
@@ -314,7 +313,6 @@ COMMENT ON COLUMN "public"."project"."owner_name" IS '业主姓名';
 COMMENT ON COLUMN "public"."project"."owner_phone" IS '业主联系电话';
 COMMENT ON COLUMN "public"."project"."budget_amount" IS '预算金额';
 COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)';
-COMMENT ON COLUMN "public"."project"."current_phase" IS '当前主要阶段(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)';
 COMMENT ON COLUMN "public"."project"."health_status" IS '健康状态(1:正常;2:预警;3:滞后;4:异常;)';
 COMMENT ON COLUMN "public"."project"."pause_reason" IS '暂停原因';
 COMMENT ON COLUMN "public"."project"."cancel_reason" IS '取消原因';
@@ -331,7 +329,7 @@ COMMENT ON TABLE "public"."project" IS '项目';
 CREATE TABLE IF NOT EXISTS "public"."project_stage" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,
     "project_id" BIGINT NOT NULL,
-    "flow_type" INTEGER DEFAULT 1,
+    "flow_type" INTEGER DEFAULT NULL,
     "stage_name" VARCHAR(100) NOT NULL,
     "status" INTEGER DEFAULT 1,
     "manager_user_id" BIGINT DEFAULT NULL,
@@ -350,7 +348,7 @@ CREATE TABLE IF NOT EXISTS "public"."project_stage" (
 );
 COMMENT ON COLUMN "public"."project_stage"."id" IS '主键';
 COMMENT ON COLUMN "public"."project_stage"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:设计;2:土建;3:精装;)';
+COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:设计;2:土建;3:精装;4:筹备;5:交付;6:售后;)';
 COMMENT ON COLUMN "public"."project_stage"."stage_name" IS '阶段名称';
 COMMENT ON COLUMN "public"."project_stage"."status" IS '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)';
 COMMENT ON COLUMN "public"."project_stage"."manager_user_id" IS '阶段负责人用户ID';

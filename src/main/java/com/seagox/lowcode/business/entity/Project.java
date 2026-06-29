@@ -57,11 +57,6 @@ public class Project {
     private Integer status;
 
     /**
-     * 当前阶段
-     */
-    private Integer currentPhase;
-
-    /**
      * 健康状态
      */
     private Integer healthStatus;
@@ -198,14 +193,6 @@ public class Project {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public Integer getCurrentPhase() {
-        return currentPhase;
-    }
-
-    public void setCurrentPhase(Integer currentPhase) {
-        this.currentPhase = currentPhase;
     }
 
     public Integer getHealthStatus() {

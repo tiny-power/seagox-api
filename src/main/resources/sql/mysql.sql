@@ -224,7 +224,6 @@ CREATE TABLE IF NOT EXISTS `project` (
     `owner_phone` VARCHAR(50) NOT NULL COMMENT '业主联系电话',
     `budget_amount` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '预算金额',
     `status` INT UNSIGNED DEFAULT 1 COMMENT '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)',
-    `current_phase` INT UNSIGNED DEFAULT 1 COMMENT '当前主要阶段(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)',
     `health_status` INT UNSIGNED DEFAULT 1 COMMENT '健康状态(1:正常;2:预警;3:滞后;4:异常;)',
     `pause_reason` VARCHAR(500) DEFAULT NULL COMMENT '暂停原因',
     `cancel_reason` VARCHAR(500) DEFAULT NULL COMMENT '取消原因',
@@ -242,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `project` (
 CREATE TABLE IF NOT EXISTS `project_stage` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `flow_type` INT UNSIGNED DEFAULT 1 COMMENT '流程类型(1:设计;2:土建;3:精装;)',
+    `flow_type` INT UNSIGNED DEFAULT NULL COMMENT '流程类型(1:设计;2:土建;3:精装;4:筹备;5:交付;6:售后;)',
     `stage_name` VARCHAR(100) NOT NULL COMMENT '阶段名称',
     `status` INT UNSIGNED DEFAULT 1 COMMENT '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)',
     `manager_user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '阶段负责人用户ID',
