@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS `project_stage` (
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
     `flow_type` INT UNSIGNED DEFAULT NULL COMMENT '流程类型(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后;)',
     `stage_name` VARCHAR(100) NOT NULL COMMENT '阶段名称',
-    `status` INT UNSIGNED DEFAULT 1 COMMENT '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)',
+    `status` INT UNSIGNED DEFAULT 1 COMMENT '状态(1:未开始;2:进行中;3:已完成;)',
     `manager_user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '阶段负责人用户ID',
     `planned_start_date` DATE DEFAULT NULL COMMENT '计划开始日期',
     `planned_end_date` DATE DEFAULT NULL COMMENT '计划完成日期',

@@ -49,7 +49,7 @@ public class InspectionService implements IInspectionService {
     /**
      * 项目阶段已完成
      */
-    private static final int STAGE_STATUS_COMPLETED = 5;
+    private static final int STAGE_STATUS_COMPLETED = 3;
 
     /**
      * 验收单数据访问对象

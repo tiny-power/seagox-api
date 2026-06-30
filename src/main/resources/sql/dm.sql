@@ -351,7 +351,7 @@ COMMENT ON COLUMN "public"."project_stage"."id" IS '主键';
 COMMENT ON COLUMN "public"."project_stage"."project_id" IS '所属项目ID';
 COMMENT ON COLUMN "public"."project_stage"."flow_type" IS '流程类型(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后;)';
 COMMENT ON COLUMN "public"."project_stage"."stage_name" IS '阶段名称';
-COMMENT ON COLUMN "public"."project_stage"."status" IS '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)';
+COMMENT ON COLUMN "public"."project_stage"."status" IS '状态(1:未开始;2:进行中;3:已完成;)';
 COMMENT ON COLUMN "public"."project_stage"."manager_user_id" IS '阶段负责人用户ID';
 COMMENT ON COLUMN "public"."project_stage"."planned_start_date" IS '计划开始日期';
 COMMENT ON COLUMN "public"."project_stage"."planned_end_date" IS '计划完成日期';
