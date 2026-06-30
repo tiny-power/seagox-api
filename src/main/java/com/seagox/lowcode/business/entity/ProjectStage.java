@@ -20,7 +20,7 @@ public class ProjectStage {
     private Long projectId;
 
     /**
-     * 流程类型(1:设计;2:土建;3:精装;4:筹备;5:交付;6:售后)
+     * 流程类型(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后)
      */
     private Integer flowType;
 

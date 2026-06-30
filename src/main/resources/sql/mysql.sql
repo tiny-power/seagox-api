@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `project` (
 CREATE TABLE IF NOT EXISTS `project_stage` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `flow_type` INT UNSIGNED DEFAULT NULL COMMENT '流程类型(1:设计;2:土建;3:精装;4:筹备;5:交付;6:售后;)',
+    `flow_type` INT UNSIGNED DEFAULT NULL COMMENT '流程类型(1:筹备;2:设计;3:土建;4:精装;5:交付;6:售后;)',
     `stage_name` VARCHAR(100) NOT NULL COMMENT '阶段名称',
     `status` INT UNSIGNED DEFAULT 1 COMMENT '状态(1:未开始;2:进行中;3:待验收;4:整改中;5:已完成;)',
     `manager_user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '阶段负责人用户ID',

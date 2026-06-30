@@ -197,16 +197,17 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
 
         Date now = new Date();
         JSONObject confirmMembers = parseConfirmMembers(detail.getConfirmMembers());
-        JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
+        String confirmRoleKey = resolveConfirmRoleKey(confirmMembers, roleKey, userId);
+        JSONObject confirmation = confirmMembers.getJSONObject(confirmRoleKey);
         confirmation.put("confirmed", true);
         confirmation.put("confirmedAt", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now));
-        confirmMembers.put(roleKey, confirmation);
+        confirmMembers.put(confirmRoleKey, confirmation);
 
         detail.setConfirmMembers(confirmMembers.toJSONString());
         detail.setUpdatedBy(userId);
         detail.setUpdatedAt(now);
         constructionDrawingMapper.updateDetailById(detail);
-        if (isConfirmed(confirmMembers, "owner") && isConfirmed(confirmMembers, "builder")) {
+        if (isAllSelectedConfirmed(confirmMembers)) {
             constructionDrawing.setStatus(STATUS_ARCHIVED);
         }
         constructionDrawing.setUpdatedBy(userId);
@@ -438,5 +439,53 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
     private boolean isConfirmed(JSONObject confirmMembers, String roleKey) {
         JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
         return confirmation != null && Boolean.TRUE.equals(confirmation.getBoolean("confirmed"));
+    }
+
+    /**
+     * 判断已选择的确认成员是否都已确认
+     */
+    private boolean isAllSelectedConfirmed(JSONObject confirmMembers) {
+        boolean hasSelectedMember = false;
+        for (String roleKey : new String[]{"owner", "builder"}) {
+            JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
+            if (confirmation == null || !hasSelectedMember(confirmation)) {
+                continue;
+            }
+            hasSelectedMember = true;
+            if (!Boolean.TRUE.equals(confirmation.getBoolean("confirmed"))) {
+                return false;
+            }
+        }
+        return hasSelectedMember;
+    }
+
+    /**
+     * 判断确认成员是否已选择
+     */
+    private boolean hasSelectedMember(JSONObject confirmation) {
+        return StringUtils.hasText(confirmation.getString("memberId"))
+                || StringUtils.hasText(confirmation.getString("userId"))
+                || StringUtils.hasText(confirmation.getString("name"));
+    }
+
+    /**
+     * 兼容确认成员槽位与当前角色不一致的历史数据
+     */
+    private String resolveConfirmRoleKey(JSONObject confirmMembers, String roleKey, Long userId) {
+        JSONObject roleConfirmation = confirmMembers.getJSONObject(roleKey);
+        if (roleConfirmation != null && hasSelectedMember(roleConfirmation)) {
+            return roleKey;
+        }
+
+        String userIdText = String.valueOf(userId);
+        for (String itemRoleKey : new String[]{"owner", "builder"}) {
+            JSONObject confirmation = confirmMembers.getJSONObject(itemRoleKey);
+            if (confirmation != null
+                    && hasSelectedMember(confirmation)
+                    && userIdText.equals(String.valueOf(confirmation.get("userId")))) {
+                return itemRoleKey;
+            }
+        }
+        return roleKey;
     }
 }
