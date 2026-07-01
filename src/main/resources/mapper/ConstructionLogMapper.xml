@@ -42,6 +42,7 @@
         <where>
             AND a.status = 1
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.filledBy != null and params.filledBy != ''">AND a.filled_by = #{params.filledBy}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>

@@ -21,6 +21,7 @@
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         <where>
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.createdBy != null and params.createdBy != ''">AND a.created_by = #{params.createdBy}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>

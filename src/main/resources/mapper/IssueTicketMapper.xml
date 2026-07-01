@@ -5,8 +5,6 @@
     <select id="queryIssueTickets" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
-               a.source_type AS "sourceType",
-               a.source_id AS "sourceId",
                a.title,
                a.description,
                a.issue_attachments AS "issueAttachments",
@@ -60,7 +58,6 @@
                     <otherwise>AND a.title LIKE '%' || #{params.keyword} || '%'</otherwise>
                 </choose>
             </if>
-            <if test="params.sourceType != null and params.sourceType != ''">AND a.source_type = #{params.sourceType}</if>
             <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
         </where>
         ORDER BY a.reported_at DESC, a.id DESC
@@ -69,8 +66,6 @@
     <select id="queryIssueTicketById" resultType="camelKeyMap">
         SELECT a.id,
                a.project_id AS "projectId",
-               a.source_type AS "sourceType",
-               a.source_id AS "sourceId",
                a.title,
                a.description,
                a.issue_attachments AS "issueAttachments",

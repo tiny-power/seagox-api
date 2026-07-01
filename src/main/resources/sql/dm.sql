@@ -498,8 +498,6 @@ COMMENT ON TABLE "public"."inspection" IS '验收单';
 CREATE TABLE IF NOT EXISTS "public"."issue_ticket" (
     "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     "project_id" BIGINT NOT NULL,
-    "source_type" INTEGER DEFAULT 1,
-    "source_id" BIGINT DEFAULT NULL,
     "title" VARCHAR(600) NOT NULL,
     "description" CLOB NOT NULL,
     "issue_attachments" CLOB,
@@ -528,8 +526,6 @@ CREATE TABLE IF NOT EXISTS "public"."issue_ticket" (
 );
 COMMENT ON COLUMN "public"."issue_ticket"."id" IS '主键';
 COMMENT ON COLUMN "public"."issue_ticket"."project_id" IS '所属项目ID';
-COMMENT ON COLUMN "public"."issue_ticket"."source_type" IS '来源类型(1:施工日记;2:验收单;3:交接单;)';
-COMMENT ON COLUMN "public"."issue_ticket"."source_id" IS '来源ID';
 COMMENT ON COLUMN "public"."issue_ticket"."title" IS '问题标题';
 COMMENT ON COLUMN "public"."issue_ticket"."description" IS '问题描述';
 COMMENT ON COLUMN "public"."issue_ticket"."issue_attachments" IS '问题附件';

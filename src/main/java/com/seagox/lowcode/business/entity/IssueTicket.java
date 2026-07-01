@@ -20,16 +20,6 @@ public class IssueTicket {
     private Long projectId;
 
     /**
-     * 问题来源类型
-     */
-    private Integer sourceType;
-
-    /**
-     * 来源单据ID
-     */
-    private Long sourceId;
-
-    /**
      * 问题标题
      */
     private String title;
@@ -184,22 +174,6 @@ public class IssueTicket {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
-    }
-
-    public Integer getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(Integer sourceType) {
-        this.sourceType = sourceType;
-    }
-
-    public Long getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(Long sourceId) {
-        this.sourceId = sourceId;
     }
 
     public String getTitle() {

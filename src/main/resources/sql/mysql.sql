@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `repair`  (
     `before_attachments` JSON COMMENT '维修前附件',
     `contact` VARCHAR(100) NOT NULL COMMENT '联系人',
     `contact_number` VARCHAR(200) NOT NULL COMMENT '联系电话',
-    `status` int(4) DEFAULT 1 COMMENT '状态(1:待受理;2:处理中;3:待确认;4:已完成;)',
+    `status` int(4) DEFAULT 1 COMMENT '状态(1:已提交;2:处理中;3:待确认;4:已完成;)',
     `repair_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '报修时间',
     `after_attachments` JSON COMMENT '维修后附件',
     `repair_member_id` BIGINT UNSIGNED COMMENT '维修人员ID',
@@ -337,8 +337,6 @@ CREATE TABLE IF NOT EXISTS `inspection` (
 CREATE TABLE IF NOT EXISTS `issue_ticket` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `source_type` INT UNSIGNED DEFAULT 1 COMMENT '来源类型(1:施工日记;2:验收单;3:交接单;)',
-    `source_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '来源ID',
     `title` VARCHAR(200) NOT NULL COMMENT '问题标题',
     `description` TEXT NOT NULL COMMENT '问题描述',
     `issue_attachments` JSON COMMENT '问题附件',

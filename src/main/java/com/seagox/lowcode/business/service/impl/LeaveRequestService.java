@@ -123,20 +123,14 @@ public class LeaveRequestService implements ILeaveRequestService {
      */
     @Override
     public ResultData miniQueryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status) {
-        List<Map<String, Object>> source = leaveRequestMapper.queryByPage(companyId, null, null, null, status, null, null);
-        Map<String, String> todoNodeMap = queryTodoNodeMap(companyId, userId);
+        if (userId == null) {
+            return ResultData.success(page(new ArrayList<>(), pageNo, pageSize));
+        }
+        List<Map<String, Object>> source = leaveRequestMapper.queryByPage(companyId, userId, null, null, status, null, null);
         List<Map<String, Object>> result = new ArrayList<>();
         for (Map<String, Object> item : source) {
-            String id = String.valueOf(item.get("id"));
-            Long applicantId = toLong(item.get("applicantId"));
-            boolean applicant = userId != null && userId.equals(applicantId);
-            boolean reviewer = todoNodeMap.containsKey(id);
-            if (!applicant && !reviewer) {
-                continue;
-            }
-            item.put("role", applicant ? "applicant" : "reviewer");
-            item.put("pendingReviewer", reviewer);
-            item.put("currentNode", todoNodeMap.get(id));
+            item.put("role", "applicant");
+            item.put("pendingReviewer", false);
             result.add(item);
         }
         return ResultData.success(page(result, pageNo, pageSize));
