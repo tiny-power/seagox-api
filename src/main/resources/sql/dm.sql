@@ -894,7 +894,7 @@ INSERT INTO "public"."sys_menu" VALUES (54,1,51,3,'删除','iconfont icon-xihuan
 INSERT INTO "public"."sys_menu" VALUES (55,1,51,3,'提交','iconfont icon-xihuan','solutionDesign:submit',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (56,1,51,3,'确认/冻结','iconfont icon-xihuan','solutionDesign:confirm',1,5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (57,1,36,2,'财务管理','iconfont icon-xihuan','finance',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (58,1,57,2,'请款单','iconfont icon-xihuan','paymentRequest',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (58,1,36,2,'请款单','iconfont icon-xihuan','paymentRequest',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (59,1,58,3,'新增','iconfont icon-xihuan','paymentRequest:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (60,1,58,3,'编辑','iconfont icon-xihuan','paymentRequest:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (61,1,58,3,'删除','iconfont icon-xihuan','paymentRequest:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);

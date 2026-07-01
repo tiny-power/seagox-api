@@ -31,17 +31,8 @@
             GROUP BY project_id
         ) used_amount ON used_amount.project_id = p.id
         <where>
-            <if test="params.code != null and params.code != ''">
-                <choose>
-                    <when test="_databaseId == 'mysql'">AND p.code LIKE CONCAT('%', #{params.code}, '%')</when>
-                    <otherwise>AND p.code LIKE '%' || #{params.code} || '%'</otherwise>
-                </choose>
-            </if>
-            <if test="params.name != null and params.name != ''">
-                <choose>
-                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.name}, '%')</when>
-                    <otherwise>AND p.name LIKE '%' || #{params.name} || '%'</otherwise>
-                </choose>
+            <if test="params.projectId != null and params.projectId != ''">
+                AND p.id = #{params.projectId}
             </if>
         </where>
         ORDER BY p.created_at DESC, p.id DESC

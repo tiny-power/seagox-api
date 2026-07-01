@@ -95,11 +95,10 @@ public class ProjectService implements IProjectService {
      * 分页查询项目财务
      */
     @Override
-    public ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, String code, String name) {
+    public ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, Long projectId) {
         PageHelper.startPage(pageNo, pageSize);
         Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        params.put("name", name);
+        params.put("projectId", projectId);
         return ResultData.success(new PageInfo<>(projectMapper.queryFinanceProjects(params)));
     }
 

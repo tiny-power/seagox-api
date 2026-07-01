@@ -27,7 +27,7 @@ public class FinanceController {
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
-                                  String code, String name) {
-        return projectService.queryFinanceByPage(pageNo, pageSize, code, name);
+                                  Long projectId) {
+        return projectService.queryFinanceByPage(pageNo, pageSize, projectId);
     }
 }

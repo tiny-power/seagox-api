@@ -13,7 +13,7 @@ public interface IProjectService {
      */
     ResultData queryByPage(Integer pageNo, Integer pageSize, String code, String name, String status);
 
-    ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, String code, String name);
+    ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, Long projectId);
 
     /**
      * 查询项目详情
