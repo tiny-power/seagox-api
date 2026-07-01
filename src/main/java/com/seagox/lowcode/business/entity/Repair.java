@@ -50,7 +50,7 @@ public class Repair {
     private String contactNumber;
 
     /**
-     * 状态(1:已提交;2:处理中;3:待确认;4:已完成;)
+     * 状态(1:待受理;2:处理中;3:待确认;4:已完成;)
      */
     private Integer status;
 
