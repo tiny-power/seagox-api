@@ -26,8 +26,8 @@ public class MessageController {
      */
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
-                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, Long companyId, Long userId, Integer status, String title) {
-        return messageService.queryByPage(pageNo, pageSize, companyId, userId, status, title);
+                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, Long companyId, Long userId, Integer status, String title, Integer type) {
+        return messageService.queryByPage(pageNo, pageSize, companyId, userId, status, title, type);
     }
 
     /**
@@ -36,6 +36,14 @@ public class MessageController {
     @GetMapping("/queryUnRead")
     public ResultData queryUnRead(Long companyId, Long userId) {
         return messageService.queryUnRead(companyId, userId);
+    }
+
+    /**
+     * 分组查询未读数量
+     */
+    @GetMapping("/queryUnreadGroup")
+    public ResultData queryUnreadGroup(Long companyId, Long userId) {
+        return messageService.queryUnreadGroup(companyId, userId);
     }
 
     /**

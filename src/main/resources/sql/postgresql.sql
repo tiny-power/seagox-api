@@ -780,7 +780,7 @@ CREATE TABLE IF NOT EXISTS "public"."sys_message" (
 );
 COMMENT ON COLUMN "public"."sys_message"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_message"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)';
+COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)';
 COMMENT ON COLUMN "public"."sys_message"."from_user_id" IS '用户id(来自)';
 COMMENT ON COLUMN "public"."sys_message"."to_user_id" IS '用户id(给谁)';
 COMMENT ON COLUMN "public"."sys_message"."title" IS '标题';

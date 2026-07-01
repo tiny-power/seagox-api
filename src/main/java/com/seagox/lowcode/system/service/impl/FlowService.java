@@ -397,11 +397,21 @@ public class FlowService implements IFlowService {
         message.setFromUserId(instance.getUserId());
         message.setTitle(instance.getName());
         message.setToUserId(instance.getUserId());
-        message.setType(1);
+        message.setType(getMessageType(instance.getBusinessType()));
         message.setCreatedBy(instance.getUserId());
         message.setUpdatedBy(instance.getUserId());
         message.setCreatedAt(new Date());
         message.setUpdatedAt(new Date());
         messageMapper.insert(message);
+    }
+
+    private Integer getMessageType(String businessType) {
+        if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+            return 8;
+        }
+        if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+            return 9;
+        }
+        return 1;
     }
 }

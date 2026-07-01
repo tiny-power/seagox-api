@@ -778,7 +778,7 @@ CREATE TABLE IF NOT EXISTS "public"."sys_message" (
 );
 COMMENT ON COLUMN "public"."sys_message"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_message"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)';
+COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)';
 COMMENT ON COLUMN "public"."sys_message"."from_user_id" IS '用户id(来自)';
 COMMENT ON COLUMN "public"."sys_message"."to_user_id" IS '用户id(给谁)';
 COMMENT ON COLUMN "public"."sys_message"."title" IS '标题';
@@ -894,7 +894,7 @@ INSERT INTO "public"."sys_menu" VALUES (54,1,51,3,'删除','iconfont icon-xihuan
 INSERT INTO "public"."sys_menu" VALUES (55,1,51,3,'提交','iconfont icon-xihuan','solutionDesign:submit',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (56,1,51,3,'确认/冻结','iconfont icon-xihuan','solutionDesign:confirm',1,5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (57,1,36,2,'财务管理','iconfont icon-xihuan','finance',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (58,1,36,2,'请款单','iconfont icon-xihuan','paymentRequest',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (58,1,57,2,'请款单','iconfont icon-xihuan','paymentRequest',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (59,1,58,3,'新增','iconfont icon-xihuan','paymentRequest:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (60,1,58,3,'编辑','iconfont icon-xihuan','paymentRequest:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (61,1,58,3,'删除','iconfont icon-xihuan','paymentRequest:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);

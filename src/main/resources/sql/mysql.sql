@@ -488,7 +488,7 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
 CREATE TABLE IF NOT EXISTS `sys_message`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` bigint(20) NOT NULL COMMENT '公司id',
-    `type` int(4) DEFAULT 1 COMMENT '类型(1:暂存数据;2:系统通知;3:项目动态;4:待办事项;5:互动消息;6:管家提醒;)',
+    `type` int(4) DEFAULT 1 COMMENT '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)',
     `from_user_id` bigint(20) NOT NULL COMMENT '用户id(来自)',
     `to_user_id` bigint(20) NOT NULL COMMENT '用户id(给谁)',
     `title` varchar(50) NOT NULL COMMENT '标题',
@@ -527,6 +527,7 @@ CREATE TABLE IF NOT EXISTS `user_role` (
 BEGIN;
 INSERT INTO company VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
 INSERT INTO department VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
+INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35', now(), now());
 INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
 INSERT INTO user_role VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO dept_user VALUES (1, 1, 1, 1, now(), now());
@@ -575,17 +576,17 @@ INSERT INTO sys_menu VALUES (42,1,41,3,'新增文件夹','iconfont icon-xihuan',
 INSERT INTO sys_menu VALUES (43,1,41,3,'上传文件','iconfont icon-xihuan','disk:upload',1,2,now(),now());
 INSERT INTO sys_menu VALUES (44,1,41,3,'重命名','iconfont icon-xihuan','disk:edit',1,3,now(),now());
 INSERT INTO sys_menu VALUES (45,1,41,3,'删除','iconfont icon-xihuan','disk:delete',1,4,now(),now());
-INSERT INTO sys_menu VALUES (46,1,36,2,'财务管理','iconfont icon-xihuan','finance',1,2,now(),now());
-INSERT INTO sys_menu VALUES (47,1,36,2,'需求沟通','iconfont icon-xihuan','requirement',1,3,now(),now());
-INSERT INTO sys_menu VALUES (48,1,36,2,'方案设计','iconfont icon-xihuan','solutionDesign',1,4,now(),now());
-INSERT INTO sys_menu VALUES (49,1,36,2,'施工图出图','iconfont icon-xihuan','constructionDrawing',1,5,now(),now());
-INSERT INTO sys_menu VALUES (50,1,36,2,'请款单','iconfont icon-xihuan','paymentRequest',1,6,now(),now());
-INSERT INTO sys_menu VALUES (51,1,36,2,'施工日志','iconfont icon-xihuan','constructionLog',1,7,now(),now());
-INSERT INTO sys_menu VALUES (52,1,36,2,'验收单','iconfont icon-xihuan','inspection',1,8,now(),now());
-INSERT INTO sys_menu VALUES (53,1,36,2,'问题单','iconfont icon-xihuan','issueTicket',1,9,now(),now());
-INSERT INTO sys_menu VALUES (54,1,36,2,'材料到场','iconfont icon-xihuan','materialArrival',1,10,now(),now());
-INSERT INTO sys_menu VALUES (55,1,36,2,'交接单','iconfont icon-xihuan','projectHandover',1,11,now(),now());
-INSERT INTO sys_menu VALUES (56,1,36,2,'报修单','iconfont icon-xihuan','repair',1,12,now(),now());
+INSERT INTO sys_menu VALUES (46,1,36,2,'需求沟通','iconfont icon-xihuan','requirement',1,2,now(),now());
+INSERT INTO sys_menu VALUES (47,1,36,2,'方案设计','iconfont icon-xihuan','solutionDesign',1,3,now(),now());
+INSERT INTO sys_menu VALUES (48,1,36,2,'财务管理','iconfont icon-xihuan','finance',1,4,now(),now());
+INSERT INTO sys_menu VALUES (49,1,48,2,'请款单','iconfont icon-xihuan','paymentRequest',1,1,now(),now());
+INSERT INTO sys_menu VALUES (50,1,36,2,'施工图出图','iconfont icon-xihuan','constructionDrawing',1,5,now(),now());
+INSERT INTO sys_menu VALUES (51,1,36,2,'施工日志','iconfont icon-xihuan','constructionLog',1,6,now(),now());
+INSERT INTO sys_menu VALUES (52,1,36,2,'验收单','iconfont icon-xihuan','inspection',1,7,now(),now());
+INSERT INTO sys_menu VALUES (53,1,36,2,'问题单','iconfont icon-xihuan','issueTicket',1,8,now(),now());
+INSERT INTO sys_menu VALUES (54,1,36,2,'材料到场','iconfont icon-xihuan','materialArrival',1,9,now(),now());
+INSERT INTO sys_menu VALUES (55,1,36,2,'交接单','iconfont icon-xihuan','projectHandover',1,10,now(),now());
+INSERT INTO sys_menu VALUES (56,1,36,2,'报修单','iconfont icon-xihuan','repair',1,11,now(),now());
 INSERT INTO sys_menu VALUES (57,1,56,3,'指派','iconfont icon-xihuan','repair:assign',1,3,now(),now());
-INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57', now(), now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57' WHERE id=1;
 COMMIT;

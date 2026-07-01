@@ -20,19 +20,33 @@ public class MessageService implements IMessageService {
     @Autowired
     private MessageMapper messageMapper;
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status, String title) {
+    public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status, String title, Integer type) {
         PageHelper.startPage(pageNo, pageSize);
-        List<Map<String, Object>> list = messageMapper.queryAll(companyId, userId, status, title);
+        List<Map<String, Object>> list = messageMapper.queryAll(companyId, userId, status, title, type);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
         return ResultData.success(pageInfo);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData queryUnRead(Long companyId, Long userId) {
         return ResultData.success(messageMapper.queryCount(companyId, userId));
     }
 
+    @Override
+    public ResultData queryUnreadGroup(Long companyId, Long userId) {
+        return ResultData.success(messageMapper.queryUnreadGroup(companyId, userId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData update(Long userId, Long id) {
         SysMessage message = messageMapper.selectById(id);
@@ -43,6 +57,9 @@ public class MessageService implements IMessageService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData updateAll(Long userId) {
         SysMessage message = new SysMessage();
@@ -56,6 +73,9 @@ public class MessageService implements IMessageService {
         return ResultData.success(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultData getUnReadMessage(Long companyId, Long userId) {
         LambdaQueryWrapper<SysMessage> qw = new LambdaQueryWrapper<>();

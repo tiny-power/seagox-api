@@ -12,12 +12,17 @@ public interface IMessageService {
      * @param companyId 公司id
      * @param userId    用户id
      */
-    public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status, String title);
+    public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status, String title, Integer type);
 
     /**
      * 是否有未读消息
      */
     public ResultData queryUnRead(Long companyId, Long userId);
+
+    /**
+     * 分组查询未读数量
+     */
+    public ResultData queryUnreadGroup(Long companyId, Long userId);
 
     /**
      * 处理消息

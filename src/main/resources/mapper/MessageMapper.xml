@@ -10,10 +10,10 @@
 			a.title, 
 			a.status, 
 		    a.business_type AS "businessType",
-			a.business_key AS "businessKey",
+		    a.business_key AS "businessKey",
 			b.name, 
 			<if test="_databaseId == 'mysql'">
-            	DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            	DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') AS "createTime" 
             </if>
             <if test="_databaseId == 'postgresql'">
             	to_char(a.created_at,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
@@ -56,9 +56,24 @@
 			<if test="status != null">
 				and a.status = #{status}
 			</if>
+			<if test="type != null">
+				and a.type = #{type}
+			</if>
 			AND a.to_user_id = #{toUserId}
 		</where>
 		ORDER BY a.created_at DESC
+	</select>
+
+	<!-- 分组查询未读数量 -->
+	<select id="queryUnreadGroup" resultType="camelKeyMap">
+		select a.type, COUNT(a.id) AS "unreadCount" FROM sys_message a
+		LEFT JOIN company c ON c.id = a.company_id
+		<where>
+			a.status = 0
+			AND c.id = #{companyId}
+			AND a.to_user_id = #{toUserId}
+		</where>
+		GROUP BY a.type
 	</select>
 	
 	<!-- 查询未读数量 -->
