@@ -57,12 +57,13 @@ public class ConstructionLogController {
      *
      * @param constructionLog 施工日志
      * @param userId 当前用户ID
+     * @param companyId 公司ID
      * @return 操作结果
      */
     @PostMapping("/insert")
     @LogPoint("新增施工日志")
-    public ResultData insert(ConstructionLog constructionLog, Long userId) {
-        return constructionLogService.insert(constructionLog, userId);
+    public ResultData insert(ConstructionLog constructionLog, Long userId, Long companyId) {
+        return constructionLogService.insert(constructionLog, userId, companyId);
     }
 
     /**
@@ -70,12 +71,13 @@ public class ConstructionLogController {
      *
      * @param constructionLog 施工日志
      * @param userId 当前用户ID
+     * @param companyId 公司ID
      * @return 操作结果
      */
     @PostMapping("/update")
     @LogPoint("修改施工日志")
-    public ResultData update(ConstructionLog constructionLog, Long userId) {
-        return constructionLogService.update(constructionLog, userId);
+    public ResultData update(ConstructionLog constructionLog, Long userId, Long companyId) {
+        return constructionLogService.update(constructionLog, userId, companyId);
     }
 
     /**

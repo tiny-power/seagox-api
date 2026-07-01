@@ -63,8 +63,8 @@ public class SolutionDesignController {
      */
     @PostMapping("/submit/{id}")
     @LogPoint("提交方案设计")
-    public ResultData submit(@PathVariable Long id, Long userId) {
-        return solutionDesignService.submit(id, userId);
+    public ResultData submit(@PathVariable Long id, Long userId, Long companyId) {
+        return solutionDesignService.submit(id, userId, companyId);
     }
 
     /**

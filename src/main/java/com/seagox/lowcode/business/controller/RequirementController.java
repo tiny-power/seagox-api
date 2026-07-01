@@ -66,8 +66,8 @@ public class RequirementController {
      */
     @PostMapping("/submit/{id}")
     @LogPoint("提交需求沟通")
-    public ResultData submit(@PathVariable Long id, Long userId) {
-        return requirementService.submit(id, userId);
+    public ResultData submit(@PathVariable Long id, Long userId, Long companyId) {
+        return requirementService.submit(id, userId, companyId);
     }
 
     /**

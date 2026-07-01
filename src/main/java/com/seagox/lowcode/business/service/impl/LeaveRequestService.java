@@ -135,6 +135,7 @@ public class LeaveRequestService implements ILeaveRequestService {
                 continue;
             }
             item.put("role", applicant ? "applicant" : "reviewer");
+            item.put("pendingReviewer", reviewer);
             item.put("currentNode", todoNodeMap.get(id));
             result.add(item);
         }
@@ -159,6 +160,7 @@ public class LeaveRequestService implements ILeaveRequestService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "无权查看请假单");
         }
         data.put("role", applicant ? "applicant" : "reviewer");
+        data.put("pendingReviewer", reviewer);
         data.put("currentNode", todoNodeMap.get(String.valueOf(id)));
         return ResultData.success(data);
     }

@@ -25,6 +25,7 @@
         LEFT JOIN sys_account applicant ON applicant.id = a.applicant_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         <where>
+            <if test="params.excludeDraft != null and params.excludeDraft != ''">AND a.status != 0</if>
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>

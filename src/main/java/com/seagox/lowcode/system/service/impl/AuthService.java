@@ -257,6 +257,10 @@ public class AuthService implements IAuthService {
 			}
 		}
 
+		if (!hasStartedMiniProject(projectMembers)) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "项目未启动，暂不能登录");
+		}
+
 		if (!StringUtils.isEmpty(openid)) {
 			SysAccount openidUser = userMapper.selectOne(new LambdaQueryWrapper<SysAccount>()
 					.eq(SysAccount::getOpenid, openid)
@@ -405,6 +409,11 @@ public class AuthService implements IAuthService {
 			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未加入项目角色");
 		}
 
+		List<Map<String, Object>> projectRows = buildProjectRows(projectMembers);
+		if (projectRows.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "项目未启动，暂不能登录");
+		}
+
 		Map<String, Object> claims = new HashMap<String, Object>();
 		Map<String, Object> payload = new HashMap<String, Object>();
 		claims.put("bindFlag", true);
@@ -426,8 +435,21 @@ public class AuthService implements IAuthService {
 		claims.put("phone", queryUser.getPhone());
 		claims.put("position", queryUser.getPosition());
 		claims.put("sex", queryUser.getSex());
-		claims.put("projects", buildProjectRows(projectMembers));
+		claims.put("projects", projectRows);
 		return ResultData.success(claims);
+	}
+
+	/**
+	 * 判断是否有已启动的小程序项目
+	 */
+	private boolean hasStartedMiniProject(List<ProjectMember> projectMembers) {
+		for (ProjectMember projectMember : projectMembers) {
+			Project project = projectMapper.selectById(projectMember.getProjectId());
+			if (project != null && project.getStatus() != null && project.getStatus() != 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -474,7 +496,7 @@ public class AuthService implements IAuthService {
 		List<Map<String, Object>> rows = new ArrayList<>();
 		for (ProjectMember projectMember : projectMembers) {
 			Project project = projectMapper.selectById(projectMember.getProjectId());
-			if (project == null) {
+			if (project == null || project.getStatus() == null || project.getStatus() == 1) {
 				continue;
 			}
 

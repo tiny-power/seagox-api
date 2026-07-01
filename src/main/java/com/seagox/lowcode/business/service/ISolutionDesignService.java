@@ -32,7 +32,7 @@ public interface ISolutionDesignService {
     /**
      * 提交方案设计
      */
-    ResultData submit(Long id, Long userId);
+    ResultData submit(Long id, Long userId, Long companyId);
 
     /**
      * 确认方案设计

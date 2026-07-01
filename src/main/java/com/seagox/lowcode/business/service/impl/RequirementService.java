@@ -4,13 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Project;
+import com.seagox.lowcode.business.entity.ProjectMember;
 import com.seagox.lowcode.business.entity.Requirement;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
+import com.seagox.lowcode.business.mapper.ProjectMemberMapper;
 import com.seagox.lowcode.business.mapper.RequirementMapper;
 import com.seagox.lowcode.business.service.IRequirementService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +43,21 @@ public class RequirementService implements IRequirementService {
     public static final int STATUS_COMPLETED = 3;
 
     /**
+     * 需求沟通消息业务类型
+     */
+    private static final String BUSINESS_TYPE = "requirement";
+
+    /**
+     * 需求表消息类型
+     */
+    private static final int MESSAGE_TYPE_REQUIREMENT = 4;
+
+    /**
+     * 业主项目角色编码
+     */
+    private static final int ROLE_OWNER = 10;
+
+    /**
      * 需求沟通数据访问对象
      */
     @Autowired
@@ -49,6 +68,18 @@ public class RequirementService implements IRequirementService {
      */
     @Autowired
     private ProjectMapper projectMapper;
+
+    /**
+     * 项目成员数据访问对象
+     */
+    @Autowired
+    private ProjectMemberMapper projectMemberMapper;
+
+    /**
+     * 消息数据访问对象
+     */
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 分页查询需求沟通
@@ -152,10 +183,14 @@ public class RequirementService implements IRequirementService {
     /**
      * 提交业主审核
      */
+    @Transactional
     @Override
-    public ResultData submit(Long id, Long userId) {
+    public ResultData submit(Long id, Long userId, Long companyId) {
         if (userId == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "当前用户不能为空");
+        }
+        if (companyId == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "公司不能为空");
         }
         Requirement requirement = requirementMapper.selectById(id);
         if (requirement == null) {
@@ -164,10 +199,16 @@ public class RequirementService implements IRequirementService {
         if (Integer.valueOf(STATUS_COMPLETED).equals(requirement.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的需求沟通不可以提交");
         }
+        ProjectMember owner = findOwner(requirement.getProjectId());
+        if (owner == null || owner.getUserId() == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目业主不存在");
+        }
         requirement.setStatus(STATUS_PENDING);
         requirement.setUpdatedBy(userId);
-        requirement.setUpdatedAt(new Date());
+        Date now = new Date();
+        requirement.setUpdatedAt(now);
         requirementMapper.updateById(requirement);
+        refreshOwnerMessage(requirement, owner.getUserId(), userId, companyId, now);
         return ResultData.success(null);
     }
 
@@ -196,6 +237,7 @@ public class RequirementService implements IRequirementService {
         requirement.setUpdatedBy(userId);
         requirement.setUpdatedAt(now);
         requirementMapper.updateById(requirement);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
     }
 
@@ -212,7 +254,43 @@ public class RequirementService implements IRequirementService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的需求沟通不可以删除");
         }
         requirementMapper.deleteById(id);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 查询项目业主
+     */
+    private ProjectMember findOwner(Long projectId) {
+        LambdaQueryWrapper<ProjectMember> qw = new LambdaQueryWrapper<>();
+        qw.eq(ProjectMember::getProjectId, projectId)
+                .eq(ProjectMember::getRoleCode, ROLE_OWNER)
+                .eq(ProjectMember::getStatus, 1)
+                .orderByAsc(ProjectMember::getId);
+        List<ProjectMember> list = projectMemberMapper.selectList(qw);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /**
+     * 重建业主审批消息
+     */
+    private void refreshOwnerMessage(Requirement requirement, Long ownerUserId, Long userId, Long companyId, Date now) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, requirement.getId());
+
+        SysMessage message = new SysMessage();
+        message.setCompanyId(companyId);
+        message.setType(MESSAGE_TYPE_REQUIREMENT);
+        message.setFromUserId(userId);
+        message.setToUserId(ownerUserId);
+        message.setTitle("您有一条需求沟通待审核");
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(requirement.getId());
+        message.setStatus(0);
+        message.setCreatedBy(userId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
     }
 
     /**

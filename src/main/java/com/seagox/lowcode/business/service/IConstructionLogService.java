@@ -34,7 +34,7 @@ public interface IConstructionLogService {
      * @param userId 当前用户ID
      * @return 操作结果
      */
-    ResultData insert(ConstructionLog constructionLog, Long userId);
+    ResultData insert(ConstructionLog constructionLog, Long userId, Long companyId);
 
     /**
      * 修改施工日志
@@ -43,7 +43,7 @@ public interface IConstructionLogService {
      * @param userId 当前用户ID
      * @return 操作结果
      */
-    ResultData update(ConstructionLog constructionLog, Long userId);
+    ResultData update(ConstructionLog constructionLog, Long userId, Long companyId);
 
     /**
      * 删除施工日志

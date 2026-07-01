@@ -2,8 +2,10 @@ package com.seagox.lowcode.business.service.impl;
 
 import app.tinybrief.weave.api.RepositoryService;
 import app.tinybrief.weave.api.RuntimeService;
+import app.tinybrief.weave.api.TaskService;
 import app.tinybrief.weave.api.dto.WeaveDefinition;
 import app.tinybrief.weave.api.dto.WeaveInstance;
+import app.tinybrief.weave.api.dto.WeaveTask;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.PaymentRequest;
@@ -18,8 +20,10 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,12 +85,19 @@ public class PaymentRequestService implements IPaymentRequestService {
     private RuntimeService runtimeService;
 
     /**
+     * 流程任务服务
+     */
+    @Autowired
+    private TaskService taskService;
+
+    /**
      * 分页查询请款单
      */
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = paymentRequestMapper.queryPaymentRequests(params);
+        fillPendingReviewer(list, params);
         MapDateFormatUtils.formatDateValues(list);
         return ResultData.success(new PageInfo<>(list));
     }
@@ -95,11 +106,12 @@ public class PaymentRequestService implements IPaymentRequestService {
      * 查询请款单详情
      */
     @Override
-    public ResultData queryById(Long id) {
+    public ResultData queryById(Long id, Map<String, Object> params) {
         Map<String, Object> data = paymentRequestMapper.queryPaymentRequestById(id);
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请款单不存在");
         }
+        fillPendingReviewer(data, params);
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
@@ -299,5 +311,72 @@ public class PaymentRequestService implements IPaymentRequestService {
      */
     private void terminateProcess(Long companyId, String businessType, String businessKey) {
         runtimeService.terminateProcessInstanceByBusinessKey(businessType, businessKey, companyId, "流程撤销");
+    }
+
+    /**
+     * 标记当前登录用户是否为该请款单当前待审批人
+     */
+    private void fillPendingReviewer(List<Map<String, Object>> list, Map<String, Object> params) {
+        Long companyId = toLong(params == null ? null : params.get("companyId"));
+        Long userId = toLong(params == null ? null : params.get("userId"));
+        Set<String> todoKeys = queryTodoPaymentKeys(companyId, userId);
+        for (Map<String, Object> item : list) {
+            fillPendingReviewer(item, todoKeys);
+        }
+    }
+
+    /**
+     * 标记当前登录用户是否为该请款单当前待审批人
+     */
+    private void fillPendingReviewer(Map<String, Object> item, Map<String, Object> params) {
+        Long companyId = toLong(params == null ? null : params.get("companyId"));
+        Long userId = toLong(params == null ? null : params.get("userId"));
+        Set<String> todoKeys = queryTodoPaymentKeys(companyId, userId);
+        fillPendingReviewer(item, todoKeys);
+    }
+
+    /**
+     * 标记当前登录用户是否为该请款单当前待审批人
+     */
+    private void fillPendingReviewer(Map<String, Object> item, Set<String> todoKeys) {
+        Object id = item.get("id");
+        item.put("pendingReviewer", id != null && todoKeys.contains(String.valueOf(id)));
+    }
+
+    /**
+     * 查询当前用户待审批请款单
+     */
+    private Set<String> queryTodoPaymentKeys(Long companyId, Long userId) {
+        Set<String> result = new HashSet<>();
+        if (companyId == null || userId == null) {
+            return result;
+        }
+        List<WeaveTask> tasks = taskService.createTaskQuery()
+                .companyId(companyId)
+                .taskAssignee(String.valueOf(userId))
+                .list();
+        for (WeaveTask task : tasks) {
+            if (BUSINESS_TYPE.equals(task.getBusinessType())) {
+                result.add(task.getBusinessKey());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 转换Long
+     */
+    private Long toLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        String text = String.valueOf(value);
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+        return Long.valueOf(text);
     }
 }

@@ -4,14 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Project;
+import com.seagox.lowcode.business.entity.ProjectMember;
 import com.seagox.lowcode.business.entity.SolutionDesign;
 import com.seagox.lowcode.business.entity.SolutionDesignDetail;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
+import com.seagox.lowcode.business.mapper.ProjectMemberMapper;
 import com.seagox.lowcode.business.mapper.SolutionDesignMapper;
 import com.seagox.lowcode.business.service.ISolutionDesignService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +36,21 @@ public class SolutionDesignService implements ISolutionDesignService {
     public static final int STATUS_FROZEN = 4;
     public static final int STATUS_DEFROSTING = 5;
     public static final int STATUS_COMPLETED = 6;
+    private static final String BUSINESS_TYPE = "solution_design";
+    private static final int MESSAGE_TYPE_SOLUTION_DESIGN = 5;
+    private static final int ROLE_OWNER = 10;
 
     @Autowired
     private SolutionDesignMapper solutionDesignMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProjectMemberMapper projectMemberMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * {@inheritDoc}
@@ -146,9 +159,34 @@ public class SolutionDesignService implements ISolutionDesignService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
-    public ResultData submit(Long id, Long userId) {
-        return updateStatus(id, userId, STATUS_PENDING, "方案设计不存在", null);
+    public ResultData submit(Long id, Long userId, Long companyId) {
+        ResultData userResult = checkUserId(userId);
+        if (userResult != null) {
+            return userResult;
+        }
+        if (companyId == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "公司不能为空");
+        }
+        SolutionDesign solutionDesign = solutionDesignMapper.selectById(id);
+        if (solutionDesign == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "方案设计不存在");
+        }
+        if (Integer.valueOf(STATUS_COMPLETED).equals(solutionDesign.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的方案设计不可以操作");
+        }
+        ProjectMember owner = findOwner(solutionDesign.getProjectId());
+        if (owner == null || owner.getUserId() == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目业主不存在");
+        }
+        Date now = new Date();
+        solutionDesign.setStatus(STATUS_PENDING);
+        solutionDesign.setUpdatedBy(userId);
+        solutionDesign.setUpdatedAt(now);
+        solutionDesignMapper.updateById(solutionDesign);
+        refreshOwnerMessage(solutionDesign, owner.getUserId(), userId, companyId, now);
+        return ResultData.success(null);
     }
 
     /**
@@ -156,7 +194,11 @@ public class SolutionDesignService implements ISolutionDesignService {
      */
     @Override
     public ResultData confirm(Long id, Long userId) {
-        return updateStatus(id, userId, STATUS_CONFIRMED, "方案设计不存在", STATUS_PENDING);
+        ResultData result = updateStatus(id, userId, STATUS_CONFIRMED, "方案设计不存在", STATUS_PENDING);
+        if (ResultCode.SUCCESS.getCode() == result.getCode()) {
+            messageMapper.deleteMessage(BUSINESS_TYPE, id);
+        }
+        return result;
     }
 
     /**
@@ -284,7 +326,43 @@ public class SolutionDesignService implements ISolutionDesignService {
         }
         solutionDesignMapper.deleteDetailsBySolutionDesignId(id);
         solutionDesignMapper.deleteById(id);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 查询项目业主
+     */
+    private ProjectMember findOwner(Long projectId) {
+        LambdaQueryWrapper<ProjectMember> qw = new LambdaQueryWrapper<>();
+        qw.eq(ProjectMember::getProjectId, projectId)
+                .eq(ProjectMember::getRoleCode, ROLE_OWNER)
+                .eq(ProjectMember::getStatus, 1)
+                .orderByAsc(ProjectMember::getId);
+        List<ProjectMember> list = projectMemberMapper.selectList(qw);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /**
+     * 重建业主确认消息
+     */
+    private void refreshOwnerMessage(SolutionDesign solutionDesign, Long ownerUserId, Long userId, Long companyId, Date now) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, solutionDesign.getId());
+
+        SysMessage message = new SysMessage();
+        message.setCompanyId(companyId);
+        message.setType(MESSAGE_TYPE_SOLUTION_DESIGN);
+        message.setFromUserId(userId);
+        message.setToUserId(ownerUserId);
+        message.setTitle("您有一条方案设计待确认");
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(solutionDesign.getId());
+        message.setStatus(0);
+        message.setCreatedBy(userId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
     }
 
     /**

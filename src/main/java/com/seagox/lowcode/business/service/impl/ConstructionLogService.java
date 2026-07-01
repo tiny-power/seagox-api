@@ -1,5 +1,7 @@
 package com.seagox.lowcode.business.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.ConstructionLog;
@@ -9,9 +11,13 @@ import com.seagox.lowcode.business.service.IConstructionLogService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,6 +39,12 @@ public class ConstructionLogService implements IConstructionLogService {
      */
     @Autowired
     private ProjectMapper projectMapper;
+
+    /**
+     * 消息数据访问对象
+     */
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 分页查询施工日志
@@ -62,7 +74,7 @@ public class ConstructionLogService implements IConstructionLogService {
      * 新增施工日志
      */
     @Override
-    public ResultData insert(ConstructionLog constructionLog, Long userId) {
+    public ResultData insert(ConstructionLog constructionLog, Long userId, Long companyId) {
         ResultData verifyResult = verify(constructionLog);
         if (verifyResult != null) {
             return verifyResult;
@@ -89,6 +101,7 @@ public class ConstructionLogService implements IConstructionLogService {
         constructionLog.setCreatedAt(now);
         constructionLog.setUpdatedAt(now);
         constructionLogMapper.insert(constructionLog);
+        refreshAssistantMessages(constructionLog, userId, companyId, now);
         return ResultData.success(constructionLog.getId());
     }
 
@@ -96,7 +109,7 @@ public class ConstructionLogService implements IConstructionLogService {
      * 修改施工日志
      */
     @Override
-    public ResultData update(ConstructionLog constructionLog, Long userId) {
+    public ResultData update(ConstructionLog constructionLog, Long userId, Long companyId) {
         ResultData verifyResult = verify(constructionLog);
         if (verifyResult != null) {
             return verifyResult;
@@ -130,6 +143,7 @@ public class ConstructionLogService implements IConstructionLogService {
         constructionLog.setUpdatedBy(userId);
         constructionLog.setUpdatedAt(now);
         constructionLogMapper.updateById(constructionLog);
+        refreshAssistantMessages(constructionLog, userId, companyId, now);
         return ResultData.success(null);
     }
 
@@ -141,8 +155,67 @@ public class ConstructionLogService implements IConstructionLogService {
         if (constructionLogMapper.selectById(id) == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "施工日志不存在");
         }
+        messageMapper.deleteMessage("construction_log", id);
         constructionLogMapper.deleteById(id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 重建施工日志相关人员消息
+     */
+    private void refreshAssistantMessages(ConstructionLog constructionLog, Long userId, Long companyId, Date now) {
+        if (constructionLog.getId() == null) {
+            return;
+        }
+
+        messageMapper.deleteMessage("construction_log", constructionLog.getId());
+        if (!Integer.valueOf(1).equals(constructionLog.getStatus()) || companyId == null) {
+            return;
+        }
+
+        Set<Long> userIds = parseAssistantUserIds(constructionLog.getAssistants());
+        for (Long toUserId : userIds) {
+            if (toUserId == null || toUserId.equals(userId)) {
+                continue;
+            }
+            SysMessage message = new SysMessage();
+            message.setCompanyId(companyId);
+            message.setType(11);
+            message.setFromUserId(userId);
+            message.setToUserId(toUserId);
+            message.setTitle("您有一条新的施工日记");
+            message.setBusinessType("construction_log");
+            message.setBusinessKey(constructionLog.getId());
+            message.setStatus(0);
+            message.setCreatedBy(userId);
+            message.setCreatedAt(now);
+            message.setUpdatedBy(userId);
+            message.setUpdatedAt(now);
+            messageMapper.insert(message);
+        }
+    }
+
+    /**
+     * 解析施工日志相关人员用户ID
+     */
+    private Set<Long> parseAssistantUserIds(String assistants) {
+        Set<Long> userIds = new HashSet<>();
+        if (StringUtils.isEmpty(assistants)) {
+            return userIds;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(assistants);
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (item == null || item.get("userId") == null) {
+                    continue;
+                }
+                userIds.add(Long.valueOf(String.valueOf(item.get("userId"))));
+            }
+        } catch (Exception e) {
+            return userIds;
+        }
+        return userIds;
     }
 
     /**

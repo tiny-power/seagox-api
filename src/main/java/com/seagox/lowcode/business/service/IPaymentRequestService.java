@@ -25,7 +25,7 @@ public interface IPaymentRequestService {
      * @param id 请款单ID
      * @return 查询结果
      */
-    ResultData queryById(Long id);
+    ResultData queryById(Long id, Map<String, Object> params);
 
     /**
      * 新增请款单

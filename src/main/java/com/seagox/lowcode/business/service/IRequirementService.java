@@ -32,7 +32,7 @@ public interface IRequirementService {
     /**
      * 提交业主审核
      */
-    ResultData submit(Long id, Long userId);
+    ResultData submit(Long id, Long userId, Long companyId);
 
     /**
      * 签字确认

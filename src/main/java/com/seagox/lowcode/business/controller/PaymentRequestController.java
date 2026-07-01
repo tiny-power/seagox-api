@@ -49,8 +49,8 @@ public class PaymentRequestController {
      * @return 查询结果
      */
     @GetMapping("/queryById/{id}")
-    public ResultData queryById(@PathVariable Long id) {
-        return paymentRequestService.queryById(id);
+    public ResultData queryById(@PathVariable Long id, @RequestParam Map<String, Object> params) {
+        return paymentRequestService.queryById(id, params);
     }
 
     /**
