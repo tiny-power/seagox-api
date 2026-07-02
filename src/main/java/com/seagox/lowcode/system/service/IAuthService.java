@@ -33,8 +33,9 @@ public interface IAuthService {
 	 * @param loginMode  登录方式
 	 * @param openid     小程序openid
 	 * @param avatar     头像
+	 * @param unionid    开放平台unionid
 	 */
-	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar);
+	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar, String unionid);
 
 	/**
 	 * 验证登陆

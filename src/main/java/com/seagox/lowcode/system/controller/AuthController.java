@@ -81,6 +81,7 @@ public class AuthController {
 	@PostMapping("/miniLogin")
 	@LogPoint("小程序登录")
 	public ResultData miniLogin(String phone, String credential, String loginMode, String code, String avatar) {
+		String unionid = null;
 		String openid = null;
 		if (!org.springframework.util.StringUtils.isEmpty(code)) {
 			JSONObject jsonObject = weiChatUtils.getAppletsLoginCertificate(code);
@@ -88,8 +89,9 @@ public class AuthController {
 				return ResultData.warn(ResultCode.INVALID_CODE);
 			}
 			openid = jsonObject.getString("openid");
+			unionid = jsonObject.getString("unionid");
 		}
-		return authService.miniLogin(phone, credential, loginMode, openid, avatar);
+		return authService.miniLogin(phone, credential, loginMode, openid, avatar, unionid);
 	}
 
 	/**

@@ -101,7 +101,7 @@ public class AuthService implements IAuthService {
 
 			// 更新openid
 			if (!StringUtils.isEmpty(openid)) {
-				queryUser.setOpenid(openid);
+				queryUser.setMiniOpenid(openid);
 				queryUser.setAvatar(avatar);
 				userMapper.updateById(queryUser);
 			}
@@ -221,7 +221,7 @@ public class AuthService implements IAuthService {
 	}
 
 	@Override
-	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar) {
+	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar, String unionid) {
 		if (StringUtils.isEmpty(phone)) {
 			return ResultData.warn(ResultCode.PARAMETER_ERROR, "请输入手机号");
 		}
@@ -263,12 +263,13 @@ public class AuthService implements IAuthService {
 
 		if (!StringUtils.isEmpty(openid)) {
 			SysAccount openidUser = userMapper.selectOne(new LambdaQueryWrapper<SysAccount>()
-					.eq(SysAccount::getOpenid, openid)
+					.eq(SysAccount::getMiniOpenid, openid)
 					.eq(SysAccount::getStatus, 1));
 			if (openidUser != null && !openidUser.getId().equals(queryUser.getId())) {
 				return ResultData.warn(ResultCode.PARAMETER_ERROR, "当前微信已绑定其他账号");
 			}
-			queryUser.setOpenid(openid);
+			queryUser.setMiniOpenid(openid);
+			queryUser.setUnionid(unionid);
 			if (!StringUtils.isEmpty(avatar)) {
 				queryUser.setAvatar(avatar);
 			}
@@ -356,7 +357,7 @@ public class AuthService implements IAuthService {
 	@Override
 	public ResultData verifyByOpenid(String openid) {
 		LambdaQueryWrapper<SysAccount> qw = new LambdaQueryWrapper<>();
-		qw.eq(SysAccount::getOpenid, openid).eq(SysAccount::getStatus, 1);
+		qw.eq(SysAccount::getMiniOpenid, openid).eq(SysAccount::getStatus, 1);
 		SysAccount queryUser = userMapper.selectOne(qw);
 		Map<String, Object> claims = new HashMap<String, Object>();
 		claims.put("openid", openid);
@@ -371,7 +372,7 @@ public class AuthService implements IAuthService {
 	@Override
 	public ResultData loginByOpenid(String openid) {
 		LambdaQueryWrapper<SysAccount> queryWrapper = new LambdaQueryWrapper<SysAccount>();
-		queryWrapper.eq(SysAccount::getOpenid, openid).eq(SysAccount::getStatus, 1);
+		queryWrapper.eq(SysAccount::getMiniOpenid, openid).eq(SysAccount::getStatus, 1);
 		SysAccount queryUser = userMapper.selectOne(queryWrapper);
 		if (queryUser == null) {
 			Map<String, Object> claims = new HashMap<String, Object>();

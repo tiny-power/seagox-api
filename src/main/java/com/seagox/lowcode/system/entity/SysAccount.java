@@ -69,7 +69,17 @@ public class SysAccount {
     /**
      * 小程序openid
      */
-    private String openid;
+    private String miniOpenid;
+    
+    /**
+     * 开放平台unionid
+     */
+    private String unionid;
+    
+    /**
+     * 服务号openid
+     */
+    private String mpOpenid;
 
     /**
      * 排序
@@ -190,15 +200,32 @@ public class SysAccount {
         this.type = type;
     }
 
-    public String getOpenid() {
-        return openid;
-    }
 
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
+    public String getMiniOpenid() {
+		return miniOpenid;
+	}
 
-    public Integer getSort() {
+	public void setMiniOpenid(String miniOpenid) {
+		this.miniOpenid = miniOpenid;
+	}
+
+	public String getUnionid() {
+		return unionid;
+	}
+
+	public void setUnionid(String unionid) {
+		this.unionid = unionid;
+	}
+
+	public String getMpOpenid() {
+		return mpOpenid;
+	}
+
+	public void setMpOpenid(String mpOpenid) {
+		this.mpOpenid = mpOpenid;
+	}
+
+	public Integer getSort() {
         return sort;
     }
 

@@ -36,14 +36,27 @@ public class WeiChatUtils {
     /**
      * 小程序APPID
      */
-    @Value("${third-party.applets.appid}")
+    @Value("${third-party.mini-program.appid}")
     private String appletsAppid;
 
     /**
      * 小程序SERCRET
      */
-    @Value("${third-party.applets.sercret}")
+    @Value("${third-party.mini-program.sercret}")
     private String appletsSercret;
+    
+    
+    /**
+     * 服务号APPID
+     */
+    @Value("${third-party.official-account.appid}")
+    private String servicesAppid;
+
+    /**
+     * 服务号SERCRET
+     */
+    @Value("${third-party.official-account.sercret}")
+    private String servicesSercret;
 
     /**
      * 获取小程序登录凭证
@@ -78,6 +91,7 @@ public class WeiChatUtils {
      * 解析微信返回的JSON字符串
      */
     private JSONObject parseJson(String response) {
+    	System.err.println(response);
         if (StringUtils.isEmpty(response)) {
             return null;
         }

@@ -83,8 +83,11 @@ jodconverter:
   working-dir: /Users/X/Downloads
 
 third-party:
-  applets:
+  mini-program:
     appid: wx402b378a50dfb509
+    sercret: e9d81fe9578f3e7d8c9b4e0c62c20b4a
+  official-account:
+    appid: wx976a6670942e1223
     sercret: e9d81fe9578f3e7d8c9b4e0c62c20b4a
 
 ignore:

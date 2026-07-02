@@ -27,13 +27,21 @@
   "type": "java.lang.String",
   "description": "A description for 'jodconverter.working-dir'"
 },{
-  "name": "third-party.applets.appid",
+  "name": "third-party.mini-program.appid",
   "type": "java.lang.String",
   "description": "A description for 'third-party.applets.appid'"
 },{
-  "name": "third-party.applets.sercret",
+  "name": "third-party.mini-program.sercret",
   "type": "java.lang.String",
   "description": "A description for 'third-party.applets.sercret'"
+},{
+  "name": "third-party.official-account.appid",
+  "type": "java.lang.String",
+  "description": "A description for 'third-party.services.appid'"
+},{
+  "name": "third-party.official-account.sercret",
+  "type": "java.lang.String",
+  "description": "A description for 'third-party.services.sercret'"
 },{
   "name": "ignore.token",
   "type": "java.lang.String",
