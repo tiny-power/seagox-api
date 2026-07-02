@@ -57,27 +57,6 @@ oss:
   access-key: admin
   secret-key: Tiny_minio_4512
   url: http://192.168.31.52:9000
-  accept:
-    - png
-    - jpeg
-    - jpg
-    - tif
-    - tiff
-    - gif
-    - bmp
-    - svg
-    - txt
-    - mp4
-    - doc
-    - docx
-    - xls
-    - xlsx
-    - ppt
-    - pptx
-    - pdf
-    - ofd
-    - zip
-    - rar
 
 jodconverter:
   working-dir: /Users/X/Downloads
@@ -88,7 +67,7 @@ third-party:
     sercret: e9d81fe9578f3e7d8c9b4e0c62c20b4a
   official-account:
     appid: wx976a6670942e1223
-    sercret: e9d81fe9578f3e7d8c9b4e0c62c20b4a
+    sercret: 6ebabe703319a499b40fd275f37cb896
 
 ignore:
   token: /auth

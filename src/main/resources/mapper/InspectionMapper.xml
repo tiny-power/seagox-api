@@ -45,6 +45,29 @@
         <where>
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.stageId != null and params.stageId != ''">AND a.stage_id = #{params.stageId}</if>
+            <if test="params.createdBy != null and params.createdBy != ''">AND a.created_by = #{params.createdBy}</if>
+            <if test="params.viewerUserId != null and params.viewerUserId != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">
+                        AND (
+                            a.created_by = #{params.viewerUserId}
+                            OR a.participants LIKE CONCAT('%"userId":', #{params.viewerUserId}, '%')
+                            OR a.participants LIKE CONCAT('%"userId":"', #{params.viewerUserId}, '"%')
+                            OR a.participants LIKE CONCAT('%"userId"%', #{params.viewerUserId}, '%')
+                            OR a.participants LIKE CONCAT('%"accountId"%', #{params.viewerUserId}, '%')
+                        )
+                    </when>
+                    <otherwise>
+                        AND (
+                            a.created_by = #{params.viewerUserId}
+                            OR a.participants LIKE '%"userId":' || #{params.viewerUserId} || '%'
+                            OR a.participants LIKE '%"userId":"' || #{params.viewerUserId} || '"%'
+                            OR a.participants LIKE '%"userId"%' || #{params.viewerUserId} || '%'
+                            OR a.participants LIKE '%"accountId"%' || #{params.viewerUserId} || '%'
+                        )
+                    </otherwise>
+                </choose>
+            </if>
             <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>

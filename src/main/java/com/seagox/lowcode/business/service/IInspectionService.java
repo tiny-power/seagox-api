@@ -34,7 +34,7 @@ public interface IInspectionService {
      * @param userId 当前用户ID
      * @return 操作结果
      */
-    ResultData insert(Inspection inspection, Long userId);
+    ResultData insert(Inspection inspection, Long userId, Long companyId);
 
     /**
      * 修改验收单
@@ -43,7 +43,7 @@ public interface IInspectionService {
      * @param userId 当前用户ID
      * @return 操作结果
      */
-    ResultData update(Inspection inspection, Long userId);
+    ResultData update(Inspection inspection, Long userId, Long companyId);
 
     /**
      * 完成验收单

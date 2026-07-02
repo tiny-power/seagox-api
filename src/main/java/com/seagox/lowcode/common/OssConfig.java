@@ -1,7 +1,5 @@
 package com.seagox.lowcode.common;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +16,6 @@ public class OssConfig {
 	private String secretKey;
 	
 	private String url;
-	
-	private List<String> accept;
 
 	public String getType() {
 		return type;
@@ -59,14 +55,6 @@ public class OssConfig {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public List<String> getAccept() {
-		return accept;
-	}
-
-	public void setAccept(List<String> accept) {
-		this.accept = accept;
 	}
 	
 }

@@ -37,8 +37,23 @@ public class InspectionController {
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
-                                  @RequestParam Map<String, Object> params) {
+                                  @RequestParam Map<String, Object> params,
+                                  Long userId) {
+        if (isOnlyMine(params) && userId != null) {
+            params.put("viewerUserId", userId);
+        }
         return inspectionService.queryByPage(pageNo, pageSize, params);
+    }
+
+    /**
+     * 是否只查询当前用户创建的数据
+     */
+    private boolean isOnlyMine(Map<String, Object> params) {
+        if (params == null || params.get("onlyMine") == null) {
+            return false;
+        }
+        String onlyMine = String.valueOf(params.get("onlyMine"));
+        return "1".equals(onlyMine) || "true".equalsIgnoreCase(onlyMine);
     }
 
     /**
@@ -61,8 +76,8 @@ public class InspectionController {
      */
     @PostMapping("/insert")
     @LogPoint("新增验收单")
-    public ResultData insert(Inspection inspection, Long userId) {
-        return inspectionService.insert(inspection, userId);
+    public ResultData insert(Inspection inspection, Long userId, Long companyId) {
+        return inspectionService.insert(inspection, userId, companyId);
     }
 
     /**
@@ -74,8 +89,8 @@ public class InspectionController {
      */
     @PostMapping("/update")
     @LogPoint("修改验收单")
-    public ResultData update(Inspection inspection, Long userId) {
-        return inspectionService.update(inspection, userId);
+    public ResultData update(Inspection inspection, Long userId, Long companyId) {
+        return inspectionService.update(inspection, userId, companyId);
     }
 
     /**

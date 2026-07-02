@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Locale;
-import java.util.List;
 
 /**
  * 文件上传下载
@@ -35,20 +34,15 @@ public class UploadController {
     @LogPoint("文件上传")
     @PostMapping("/putObject/{bucketName}")
     public ResultData putObject(@RequestParam("file") MultipartFile file, @PathVariable String bucketName) throws IOException {
-    	List<String> accept = ossConfig.getAccept();
     	String suffix = getSuffix(file);
-    	if(accept.contains(suffix)) {
-            String originalFilename = fillFilenameSuffix(file.getOriginalFilename(), suffix);
-    		String address = uploadService.uploadByInputStream(bucketName, originalFilename,
-                    file.getContentType(), file.getSize(), file.getInputStream());
-            if (StringUtils.isEmpty(address)) {
-                return ResultData.warn(ResultCode.OTHER_ERROR, "文件服务器配置有误");
-            } else {
-                return ResultData.success(address);
-            }
-    	} else {
-    		return ResultData.warn(ResultCode.OTHER_ERROR, "文件类型不支持");
-    	}
+        String originalFilename = fillFilenameSuffix(file.getOriginalFilename(), suffix);
+		String address = uploadService.uploadByInputStream(bucketName, originalFilename,
+                file.getContentType(), file.getSize(), file.getInputStream());
+        if (StringUtils.isEmpty(address)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "文件服务器配置有误");
+        } else {
+            return ResultData.success(address);
+        }
     }
 
     private String getSuffix(MultipartFile file) {

@@ -16,6 +16,8 @@ import com.seagox.lowcode.business.service.IInspectionService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +54,16 @@ public class InspectionService implements IInspectionService {
     private static final int STAGE_STATUS_COMPLETED = 3;
 
     /**
+     * 验收单消息业务类型
+     */
+    private static final String BUSINESS_TYPE = "inspection";
+
+    /**
+     * 验收单消息类型
+     */
+    private static final int MESSAGE_TYPE_INSPECTION = 7;
+
+    /**
      * 验收单数据访问对象
      */
     @Autowired
@@ -74,6 +86,12 @@ public class InspectionService implements IInspectionService {
      */
     @Autowired
     private StageInspectionItemMapper stageInspectionItemMapper;
+
+    /**
+     * 消息数据访问对象
+     */
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 分页查询验收单
@@ -102,8 +120,9 @@ public class InspectionService implements IInspectionService {
     /**
      * 新增验收单
      */
+    @Transactional
     @Override
-    public ResultData insert(Inspection inspection, Long userId) {
+    public ResultData insert(Inspection inspection, Long userId, Long companyId) {
         ResultData verifyResult = verify(inspection);
         if (verifyResult != null) {
             return verifyResult;
@@ -124,14 +143,16 @@ public class InspectionService implements IInspectionService {
         inspection.setCreatedAt(now);
         inspection.setUpdatedAt(now);
         inspectionMapper.insert(inspection);
+        refreshParticipantMessages(inspection, userId, companyId, now);
         return ResultData.success(inspection.getId());
     }
 
     /**
      * 修改验收单
      */
+    @Transactional
     @Override
-    public ResultData update(Inspection inspection, Long userId) {
+    public ResultData update(Inspection inspection, Long userId, Long companyId) {
         if (inspection == null || inspection.getId() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单ID不能为空");
         }
@@ -161,6 +182,7 @@ public class InspectionService implements IInspectionService {
         inspection.setUpdatedBy(userId);
         inspection.setUpdatedAt(now);
         inspectionMapper.updateById(inspection);
+        refreshParticipantMessages(inspection, userId, companyId, now);
         return ResultData.success(null);
     }
 
@@ -178,6 +200,18 @@ public class InspectionService implements IInspectionService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
         if (Integer.valueOf(STATUS_COMPLETED).equals(exist.getStatus())) {
+            ResultData participantResult = verifyParticipant(exist, userId);
+            if (participantResult != null) {
+                return participantResult;
+            }
+            if (inspection.getInspectionItems() != null && inspection.getInspectionItems().trim().length() > 0) {
+                Date now = new Date();
+                exist.setInspectionItems(markInspectionItemsCompleted(inspection.getInspectionItems()));
+                exist.setUpdatedBy(userId);
+                exist.setUpdatedAt(now);
+                inspectionMapper.updateById(exist);
+                return ResultData.success(null);
+            }
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单已完成");
         }
         ResultData participantResult = verifyParticipant(exist, userId);
@@ -186,7 +220,8 @@ public class InspectionService implements IInspectionService {
         }
 
         Date now = new Date();
-        exist.setInspectionItems(inspection.getInspectionItems() == null ? exist.getInspectionItems() : inspection.getInspectionItems());
+        String inspectionItems = inspection.getInspectionItems() == null ? exist.getInspectionItems() : inspection.getInspectionItems();
+        exist.setInspectionItems(markInspectionItemsCompleted(inspectionItems));
         exist.setSitePhotos(inspection.getSitePhotos() == null ? exist.getSitePhotos() : inspection.getSitePhotos());
         exist.setParticipants(inspection.getParticipants() == null ? exist.getParticipants() : inspection.getParticipants());
         exist.setSignatures(inspection.getSignatures() == null ? exist.getSignatures() : inspection.getSignatures());
@@ -197,8 +232,33 @@ public class InspectionService implements IInspectionService {
         exist.setUpdatedBy(userId);
         exist.setUpdatedAt(now);
         inspectionMapper.updateById(exist);
+        messageMapper.deleteMessage(BUSINESS_TYPE, exist.getId());
         completeProjectStage(exist, userId, now);
         return ResultData.success(null);
+    }
+
+    /**
+     * 验收完成后同步本次验收项目状态
+     */
+    private String markInspectionItemsCompleted(String inspectionItems) {
+        if (inspectionItems == null || inspectionItems.trim().length() == 0) {
+            return inspectionItems;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(inspectionItems);
+            for (int i = 0; i < items.size(); i++) {
+                Object raw = items.get(i);
+                if (!(raw instanceof JSONObject)) {
+                    continue;
+                }
+                JSONObject item = (JSONObject) raw;
+                item.put("status", "completed");
+                item.put("statusText", "验收完成");
+            }
+            return items.toJSONString();
+        } catch (Exception e) {
+            return inspectionItems;
+        }
     }
 
     /**
@@ -313,7 +373,71 @@ public class InspectionService implements IInspectionService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
         inspectionMapper.deleteById(id);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 重建验收人消息
+     */
+    private void refreshParticipantMessages(Inspection inspection, Long userId, Long companyId, Date now) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, inspection.getId());
+        if (companyId == null || inspection.getId() == null
+                || Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())) {
+            return;
+        }
+        Set<Long> participantUserIds = parseParticipantUserIds(inspection.getParticipants());
+        for (Long toUserId : participantUserIds) {
+            if (toUserId == null || toUserId.equals(userId)) {
+                continue;
+            }
+            SysMessage message = new SysMessage();
+            message.setCompanyId(companyId);
+            message.setType(MESSAGE_TYPE_INSPECTION);
+            message.setFromUserId(userId);
+            message.setToUserId(toUserId);
+            message.setTitle("您有一条验收单待处理");
+            message.setBusinessType(BUSINESS_TYPE);
+            message.setBusinessKey(inspection.getId());
+            message.setStatus(0);
+            message.setCreatedBy(userId);
+            message.setCreatedAt(now);
+            message.setUpdatedBy(userId);
+            message.setUpdatedAt(now);
+            messageMapper.insert(message);
+        }
+    }
+
+    /**
+     * 解析验收人用户ID
+     */
+    private Set<Long> parseParticipantUserIds(String participants) {
+        Set<Long> userIds = new HashSet<>();
+        if (participants == null || participants.trim().length() == 0) {
+            return userIds;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(participants);
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (item == null) {
+                    continue;
+                }
+                Object userId = item.get("userId");
+                if (userId == null) {
+                    userId = item.get("accountId");
+                }
+                if (userId == null) {
+                    userId = item.get("backendUserId");
+                }
+                if (userId != null) {
+                    userIds.add(Long.valueOf(String.valueOf(userId)));
+                }
+            }
+        } catch (Exception e) {
+            return userIds;
+        }
+        return userIds;
     }
 
     /**
