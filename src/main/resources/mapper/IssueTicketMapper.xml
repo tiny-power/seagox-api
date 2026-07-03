@@ -8,23 +8,10 @@
                a.title,
                a.description,
                a.issue_attachments AS "issueAttachments",
-               a.reported_by AS "reportedBy",
-               a.reported_at AS "reportedAt",
-               a.assigned_by AS "assignedBy",
-               a.assigned_at AS "assignedAt",
-               a.rectification_deadline AS "rectificationDeadline",
-               a.rectification_count AS "rectificationCount",
-               a.rectification_description AS "rectificationDescription",
-               a.rectification_attachments AS "rectificationAttachments",
-               a.rectification_user_id AS "rectificationUserId",
-               a.rectification_submitted_at AS "rectificationSubmittedAt",
-               a.review_user_id AS "reviewUserId",
-               a.review_result AS "reviewResult",
-               a.review_remark AS "reviewRemark",
-               a.review_attachments AS "reviewAttachments",
-               a.reviewed_at AS "reviewedAt",
-               a.closed_by AS "closedBy",
-               a.closed_at AS "closedAt",
+               a.assignee,
+               a.due_date AS "dueDate",
+               a.confirmed,
+               a.resolution,
                a.status,
                a.created_by AS "createdBy",
                a.created_at AS "createdAt",
@@ -32,18 +19,12 @@
                a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
-               reporter.name AS "reportedByName",
-               assigned.name AS "assignedByName",
-               rectifier.name AS "rectificationUserName",
-               reviewer.name AS "reviewUserName",
-               closer.name AS "closedByName"
+               creator.name AS "createdByName",
+               assignee.name AS "assigneeName"
         FROM issue_ticket a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN sys_account reporter ON reporter.id = a.reported_by
-        LEFT JOIN sys_account assigned ON assigned.id = a.assigned_by
-        LEFT JOIN sys_account rectifier ON rectifier.id = a.rectification_user_id
-        LEFT JOIN sys_account reviewer ON reviewer.id = a.review_user_id
-        LEFT JOIN sys_account closer ON closer.id = a.closed_by
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account assignee ON assignee.id = a.assignee
         <where>
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
             <if test="params.projectName != null and params.projectName != ''">
@@ -60,7 +41,7 @@
             </if>
             <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
         </where>
-        ORDER BY a.reported_at DESC, a.id DESC
+        ORDER BY a.created_at DESC, a.id DESC
     </select>
     <!-- 查询问题单详情 -->
     <select id="queryIssueTicketById" resultType="camelKeyMap">
@@ -69,23 +50,10 @@
                a.title,
                a.description,
                a.issue_attachments AS "issueAttachments",
-               a.reported_by AS "reportedBy",
-               a.reported_at AS "reportedAt",
-               a.assigned_by AS "assignedBy",
-               a.assigned_at AS "assignedAt",
-               a.rectification_deadline AS "rectificationDeadline",
-               a.rectification_count AS "rectificationCount",
-               a.rectification_description AS "rectificationDescription",
-               a.rectification_attachments AS "rectificationAttachments",
-               a.rectification_user_id AS "rectificationUserId",
-               a.rectification_submitted_at AS "rectificationSubmittedAt",
-               a.review_user_id AS "reviewUserId",
-               a.review_result AS "reviewResult",
-               a.review_remark AS "reviewRemark",
-               a.review_attachments AS "reviewAttachments",
-               a.reviewed_at AS "reviewedAt",
-               a.closed_by AS "closedBy",
-               a.closed_at AS "closedAt",
+               a.assignee,
+               a.due_date AS "dueDate",
+               a.confirmed,
+               a.resolution,
                a.status,
                a.created_by AS "createdBy",
                a.created_at AS "createdAt",
@@ -93,18 +61,12 @@
                a.updated_at AS "updatedAt",
                p.code AS "projectCode",
                p.name AS "projectName",
-               reporter.name AS "reportedByName",
-               assigned.name AS "assignedByName",
-               rectifier.name AS "rectificationUserName",
-               reviewer.name AS "reviewUserName",
-               closer.name AS "closedByName"
+               creator.name AS "createdByName",
+               assignee.name AS "assigneeName"
         FROM issue_ticket a
         LEFT JOIN project p ON p.id = a.project_id
-        LEFT JOIN sys_account reporter ON reporter.id = a.reported_by
-        LEFT JOIN sys_account assigned ON assigned.id = a.assigned_by
-        LEFT JOIN sys_account rectifier ON rectifier.id = a.rectification_user_id
-        LEFT JOIN sys_account reviewer ON reviewer.id = a.review_user_id
-        LEFT JOIN sys_account closer ON closer.id = a.closed_by
+        LEFT JOIN sys_account creator ON creator.id = a.created_by
+        LEFT JOIN sys_account assignee ON assignee.id = a.assignee
         WHERE a.id = #{id}
     </select>
 </mapper>

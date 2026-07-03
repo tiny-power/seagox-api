@@ -1,7 +1,8 @@
 package com.seagox.lowcode.business.entity;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -35,104 +36,29 @@ public class IssueTicket {
     private String issueAttachments;
 
     /**
-     * 问题发现人用户ID
+     * 负责人
      */
-    private Long reportedBy;
+    private Long assignee;
 
     /**
-     * 问题发现时间
+     * 截止日期
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date reportedAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date dueDate;
 
     /**
-     * 分配人用户ID
+     * 是否确认(0:未确认;1:已确认;)
      */
-    private Long assignedBy;
+    private Integer confirmed;
 
     /**
-     * 分配时间
+     * 解决方案
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date assignedAt;
+    private String resolution;
 
     /**
-     * 整改截止时间
-     */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date rectificationDeadline;
-
-    /**
-     * 整改提交次数
-     */
-    private Integer rectificationCount;
-
-    /**
-     * 整改说明
-     */
-    private String rectificationDescription;
-
-    /**
-     * 整改附件
-     */
-    private String rectificationAttachments;
-
-    /**
-     * 整改责任人用户ID
-     */
-    private Long rectificationUserId;
-
-    /**
-     * 整改提交时间
-     */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date rectificationSubmittedAt;
-
-    /**
-     * 复验人用户ID
-     */
-    private Long reviewUserId;
-
-    /**
-     * 复验结果
-     */
-    private Integer reviewResult;
-
-    /**
-     * 复验说明
-     */
-    private String reviewRemark;
-
-    /**
-     * 复验附件
-     */
-    private String reviewAttachments;
-
-    /**
-     * 复验时间
-     */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date reviewedAt;
-
-    /**
-     * 关闭人用户ID
-     */
-    private Long closedBy;
-
-    /**
-     * 关闭时间
-     */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date closedAt;
-
-    /**
-     * 状态
+     * 状态(1:激活;2:已解决;3:已关闭;)
      */
     private Integer status;
 
@@ -159,6 +85,66 @@ public class IssueTicket {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
+
+    /**
+     * 兼容旧接口：整改责任人
+     */
+    @TableField(exist = false)
+    private Long rectificationUserId;
+
+    /**
+     * 兼容旧接口：整改截止时间
+     */
+    @TableField(exist = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date rectificationDeadline;
+
+    /**
+     * 兼容旧接口：整改说明
+     */
+    @TableField(exist = false)
+    private String rectificationDescription;
+
+    /**
+     * 兼容旧接口：整改附件
+     */
+    @TableField(exist = false)
+    private String rectificationAttachments;
+
+    /**
+     * 兼容旧接口：整改提交时间
+     */
+    @TableField(exist = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date rectificationSubmittedAt;
+
+    /**
+     * 兼容旧接口：复验结果
+     */
+    @TableField(exist = false)
+    private Integer reviewResult;
+
+    /**
+     * 兼容旧接口：复验说明
+     */
+    @TableField(exist = false)
+    private String reviewRemark;
+
+    /**
+     * 兼容旧接口：复验附件
+     */
+    @TableField(exist = false)
+    private String reviewAttachments;
+
+    /**
+     * 兼容旧接口：复验时间
+     */
+    @TableField(exist = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date reviewedAt;
 
     public Long getId() {
         return id;
@@ -200,140 +186,36 @@ public class IssueTicket {
         this.issueAttachments = issueAttachments;
     }
 
-    public Long getReportedBy() {
-        return reportedBy;
+    public Long getAssignee() {
+        return assignee;
     }
 
-    public void setReportedBy(Long reportedBy) {
-        this.reportedBy = reportedBy;
+    public void setAssignee(Long assignee) {
+        this.assignee = assignee;
     }
 
-    public Date getReportedAt() {
-        return reportedAt;
+    public Date getDueDate() {
+        return dueDate;
     }
 
-    public void setReportedAt(Date reportedAt) {
-        this.reportedAt = reportedAt;
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
     }
 
-    public Long getAssignedBy() {
-        return assignedBy;
+    public Integer getConfirmed() {
+        return confirmed;
     }
 
-    public void setAssignedBy(Long assignedBy) {
-        this.assignedBy = assignedBy;
+    public void setConfirmed(Integer confirmed) {
+        this.confirmed = confirmed;
     }
 
-    public Date getAssignedAt() {
-        return assignedAt;
+    public String getResolution() {
+        return resolution;
     }
 
-    public void setAssignedAt(Date assignedAt) {
-        this.assignedAt = assignedAt;
-    }
-
-    public Date getRectificationDeadline() {
-        return rectificationDeadline;
-    }
-
-    public void setRectificationDeadline(Date rectificationDeadline) {
-        this.rectificationDeadline = rectificationDeadline;
-    }
-
-    public Integer getRectificationCount() {
-        return rectificationCount;
-    }
-
-    public void setRectificationCount(Integer rectificationCount) {
-        this.rectificationCount = rectificationCount;
-    }
-
-    public String getRectificationDescription() {
-        return rectificationDescription;
-    }
-
-    public void setRectificationDescription(String rectificationDescription) {
-        this.rectificationDescription = rectificationDescription;
-    }
-
-    public String getRectificationAttachments() {
-        return rectificationAttachments;
-    }
-
-    public void setRectificationAttachments(String rectificationAttachments) {
-        this.rectificationAttachments = rectificationAttachments;
-    }
-
-    public Long getRectificationUserId() {
-        return rectificationUserId;
-    }
-
-    public void setRectificationUserId(Long rectificationUserId) {
-        this.rectificationUserId = rectificationUserId;
-    }
-
-    public Date getRectificationSubmittedAt() {
-        return rectificationSubmittedAt;
-    }
-
-    public void setRectificationSubmittedAt(Date rectificationSubmittedAt) {
-        this.rectificationSubmittedAt = rectificationSubmittedAt;
-    }
-
-    public Long getReviewUserId() {
-        return reviewUserId;
-    }
-
-    public void setReviewUserId(Long reviewUserId) {
-        this.reviewUserId = reviewUserId;
-    }
-
-    public Integer getReviewResult() {
-        return reviewResult;
-    }
-
-    public void setReviewResult(Integer reviewResult) {
-        this.reviewResult = reviewResult;
-    }
-
-    public String getReviewRemark() {
-        return reviewRemark;
-    }
-
-    public void setReviewRemark(String reviewRemark) {
-        this.reviewRemark = reviewRemark;
-    }
-
-    public String getReviewAttachments() {
-        return reviewAttachments;
-    }
-
-    public void setReviewAttachments(String reviewAttachments) {
-        this.reviewAttachments = reviewAttachments;
-    }
-
-    public Date getReviewedAt() {
-        return reviewedAt;
-    }
-
-    public void setReviewedAt(Date reviewedAt) {
-        this.reviewedAt = reviewedAt;
-    }
-
-    public Long getClosedBy() {
-        return closedBy;
-    }
-
-    public void setClosedBy(Long closedBy) {
-        this.closedBy = closedBy;
-    }
-
-    public Date getClosedAt() {
-        return closedAt;
-    }
-
-    public void setClosedAt(Date closedAt) {
-        this.closedAt = closedAt;
+    public void setResolution(String resolution) {
+        this.resolution = resolution;
     }
 
     public Integer getStatus() {
@@ -374,5 +256,77 @@ public class IssueTicket {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getRectificationUserId() {
+        return rectificationUserId;
+    }
+
+    public void setRectificationUserId(Long rectificationUserId) {
+        this.rectificationUserId = rectificationUserId;
+    }
+
+    public Date getRectificationDeadline() {
+        return rectificationDeadline;
+    }
+
+    public void setRectificationDeadline(Date rectificationDeadline) {
+        this.rectificationDeadline = rectificationDeadline;
+    }
+
+    public String getRectificationDescription() {
+        return rectificationDescription;
+    }
+
+    public void setRectificationDescription(String rectificationDescription) {
+        this.rectificationDescription = rectificationDescription;
+    }
+
+    public String getRectificationAttachments() {
+        return rectificationAttachments;
+    }
+
+    public void setRectificationAttachments(String rectificationAttachments) {
+        this.rectificationAttachments = rectificationAttachments;
+    }
+
+    public Date getRectificationSubmittedAt() {
+        return rectificationSubmittedAt;
+    }
+
+    public void setRectificationSubmittedAt(Date rectificationSubmittedAt) {
+        this.rectificationSubmittedAt = rectificationSubmittedAt;
+    }
+
+    public Integer getReviewResult() {
+        return reviewResult;
+    }
+
+    public void setReviewResult(Integer reviewResult) {
+        this.reviewResult = reviewResult;
+    }
+
+    public String getReviewRemark() {
+        return reviewRemark;
+    }
+
+    public void setReviewRemark(String reviewRemark) {
+        this.reviewRemark = reviewRemark;
+    }
+
+    public String getReviewAttachments() {
+        return reviewAttachments;
+    }
+
+    public void setReviewAttachments(String reviewAttachments) {
+        this.reviewAttachments = reviewAttachments;
+    }
+
+    public Date getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(Date reviewedAt) {
+        this.reviewedAt = reviewedAt;
     }
 }

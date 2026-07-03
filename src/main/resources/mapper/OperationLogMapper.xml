@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.OperationLogMapper">
+    <select id="queryByObject" resultType="camelKeyMap">
+        SELECT a.id,
+               a.object_type AS "objectType",
+               a.object_id AS "objectId",
+               a.action,
+               a.actor_id AS "actorId",
+               COALESCE(account.name, a.actor_name) AS "actorName",
+               a.comment,
+               a.extra,
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt"
+        FROM operation_log a
+        LEFT JOIN sys_account account ON account.id = a.actor_id
+        WHERE a.object_type = #{objectType}
+          AND a.object_id = #{objectId}
+        ORDER BY a.created_at ASC, a.id ASC
+    </select>
+</mapper>

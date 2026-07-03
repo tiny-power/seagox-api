@@ -502,23 +502,10 @@ CREATE TABLE IF NOT EXISTS "public"."issue_ticket" (
     "title" VARCHAR(200) NOT NULL,
     "description" TEXT NOT NULL,
     "issue_attachments" JSONB,
-    "reported_by" BIGINT NOT NULL,
-    "reported_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "assigned_by" BIGINT DEFAULT NULL,
-    "assigned_at" TIMESTAMP DEFAULT NULL,
-    "rectification_deadline" TIMESTAMP DEFAULT NULL,
-    "rectification_count" INTEGER NOT NULL DEFAULT 0,
-    "rectification_description" TEXT DEFAULT NULL,
-    "rectification_attachments" JSONB,
-    "rectification_user_id" BIGINT DEFAULT NULL,
-    "rectification_submitted_at" TIMESTAMP DEFAULT NULL,
-    "review_user_id" BIGINT DEFAULT NULL,
-    "review_result" INTEGER DEFAULT 1,
-    "review_remark" VARCHAR(1000) DEFAULT NULL,
-    "review_attachments" JSONB DEFAULT NULL,
-    "reviewed_at" TIMESTAMP DEFAULT NULL,
-    "closed_by" BIGINT DEFAULT NULL,
-    "closed_at" TIMESTAMP DEFAULT NULL,
+    "assignee" BIGINT DEFAULT NULL,
+    "due_date" DATE DEFAULT NULL,
+    "confirmed" INTEGER DEFAULT 1,
+    "resolution" VARCHAR(200) DEFAULT NULL,
     "status" INTEGER DEFAULT 1,
     "created_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -530,29 +517,40 @@ COMMENT ON COLUMN "public"."issue_ticket"."project_id" IS '所属项目ID';
 COMMENT ON COLUMN "public"."issue_ticket"."title" IS '问题标题';
 COMMENT ON COLUMN "public"."issue_ticket"."description" IS '问题描述';
 COMMENT ON COLUMN "public"."issue_ticket"."issue_attachments" IS '问题附件';
-COMMENT ON COLUMN "public"."issue_ticket"."reported_by" IS '问题发现人用户ID';
-COMMENT ON COLUMN "public"."issue_ticket"."reported_at" IS '问题发现时间';
-COMMENT ON COLUMN "public"."issue_ticket"."assigned_by" IS '分配人用户ID';
-COMMENT ON COLUMN "public"."issue_ticket"."assigned_at" IS '分配时间';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_deadline" IS '整改截止时间';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_count" IS '整改提交次数';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_description" IS '整改说明';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_attachments" IS '整改附件';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_user_id" IS '整改责任人用户ID';
-COMMENT ON COLUMN "public"."issue_ticket"."rectification_submitted_at" IS '整改提交时间';
-COMMENT ON COLUMN "public"."issue_ticket"."review_user_id" IS '复验人或质检员用户ID';
-COMMENT ON COLUMN "public"."issue_ticket"."review_result" IS '复验结果(1:通过;2:不通过)';
-COMMENT ON COLUMN "public"."issue_ticket"."review_remark" IS '复验说明';
-COMMENT ON COLUMN "public"."issue_ticket"."review_attachments" IS '复验附件';
-COMMENT ON COLUMN "public"."issue_ticket"."reviewed_at" IS '复验时间';
-COMMENT ON COLUMN "public"."issue_ticket"."closed_by" IS '关闭人用户ID';
-COMMENT ON COLUMN "public"."issue_ticket"."closed_at" IS '问题关闭时间';
-COMMENT ON COLUMN "public"."issue_ticket"."status" IS '状态(1:待整改;2:整改中;3:待复验;4:已关闭;)';
+COMMENT ON COLUMN "public"."issue_ticket"."assignee" IS '负责人';
+COMMENT ON COLUMN "public"."issue_ticket"."due_date" IS '截止日期';
+COMMENT ON COLUMN "public"."issue_ticket"."confirmed" IS '是否确认(0:未确认;1:已确认;)';
+COMMENT ON COLUMN "public"."issue_ticket"."resolution" IS '解决方案(已解决、延期处理、不予解决、重复问题、设计如此、外部原因、无法重现)';
+COMMENT ON COLUMN "public"."issue_ticket"."status" IS '状态(1:激活;2:已解决;3:已关闭;)';
 COMMENT ON COLUMN "public"."issue_ticket"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."issue_ticket"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."issue_ticket"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."issue_ticket"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."issue_ticket" IS '问题单';
+
+CREATE TABLE IF NOT EXISTS "public"."operation_log" (
+    "id" BIGSERIAL NOT NULL PRIMARY KEY,
+    "object_type" VARCHAR(50) NOT NULL,
+    "object_id" BIGINT NOT NULL,
+    "action" VARCHAR(50) NOT NULL,
+    "actor_id" BIGINT NOT NULL,
+    "actor_name" VARCHAR(100) DEFAULT NULL,
+    "comment" TEXT DEFAULT NULL,
+    "extra" JSONB DEFAULT NULL,
+    "created_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."operation_log"."id" IS '主键';
+COMMENT ON COLUMN "public"."operation_log"."object_type" IS '对象类型:issue问题/task任务';
+COMMENT ON COLUMN "public"."operation_log"."object_id" IS '对象ID';
+COMMENT ON COLUMN "public"."operation_log"."action" IS '操作类型:edited编辑/assigned指派/resolved解决/closed关闭/commented备注/activated激活';
+COMMENT ON COLUMN "public"."operation_log"."actor_id" IS '操作人ID';
+COMMENT ON COLUMN "public"."operation_log"."actor_name" IS '操作人名称';
+COMMENT ON COLUMN "public"."operation_log"."comment" IS '备注/评论内容';
+COMMENT ON COLUMN "public"."operation_log"."extra" IS '扩展信息，比如IP、附件、来源端';
+COMMENT ON COLUMN "public"."operation_log"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."operation_log"."created_at" IS '创建时间';
+COMMENT ON TABLE "public"."operation_log" IS '操作记录表';
 
 CREATE TABLE IF NOT EXISTS "public"."payment_request" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,

@@ -2,13 +2,19 @@ package com.seagox.lowcode.business.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.seagox.lowcode.business.entity.IssueTicket;
+import com.seagox.lowcode.business.entity.OperationLog;
 import com.seagox.lowcode.business.mapper.IssueTicketMapper;
+import com.seagox.lowcode.business.mapper.OperationLogMapper;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
 import com.seagox.lowcode.business.service.IIssueTicketService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysAccount;
+import com.seagox.lowcode.system.mapper.AccountMapper;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,21 +29,17 @@ import org.springframework.util.StringUtils;
 public class IssueTicketService implements IIssueTicketService {
 
     /**
-     * 待整改
+     * 激活
      */
-    public static final int STATUS_PENDING = 1;
+    public static final int STATUS_ACTIVE = 1;
     /**
-     * 整改中
+     * 已解决
      */
-    public static final int STATUS_RECTIFYING = 2;
-    /**
-     * 待复验
-     */
-    public static final int STATUS_REVIEWING = 3;
+    public static final int STATUS_RESOLVED = 2;
     /**
      * 已关闭
      */
-    public static final int STATUS_CLOSED = 4;
+    public static final int STATUS_CLOSED = 3;
     /**
      * 复验通过
      */
@@ -47,6 +49,13 @@ public class IssueTicketService implements IIssueTicketService {
      */
     public static final int REVIEW_REJECT = 2;
 
+    private static final String OBJECT_TYPE_ISSUE = "issue";
+    private static final String ACTION_ACTIVATED = "activated";
+    private static final String ACTION_ASSIGNED = "assigned";
+    private static final String ACTION_EDITED = "edited";
+    private static final String ACTION_RESOLVED = "resolved";
+    private static final String ACTION_CLOSED = "closed";
+
     /**
      * 问题单数据访问对象
      */
@@ -54,10 +63,22 @@ public class IssueTicketService implements IIssueTicketService {
     private IssueTicketMapper issueTicketMapper;
 
     /**
+     * 操作记录数据访问对象
+     */
+    @Autowired
+    private OperationLogMapper operationLogMapper;
+
+    /**
      * 项目数据访问对象
      */
     @Autowired
     private ProjectMapper projectMapper;
+
+    /**
+     * 账号数据访问对象
+     */
+    @Autowired
+    private AccountMapper accountMapper;
 
     /**
      * 分页查询问题单
@@ -79,6 +100,10 @@ public class IssueTicketService implements IIssueTicketService {
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
+        List<Map<String, Object>> operationLogs = operationLogMapper.queryByObject(OBJECT_TYPE_ISSUE, id);
+        MapDateFormatUtils.formatDateValues(operationLogs);
+        fillCompatibleFields(data, operationLogs);
+        data.put("operationLogs", operationLogs);
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
@@ -97,15 +122,18 @@ public class IssueTicketService implements IIssueTicketService {
         }
 
         Date now = new Date();
-        issueTicket.setStatus(STATUS_PENDING);
-        issueTicket.setReportedBy(defaultUser(issueTicket.getReportedBy(), userId));
-        issueTicket.setReportedAt(defaultDate(issueTicket.getReportedAt(), now));
-        issueTicket.setRectificationCount(0);
+        issueTicket.setStatus(STATUS_ACTIVE);
+        issueTicket.setConfirmed(defaultInteger(issueTicket.getConfirmed(), 0));
         issueTicket.setCreatedBy(userId);
         issueTicket.setUpdatedBy(userId);
         issueTicket.setCreatedAt(now);
         issueTicket.setUpdatedAt(now);
         issueTicketMapper.insert(issueTicket);
+        insertLog(issueTicket.getId(), ACTION_ACTIVATED, userId, "创建问题单", null, now);
+        if (issueTicket.getAssignee() != null) {
+            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, "指派问题负责人",
+                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), null, null), now);
+        }
         return ResultData.success(issueTicket.getId());
     }
 
@@ -121,9 +149,6 @@ public class IssueTicketService implements IIssueTicketService {
         if (original == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
-        if (Integer.valueOf(STATUS_CLOSED).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "已关闭的问题单不可以修改");
-        }
         ResultData verifyResult = verifyBase(issueTicket);
         if (verifyResult != null) {
             return verifyResult;
@@ -132,29 +157,19 @@ public class IssueTicketService implements IIssueTicketService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
 
-        issueTicket.setStatus(original.getStatus());
-        issueTicket.setReportedBy(defaultUser(issueTicket.getReportedBy(), original.getReportedBy()));
-        issueTicket.setReportedAt(defaultDate(issueTicket.getReportedAt(), original.getReportedAt()));
-        issueTicket.setAssignedBy(original.getAssignedBy());
-        issueTicket.setAssignedAt(original.getAssignedAt());
-        issueTicket.setRectificationDeadline(original.getRectificationDeadline());
-        issueTicket.setRectificationCount(original.getRectificationCount());
-        issueTicket.setRectificationDescription(original.getRectificationDescription());
-        issueTicket.setRectificationAttachments(original.getRectificationAttachments());
-        issueTicket.setRectificationUserId(original.getRectificationUserId());
-        issueTicket.setRectificationSubmittedAt(original.getRectificationSubmittedAt());
-        issueTicket.setReviewUserId(original.getReviewUserId());
-        issueTicket.setReviewResult(original.getReviewResult());
-        issueTicket.setReviewRemark(original.getReviewRemark());
-        issueTicket.setReviewAttachments(original.getReviewAttachments());
-        issueTicket.setReviewedAt(original.getReviewedAt());
-        issueTicket.setClosedBy(original.getClosedBy());
-        issueTicket.setClosedAt(original.getClosedAt());
+        Date now = new Date();
+        issueTicket.setStatus(defaultInteger(issueTicket.getStatus(), original.getStatus()));
+        issueTicket.setConfirmed(defaultInteger(issueTicket.getConfirmed(), original.getConfirmed()));
         issueTicket.setCreatedBy(original.getCreatedBy());
         issueTicket.setCreatedAt(original.getCreatedAt());
         issueTicket.setUpdatedBy(userId);
-        issueTicket.setUpdatedAt(new Date());
+        issueTicket.setUpdatedAt(now);
         issueTicketMapper.updateById(issueTicket);
+        insertLog(issueTicket.getId(), ACTION_EDITED, userId, "编辑问题单", null, now);
+        if (issueTicket.getAssignee() != null && !issueTicket.getAssignee().equals(original.getAssignee())) {
+            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, "指派问题负责人",
+                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), null, null), now);
+        }
         return ResultData.success(null);
     }
 
@@ -173,19 +188,21 @@ public class IssueTicketService implements IIssueTicketService {
         if (Integer.valueOf(STATUS_CLOSED).equals(original.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已关闭的问题单不可以指派");
         }
-        if (issueTicket.getRectificationUserId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "整改责任人不能为空");
+        Long assignee = defaultUser(issueTicket.getAssignee(), issueTicket.getRectificationUserId());
+        if (assignee == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "负责人不能为空");
         }
 
         Date now = new Date();
-        original.setRectificationUserId(issueTicket.getRectificationUserId());
-        original.setRectificationDeadline(issueTicket.getRectificationDeadline());
-        original.setAssignedBy(userId);
-        original.setAssignedAt(now);
-        original.setStatus(STATUS_RECTIFYING);
+        Date dueDate = defaultDate(issueTicket.getDueDate(), issueTicket.getRectificationDeadline());
+        original.setAssignee(assignee);
+        original.setDueDate(dueDate);
+        original.setStatus(STATUS_ACTIVE);
+        original.setConfirmed(1);
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
         issueTicketMapper.updateById(original);
+        insertLog(original.getId(), ACTION_ASSIGNED, userId, "指派问题负责人", buildExtra(assignee, dueDate, null, null), now);
         return ResultData.success(null);
     }
 
@@ -201,23 +218,23 @@ public class IssueTicketService implements IIssueTicketService {
         if (original == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
-        if (!Integer.valueOf(STATUS_RECTIFYING).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "只有整改中的问题单可以提交整改");
+        if (Integer.valueOf(STATUS_CLOSED).equals(original.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "已关闭的问题单不可以提交整改");
         }
         if (StringUtils.isEmpty(issueTicket.getRectificationDescription())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "整改说明不能为空");
         }
 
         Date now = new Date();
-        original.setRectificationDescription(issueTicket.getRectificationDescription());
-        original.setRectificationAttachments(issueTicket.getRectificationAttachments());
-        original.setRectificationUserId(defaultUser(original.getRectificationUserId(), userId));
-        original.setRectificationSubmittedAt(defaultDate(issueTicket.getRectificationSubmittedAt(), now));
-        original.setRectificationCount(defaultCount(original.getRectificationCount()) + 1);
-        original.setStatus(STATUS_REVIEWING);
+        Date submittedAt = defaultDate(issueTicket.getRectificationSubmittedAt(), now);
+        original.setStatus(STATUS_RESOLVED);
+        original.setResolution(defaultText(issueTicket.getResolution(), "已解决"));
+        original.setConfirmed(0);
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
         issueTicketMapper.updateById(original);
+        insertLog(original.getId(), ACTION_RESOLVED, userId, issueTicket.getRectificationDescription(),
+                buildExtra(null, null, issueTicket.getRectificationAttachments(), null), submittedAt);
         return ResultData.success(null);
     }
 
@@ -233,8 +250,8 @@ public class IssueTicketService implements IIssueTicketService {
         if (original == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
-        if (!Integer.valueOf(STATUS_REVIEWING).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "只有待复验的问题单可以复验");
+        if (!Integer.valueOf(STATUS_RESOLVED).equals(original.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "只有已解决的问题单可以复验");
         }
         if (!Integer.valueOf(REVIEW_PASS).equals(issueTicket.getReviewResult())
                 && !Integer.valueOf(REVIEW_REJECT).equals(issueTicket.getReviewResult())) {
@@ -242,23 +259,15 @@ public class IssueTicketService implements IIssueTicketService {
         }
 
         Date now = new Date();
-        original.setReviewUserId(userId);
-        original.setReviewResult(issueTicket.getReviewResult());
-        original.setReviewRemark(issueTicket.getReviewRemark());
-        original.setReviewAttachments(issueTicket.getReviewAttachments());
-        original.setReviewedAt(defaultDate(issueTicket.getReviewedAt(), now));
-        if (Integer.valueOf(REVIEW_PASS).equals(issueTicket.getReviewResult())) {
-            original.setStatus(STATUS_CLOSED);
-            original.setClosedBy(userId);
-            original.setClosedAt(now);
-        } else {
-            original.setStatus(STATUS_RECTIFYING);
-            original.setClosedBy(null);
-            original.setClosedAt(null);
-        }
+        Date reviewedAt = defaultDate(issueTicket.getReviewedAt(), now);
+        boolean pass = Integer.valueOf(REVIEW_PASS).equals(issueTicket.getReviewResult());
+        original.setStatus(pass ? STATUS_CLOSED : STATUS_ACTIVE);
+        original.setConfirmed(pass ? 1 : 0);
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
         issueTicketMapper.updateById(original);
+        insertLog(original.getId(), pass ? ACTION_CLOSED : ACTION_ACTIVATED, userId, issueTicket.getReviewRemark(),
+                buildExtra(null, null, issueTicket.getReviewAttachments(), issueTicket.getReviewResult()), reviewedAt);
         return ResultData.success(null);
     }
 
@@ -271,6 +280,7 @@ public class IssueTicketService implements IIssueTicketService {
         if (issueTicket == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
         }
+        deleteLogs(id);
         issueTicketMapper.deleteById(id);
         return ResultData.success(null);
     }
@@ -295,23 +305,148 @@ public class IssueTicketService implements IIssueTicketService {
     }
 
     /**
-     * 默认用户
+     * 写入操作记录
      */
+    private void insertLog(Long objectId, String action, Long userId, String comment, String extra, Date createdAt) {
+        OperationLog log = new OperationLog();
+        log.setObjectType(OBJECT_TYPE_ISSUE);
+        log.setObjectId(objectId);
+        log.setAction(action);
+        log.setActorId(userId);
+        log.setActorName(getActorName(userId));
+        log.setComment(comment);
+        log.setExtra(extra);
+        log.setCreatedBy(userId);
+        log.setCreatedAt(createdAt == null ? new Date() : createdAt);
+        operationLogMapper.insert(log);
+    }
+
+    private void deleteLogs(Long objectId) {
+        QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("object_type", OBJECT_TYPE_ISSUE);
+        queryWrapper.eq("object_id", objectId);
+        operationLogMapper.delete(queryWrapper);
+    }
+
+    private String getActorName(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        SysAccount account = accountMapper.selectById(userId);
+        return account == null ? null : account.getName();
+    }
+
+    /**
+     * 兼容旧详情字段
+     */
+    private void fillCompatibleFields(Map<String, Object> data, List<Map<String, Object>> operationLogs) {
+        data.put("reportedBy", data.get("createdBy"));
+        data.put("reportedByName", data.get("createdByName"));
+        data.put("reportedAt", data.get("createdAt"));
+        data.put("rectificationUserId", data.get("assignee"));
+        data.put("rectificationUserName", data.get("assigneeName"));
+        data.put("rectificationDeadline", data.get("dueDate"));
+        data.put("rectificationCount", countAction(operationLogs, ACTION_RESOLVED));
+
+        for (Map<String, Object> log : operationLogs) {
+            String action = String.valueOf(log.get("action"));
+            if (ACTION_ASSIGNED.equals(action)) {
+                data.put("assignedBy", log.get("actorId"));
+                data.put("assignedByName", log.get("actorName"));
+                data.put("assignedAt", log.get("createdAt"));
+            } else if (ACTION_RESOLVED.equals(action)) {
+                data.put("rectificationDescription", log.get("comment"));
+                data.put("rectificationAttachments", findJsonArray(log.get("extra")));
+                data.put("rectificationSubmittedAt", log.get("createdAt"));
+            } else if (ACTION_CLOSED.equals(action) || ACTION_ACTIVATED.equals(action)) {
+                data.put("reviewUserId", log.get("actorId"));
+                data.put("reviewUserName", log.get("actorName"));
+                data.put("reviewRemark", log.get("comment"));
+                data.put("reviewAttachments", findJsonArray(log.get("extra")));
+                data.put("reviewedAt", log.get("createdAt"));
+                if (ACTION_CLOSED.equals(action)) {
+                    data.put("reviewResult", REVIEW_PASS);
+                    data.put("closedBy", log.get("actorId"));
+                    data.put("closedByName", log.get("actorName"));
+                    data.put("closedAt", log.get("createdAt"));
+                } else if (!"创建问题单".equals(log.get("comment"))) {
+                    data.put("reviewResult", REVIEW_REJECT);
+                }
+            }
+        }
+    }
+
+    private int countAction(List<Map<String, Object>> operationLogs, String action) {
+        int count = 0;
+        for (Map<String, Object> log : operationLogs) {
+            if (action.equals(log.get("action"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private Long defaultUser(Long first, Long second) {
         return first == null ? second : first;
     }
 
-    /**
-     * 默认时间
-     */
     private Date defaultDate(Date first, Date second) {
         return first == null ? second : first;
     }
 
-    /**
-     * 默认次数
-     */
-    private int defaultCount(Integer count) {
-        return count == null ? 0 : count;
+    private Integer defaultInteger(Integer first, Integer second) {
+        return first == null ? second : first;
+    }
+
+    private String defaultText(String first, String second) {
+        return StringUtils.isEmpty(first) ? second : first;
+    }
+
+    private String buildExtra(Long assignee, Date dueDate, String attachments, Integer result) {
+        StringBuilder builder = new StringBuilder("{");
+        boolean hasField = false;
+        if (assignee != null) {
+            builder.append("\"assignee\":").append(assignee);
+            hasField = true;
+        }
+        if (dueDate != null) {
+            appendSeparator(builder, hasField);
+            builder.append("\"dueDate\":\"").append(new SimpleDateFormat("yyyy-MM-dd").format(dueDate)).append("\"");
+            hasField = true;
+        }
+        if (!StringUtils.isEmpty(attachments)) {
+            appendSeparator(builder, hasField);
+            builder.append("\"attachments\":").append(attachments);
+            hasField = true;
+        }
+        if (result != null) {
+            appendSeparator(builder, hasField);
+            builder.append("\"result\":").append(result);
+        }
+        builder.append("}");
+        return builder.toString();
+    }
+
+    private void appendSeparator(StringBuilder builder, boolean hasField) {
+        if (hasField) {
+            builder.append(",");
+        }
+    }
+
+    private String findJsonArray(Object extra) {
+        if (extra == null) {
+            return null;
+        }
+        String value = String.valueOf(extra);
+        int keyIndex = value.indexOf("\"attachments\"");
+        if (keyIndex < 0) {
+            return null;
+        }
+        int start = value.indexOf('[', keyIndex);
+        int end = value.lastIndexOf(']');
+        if (start < 0 || end < start) {
+            return null;
+        }
+        return value.substring(start, end + 1);
     }
 }
