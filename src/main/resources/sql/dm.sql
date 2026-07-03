@@ -641,6 +641,50 @@ COMMENT ON COLUMN "public"."project_handover"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."project_handover"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."project_handover" IS '交接单';
 
+CREATE TABLE IF NOT EXISTS "public"."repair" (
+    "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "project_id" BIGINT NOT NULL,
+    "repair_no" VARCHAR(192) DEFAULT NULL,
+    "type" VARCHAR(600) NOT NULL,
+    "location" VARCHAR(600) NOT NULL,
+    "description" VARCHAR(3000) NOT NULL,
+    "before_attachments" CLOB,
+    "contact" VARCHAR(300) NOT NULL,
+    "contact_number" VARCHAR(600) NOT NULL,
+    "status" INTEGER DEFAULT 1,
+    "repair_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "after_attachments" CLOB,
+    "repair_result" VARCHAR(3000) DEFAULT NULL,
+    "repair_member_id" BIGINT DEFAULT NULL,
+    "expected_visit_at" TIMESTAMP DEFAULT NULL,
+    "complete_at" TIMESTAMP DEFAULT NULL,
+    "created_by" BIGINT NOT NULL,
+    "updated_by" BIGINT NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."repair"."id" IS '主键';
+COMMENT ON COLUMN "public"."repair"."project_id" IS '所属项目ID';
+COMMENT ON COLUMN "public"."repair"."repair_no" IS '报修单号';
+COMMENT ON COLUMN "public"."repair"."type" IS '报修类型(水电维修、电路维修、门窗维修、家电维修、墙面地面、管道疏通、卫浴洁具、家具维修、其他问题)';
+COMMENT ON COLUMN "public"."repair"."location" IS '报修位置(卫生间、客厅、卧室、厨房、阳台、其他位置)';
+COMMENT ON COLUMN "public"."repair"."description" IS '问题描述';
+COMMENT ON COLUMN "public"."repair"."before_attachments" IS '维修前附件';
+COMMENT ON COLUMN "public"."repair"."contact" IS '联系人';
+COMMENT ON COLUMN "public"."repair"."contact_number" IS '联系电话';
+COMMENT ON COLUMN "public"."repair"."status" IS '状态(1:待派单;2:处理中;3:待验收;4:已完成;5:已取消)';
+COMMENT ON COLUMN "public"."repair"."repair_at" IS '报修时间';
+COMMENT ON COLUMN "public"."repair"."after_attachments" IS '维修后附件';
+COMMENT ON COLUMN "public"."repair"."repair_result" IS '维修说明';
+COMMENT ON COLUMN "public"."repair"."repair_member_id" IS '维修人员ID';
+COMMENT ON COLUMN "public"."repair"."expected_visit_at" IS '预计上门时间';
+COMMENT ON COLUMN "public"."repair"."complete_at" IS '完成时间';
+COMMENT ON COLUMN "public"."repair"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."repair"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."repair"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."repair"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."repair" IS '报修单';
+
 CREATE TABLE IF NOT EXISTS "public"."phone_code" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"phone" VARCHAR(100) NOT NULL,
@@ -924,11 +968,5 @@ INSERT INTO "public"."sys_menu" VALUES (90,1,36,2,'交接单','iconfont icon-xih
 INSERT INTO "public"."sys_menu" VALUES (91,1,90,3,'新增','iconfont icon-xihuan','projectHandover:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (92,1,90,3,'确认','iconfont icon-xihuan','projectHandover:confirm',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (93,1,36,2,'报修单','iconfont icon-xihuan','repair',1,11,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (94,1,93,3,'新增','iconfont icon-xihuan','repair:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (95,1,93,3,'编辑','iconfont icon-xihuan','repair:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (96,1,93,3,'指派','iconfont icon-xihuan','repair:assign',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (97,1,93,3,'完成','iconfont icon-xihuan','repair:complete',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (98,1,93,3,'确认','iconfont icon-xihuan','repair:confirm',1,5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-INSERT INTO "public"."sys_menu" VALUES (99,1,93,3,'删除','iconfont icon-xihuan','repair:delete',1,6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99' WHERE "id"=1;
+UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93' WHERE "id"=1;
 COMMIT;
