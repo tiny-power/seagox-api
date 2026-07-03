@@ -40,21 +40,13 @@ public class IssueTicketService implements IIssueTicketService {
      * 已关闭
      */
     public static final int STATUS_CLOSED = 3;
-    /**
-     * 复验通过
-     */
-    public static final int REVIEW_PASS = 1;
-    /**
-     * 复验不通过
-     */
-    public static final int REVIEW_REJECT = 2;
-
     private static final String OBJECT_TYPE_ISSUE = "issue";
     private static final String ACTION_ACTIVATED = "activated";
     private static final String ACTION_ASSIGNED = "assigned";
     private static final String ACTION_EDITED = "edited";
     private static final String ACTION_RESOLVED = "resolved";
     private static final String ACTION_CLOSED = "closed";
+    private static final String ACTION_CONFIRMED = "confirmed";
 
     /**
      * 问题单数据访问对象
@@ -102,7 +94,6 @@ public class IssueTicketService implements IIssueTicketService {
         }
         List<Map<String, Object>> operationLogs = operationLogMapper.queryByObject(OBJECT_TYPE_ISSUE, id);
         MapDateFormatUtils.formatDateValues(operationLogs);
-        fillCompatibleFields(data, operationLogs);
         data.put("operationLogs", operationLogs);
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
@@ -129,10 +120,10 @@ public class IssueTicketService implements IIssueTicketService {
         issueTicket.setCreatedAt(now);
         issueTicket.setUpdatedAt(now);
         issueTicketMapper.insert(issueTicket);
-        insertLog(issueTicket.getId(), ACTION_ACTIVATED, userId, "创建问题单", null, now);
+        insertLog(issueTicket.getId(), ACTION_ACTIVATED, userId, null, null);
         if (issueTicket.getAssignee() != null) {
-            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, "指派问题负责人",
-                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), null, null), now);
+            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, null,
+                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), null));
         }
         return ResultData.success(issueTicket.getId());
     }
@@ -165,109 +156,7 @@ public class IssueTicketService implements IIssueTicketService {
         issueTicket.setUpdatedBy(userId);
         issueTicket.setUpdatedAt(now);
         issueTicketMapper.updateById(issueTicket);
-        insertLog(issueTicket.getId(), ACTION_EDITED, userId, "编辑问题单", null, now);
-        if (issueTicket.getAssignee() != null && !issueTicket.getAssignee().equals(original.getAssignee())) {
-            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, "指派问题负责人",
-                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), null, null), now);
-        }
-        return ResultData.success(null);
-    }
-
-    /**
-     * 指派整改人
-     */
-    @Override
-    public ResultData assign(IssueTicket issueTicket, Long userId) {
-        if (issueTicket == null || issueTicket.getId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单ID不能为空");
-        }
-        IssueTicket original = issueTicketMapper.selectById(issueTicket.getId());
-        if (original == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
-        }
-        if (Integer.valueOf(STATUS_CLOSED).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "已关闭的问题单不可以指派");
-        }
-        Long assignee = defaultUser(issueTicket.getAssignee(), issueTicket.getRectificationUserId());
-        if (assignee == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "负责人不能为空");
-        }
-
-        Date now = new Date();
-        Date dueDate = defaultDate(issueTicket.getDueDate(), issueTicket.getRectificationDeadline());
-        original.setAssignee(assignee);
-        original.setDueDate(dueDate);
-        original.setStatus(STATUS_ACTIVE);
-        original.setConfirmed(1);
-        original.setUpdatedBy(userId);
-        original.setUpdatedAt(now);
-        issueTicketMapper.updateById(original);
-        insertLog(original.getId(), ACTION_ASSIGNED, userId, "指派问题负责人", buildExtra(assignee, dueDate, null, null), now);
-        return ResultData.success(null);
-    }
-
-    /**
-     * 提交整改
-     */
-    @Override
-    public ResultData rectify(IssueTicket issueTicket, Long userId) {
-        if (issueTicket == null || issueTicket.getId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单ID不能为空");
-        }
-        IssueTicket original = issueTicketMapper.selectById(issueTicket.getId());
-        if (original == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
-        }
-        if (Integer.valueOf(STATUS_CLOSED).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "已关闭的问题单不可以提交整改");
-        }
-        if (StringUtils.isEmpty(issueTicket.getRectificationDescription())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "整改说明不能为空");
-        }
-
-        Date now = new Date();
-        Date submittedAt = defaultDate(issueTicket.getRectificationSubmittedAt(), now);
-        original.setStatus(STATUS_RESOLVED);
-        original.setResolution(defaultText(issueTicket.getResolution(), "已解决"));
-        original.setConfirmed(0);
-        original.setUpdatedBy(userId);
-        original.setUpdatedAt(now);
-        issueTicketMapper.updateById(original);
-        insertLog(original.getId(), ACTION_RESOLVED, userId, issueTicket.getRectificationDescription(),
-                buildExtra(null, null, issueTicket.getRectificationAttachments(), null), submittedAt);
-        return ResultData.success(null);
-    }
-
-    /**
-     * 复验问题单
-     */
-    @Override
-    public ResultData review(IssueTicket issueTicket, Long userId) {
-        if (issueTicket == null || issueTicket.getId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单ID不能为空");
-        }
-        IssueTicket original = issueTicketMapper.selectById(issueTicket.getId());
-        if (original == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "问题单不存在");
-        }
-        if (!Integer.valueOf(STATUS_RESOLVED).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "只有已解决的问题单可以复验");
-        }
-        if (!Integer.valueOf(REVIEW_PASS).equals(issueTicket.getReviewResult())
-                && !Integer.valueOf(REVIEW_REJECT).equals(issueTicket.getReviewResult())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "复验结果不正确");
-        }
-
-        Date now = new Date();
-        Date reviewedAt = defaultDate(issueTicket.getReviewedAt(), now);
-        boolean pass = Integer.valueOf(REVIEW_PASS).equals(issueTicket.getReviewResult());
-        original.setStatus(pass ? STATUS_CLOSED : STATUS_ACTIVE);
-        original.setConfirmed(pass ? 1 : 0);
-        original.setUpdatedBy(userId);
-        original.setUpdatedAt(now);
-        issueTicketMapper.updateById(original);
-        insertLog(original.getId(), pass ? ACTION_CLOSED : ACTION_ACTIVATED, userId, issueTicket.getReviewRemark(),
-                buildExtra(null, null, issueTicket.getReviewAttachments(), issueTicket.getReviewResult()), reviewedAt);
+        insertUpdateLog(issueTicket, original, userId);
         return ResultData.success(null);
     }
 
@@ -307,7 +196,7 @@ public class IssueTicketService implements IIssueTicketService {
     /**
      * 写入操作记录
      */
-    private void insertLog(Long objectId, String action, Long userId, String comment, String extra, Date createdAt) {
+    private void insertLog(Long objectId, String action, Long userId, String comment, String extra) {
         OperationLog log = new OperationLog();
         log.setObjectType(OBJECT_TYPE_ISSUE);
         log.setObjectId(objectId);
@@ -317,8 +206,37 @@ public class IssueTicketService implements IIssueTicketService {
         log.setComment(comment);
         log.setExtra(extra);
         log.setCreatedBy(userId);
-        log.setCreatedAt(createdAt == null ? new Date() : createdAt);
         operationLogMapper.insert(log);
+    }
+
+    private void insertUpdateLog(IssueTicket issueTicket, IssueTicket original, Long userId) {
+        String comment = defaultText(issueTicket.getReviewRemark(), issueTicket.getRectificationDescription());
+        String attachments = defaultText(issueTicket.getReviewAttachments(), issueTicket.getRectificationAttachments());
+        Integer status = issueTicket.getStatus();
+        if (status != null && !status.equals(original.getStatus())) {
+            if (Integer.valueOf(STATUS_RESOLVED).equals(status)) {
+                insertLog(issueTicket.getId(), ACTION_RESOLVED, userId, comment,
+                        buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), attachments, issueTicket.getResolution()));
+            } else if (Integer.valueOf(STATUS_CLOSED).equals(status)) {
+                insertLog(issueTicket.getId(), ACTION_CLOSED, userId, comment,
+                        buildExtra(null, null, attachments));
+            } else if (Integer.valueOf(STATUS_ACTIVE).equals(status)) {
+                insertLog(issueTicket.getId(), ACTION_ACTIVATED, userId, comment,
+                        buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), attachments));
+            }
+            return;
+        }
+        if (Integer.valueOf(1).equals(issueTicket.getConfirmed()) && !Integer.valueOf(1).equals(original.getConfirmed())) {
+            insertLog(issueTicket.getId(), ACTION_CONFIRMED, userId, comment,
+                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), attachments));
+        } else if ("assign".equals(issueTicket.getActionType())
+                || (issueTicket.getAssignee() != null && !issueTicket.getAssignee().equals(original.getAssignee()))) {
+            insertLog(issueTicket.getId(), ACTION_ASSIGNED, userId, comment,
+                    buildExtra(issueTicket.getAssignee(), issueTicket.getDueDate(), attachments));
+        } else {
+            insertLog(issueTicket.getId(), ACTION_EDITED, userId, comment,
+                    buildExtra(null, null, attachments));
+        }
     }
 
     private void deleteLogs(Long objectId) {
@@ -336,64 +254,6 @@ public class IssueTicketService implements IIssueTicketService {
         return account == null ? null : account.getName();
     }
 
-    /**
-     * 兼容旧详情字段
-     */
-    private void fillCompatibleFields(Map<String, Object> data, List<Map<String, Object>> operationLogs) {
-        data.put("reportedBy", data.get("createdBy"));
-        data.put("reportedByName", data.get("createdByName"));
-        data.put("reportedAt", data.get("createdAt"));
-        data.put("rectificationUserId", data.get("assignee"));
-        data.put("rectificationUserName", data.get("assigneeName"));
-        data.put("rectificationDeadline", data.get("dueDate"));
-        data.put("rectificationCount", countAction(operationLogs, ACTION_RESOLVED));
-
-        for (Map<String, Object> log : operationLogs) {
-            String action = String.valueOf(log.get("action"));
-            if (ACTION_ASSIGNED.equals(action)) {
-                data.put("assignedBy", log.get("actorId"));
-                data.put("assignedByName", log.get("actorName"));
-                data.put("assignedAt", log.get("createdAt"));
-            } else if (ACTION_RESOLVED.equals(action)) {
-                data.put("rectificationDescription", log.get("comment"));
-                data.put("rectificationAttachments", findJsonArray(log.get("extra")));
-                data.put("rectificationSubmittedAt", log.get("createdAt"));
-            } else if (ACTION_CLOSED.equals(action) || ACTION_ACTIVATED.equals(action)) {
-                data.put("reviewUserId", log.get("actorId"));
-                data.put("reviewUserName", log.get("actorName"));
-                data.put("reviewRemark", log.get("comment"));
-                data.put("reviewAttachments", findJsonArray(log.get("extra")));
-                data.put("reviewedAt", log.get("createdAt"));
-                if (ACTION_CLOSED.equals(action)) {
-                    data.put("reviewResult", REVIEW_PASS);
-                    data.put("closedBy", log.get("actorId"));
-                    data.put("closedByName", log.get("actorName"));
-                    data.put("closedAt", log.get("createdAt"));
-                } else if (!"创建问题单".equals(log.get("comment"))) {
-                    data.put("reviewResult", REVIEW_REJECT);
-                }
-            }
-        }
-    }
-
-    private int countAction(List<Map<String, Object>> operationLogs, String action) {
-        int count = 0;
-        for (Map<String, Object> log : operationLogs) {
-            if (action.equals(log.get("action"))) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private Long defaultUser(Long first, Long second) {
-        return first == null ? second : first;
-    }
-
-    private Date defaultDate(Date first, Date second) {
-        return first == null ? second : first;
-    }
-
     private Integer defaultInteger(Integer first, Integer second) {
         return first == null ? second : first;
     }
@@ -402,12 +262,22 @@ public class IssueTicketService implements IIssueTicketService {
         return StringUtils.isEmpty(first) ? second : first;
     }
 
-    private String buildExtra(Long assignee, Date dueDate, String attachments, Integer result) {
+    private String buildExtra(Long assignee, Date dueDate, String attachments) {
+        return buildExtra(assignee, dueDate, attachments, null);
+    }
+
+    private String buildExtra(Long assignee, Date dueDate, String attachments, String resolution) {
         StringBuilder builder = new StringBuilder("{");
         boolean hasField = false;
         if (assignee != null) {
             builder.append("\"assignee\":").append(assignee);
             hasField = true;
+            String assigneeName = getActorName(assignee);
+            if (!StringUtils.isEmpty(assigneeName)) {
+                appendSeparator(builder, hasField);
+                builder.append("\"assigneeName\":\"").append(escapeJson(assigneeName)).append("\"");
+                hasField = true;
+            }
         }
         if (dueDate != null) {
             appendSeparator(builder, hasField);
@@ -419,12 +289,16 @@ public class IssueTicketService implements IIssueTicketService {
             builder.append("\"attachments\":").append(attachments);
             hasField = true;
         }
-        if (result != null) {
+        if (!StringUtils.isEmpty(resolution)) {
             appendSeparator(builder, hasField);
-            builder.append("\"result\":").append(result);
+            builder.append("\"resolution\":\"").append(escapeJson(resolution)).append("\"");
         }
         builder.append("}");
         return builder.toString();
+    }
+
+    private String escapeJson(String text) {
+        return text == null ? "" : text.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private void appendSeparator(StringBuilder builder, boolean hasField) {
@@ -433,20 +307,4 @@ public class IssueTicketService implements IIssueTicketService {
         }
     }
 
-    private String findJsonArray(Object extra) {
-        if (extra == null) {
-            return null;
-        }
-        String value = String.valueOf(extra);
-        int keyIndex = value.indexOf("\"attachments\"");
-        if (keyIndex < 0) {
-            return null;
-        }
-        int start = value.indexOf('[', keyIndex);
-        int end = value.lastIndexOf(']');
-        if (start < 0 || end < start) {
-            return null;
-        }
-        return value.substring(start, end + 1);
-    }
 }

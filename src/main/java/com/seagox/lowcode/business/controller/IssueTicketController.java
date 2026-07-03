@@ -79,51 +79,6 @@ public class IssueTicketController {
     }
 
     /**
-     * 指派整改人
-     *
-     * @param id 问题单ID
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    @PostMapping("/assign/{id}")
-    @LogPoint("指派问题单整改")
-    public ResultData assign(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
-        issueTicket.setId(id);
-        return issueTicketService.assign(issueTicket, userId);
-    }
-
-    /**
-     * 提交整改
-     *
-     * @param id 问题单ID
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    @PostMapping("/rectify/{id}")
-    @LogPoint("提交问题单整改")
-    public ResultData rectify(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
-        issueTicket.setId(id);
-        return issueTicketService.rectify(issueTicket, userId);
-    }
-
-    /**
-     * 复验问题单
-     *
-     * @param id 问题单ID
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    @PostMapping("/review/{id}")
-    @LogPoint("复验问题单")
-    public ResultData review(@PathVariable Long id, IssueTicket issueTicket, Long userId) {
-        issueTicket.setId(id);
-        return issueTicketService.review(issueTicket, userId);
-    }
-
-    /**
      * 删除问题单
      *
      * @param id 问题单ID

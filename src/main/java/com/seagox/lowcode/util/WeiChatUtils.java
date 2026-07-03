@@ -2,6 +2,17 @@ package com.seagox.lowcode.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
+import java.io.IOException;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,153 +24,167 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class WeiChatUtils {
 
-    /**
-     * 小程序登录凭证
-     */
-    public static final String MINIPROGRAM_LOGIN_CERTIFICATE = "https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=CODE&grant_type=authorization_code";
+	/**
+	 * 小程序登录凭证
+	 */
+	public static final String MINIPROGRAM_LOGIN_CERTIFICATE = "https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=CODE&grant_type=authorization_code";
 
-    /**
-     * 获取小程序及服务号access_token地址
-     */
-    public static final String ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=SECRET";
+	/**
+	 * 获取小程序及服务号access_token地址
+	 */
+	public static final String ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=SECRET";
 
-    /**
-     * 小程序发送模板消息地址
-     */
-    public static final String SEND_MINIPROGRAM_MSG = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=ACCESS_TOKEN";
-    
-    /**
-     * 服务号发送模板消息地址
-     */
-    public static final String SEND_SERVICE_MSG = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN";
+	/**
+	 * 小程序发送模板消息地址
+	 */
+	public static final String SEND_MINIPROGRAM_MSG = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=ACCESS_TOKEN";
 
-    /**
-     * 小程序APPID
-     */
-    @Value("${third-party.mini-program.appid}")
-    private String appletsAppid;
+	/**
+	 * 服务号发送模板消息地址
+	 */
+	public static final String SEND_SERVICE_MSG = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN";
 
-    /**
-     * 小程序SERCRET
-     */
-    @Value("${third-party.mini-program.sercret}")
-    private String appletsSercret;
-    
-    
-    /**
-     * 服务号APPID
-     */
-    @Value("${third-party.official-account.appid}")
-    private String servicesAppid;
+	/**
+	 * 小程序APPID
+	 */
+	@Value("${third-party.mini-program.appid}")
+	private String appletsAppid;
 
-    /**
-     * 服务号SERCRET
-     */
-    @Value("${third-party.official-account.sercret}")
-    private String servicesSercret;
+	/**
+	 * 小程序SERCRET
+	 */
+	@Value("${third-party.mini-program.sercret}")
+	private String appletsSercret;
 
-    /**
-     * 获取小程序登录凭证
-     */
-    public JSONObject getAppletsLoginCertificate(String code) {
-        try {
-            String url = MINIPROGRAM_LOGIN_CERTIFICATE.replace("APPID", appletsAppid).replace("SECRET", appletsSercret)
-                    .replace("CODE", code);
-            RestTemplate restTemplate = new RestTemplate();
-            return parseJson(restTemplate.getForObject(url, String.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    /**
-     * 获取access_token
-     */
-    public JSONObject getAccessToken() {
-        try {
-            String url = ACCESS_TOKEN.replace("APPID", appletsAppid).replace("SECRET", appletsSercret);
-            RestTemplate restTemplate = new RestTemplate();
-            return parseJson(restTemplate.getForObject(url, String.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	/**
+	 * 服务号APPID
+	 */
+	@Value("${third-party.official-account.appid}")
+	private String servicesAppid;
 
-    /**
-     * 解析微信返回的JSON字符串
-     */
-    private JSONObject parseJson(String response) {
-    	System.err.println(response);
-        if (StringUtils.isEmpty(response)) {
-            return null;
-        }
-        return JSON.parseObject(response);
-    }
+	/**
+	 * 服务号SERCRET
+	 */
+	@Value("${third-party.official-account.sercret}")
+	private String servicesSercret;
 
-    /**
-     * 发送小程序模版消息
-     */
-    public  JSONObject sendMiniProgramMsg(String accessToken, String templateId, String page, String openid) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("template_id", templateId);
-        jsonObject.put("page", page);
-        jsonObject.put("touser", openid);
+	/**
+	 * 获取小程序登录凭证
+	 */
+	public JSONObject getAppletsLoginCertificate(String code) {
+		try {
+			String url = MINIPROGRAM_LOGIN_CERTIFICATE.replace("APPID", appletsAppid).replace("SECRET", appletsSercret)
+					.replace("CODE", code);
+			RestTemplate restTemplate = new RestTemplate();
+			return parseJson(restTemplate.getForObject(url, String.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-        JSONObject data = new JSONObject();
-        JSONObject name = new JSONObject();
-        name.put("value", "hello");
-        data.put("name2", name);
-        
-        JSONObject thing = new JSONObject();
-        thing.put("value", "hello");
-        data.put("thing11", thing);
-        
-        JSONObject time = new JSONObject();
-        time.put("value", "2023-08-09 16:10:00");
-        data.put("time26", time);
+	/**
+	 * 获取access_token
+	 */
+	public JSONObject getAccessToken() {
+		try {
+			String url = ACCESS_TOKEN.replace("APPID", appletsAppid).replace("SECRET", appletsSercret);
+			RestTemplate restTemplate = new RestTemplate();
+			return parseJson(restTemplate.getForObject(url, String.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-        jsonObject.put("data", data);
+	/**
+	 * 解析微信返回的JSON字符串
+	 */
+	private JSONObject parseJson(String response) {
+		System.err.println(response);
+		if (StringUtils.isEmpty(response)) {
+			return null;
+		}
+		return JSON.parseObject(response);
+	}
+
+	/**
+	 * 发送小程序模版消息
+	 */
+	public JSONObject sendMiniProgramMsg(String accessToken, String templateId, String page, String openid) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("template_id", templateId);
+		jsonObject.put("page", page);
+		jsonObject.put("touser", openid);
+
+		JSONObject data = new JSONObject();
+		JSONObject name = new JSONObject();
+		name.put("value", "hello");
+		data.put("name2", name);
+
+		JSONObject thing = new JSONObject();
+		thing.put("value", "hello");
+		data.put("thing11", thing);
+
+		JSONObject time = new JSONObject();
+		time.put("value", "2023-08-09 16:10:00");
+		data.put("time26", time);
+
+		jsonObject.put("data", data);
 
 //        String url = SEND_MINIPROGRAM_MSG.replace("ACCESS_TOKEN", accessToken);
 //        String result = HttpClientUtils.sendPostJsonStr(url, jsonObject.toJSONString(), "text/plain");
 //        if (!StringUtils.isEmpty(result)) {
 //            return JSON.parseObject(result);
 //        }
-        return null;
-    }
-    
-    /**
-     * 发送服务号模版消息
-     */
-    public  JSONObject sendServiceMsg(String accessToken, String templateId, String page, String openid) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("template_id", templateId);
-        jsonObject.put("page", page);
-        jsonObject.put("touser", openid);
+		return null;
+	}
 
-        JSONObject data = new JSONObject();
-        JSONObject name = new JSONObject();
-        name.put("value", "hello");
-        data.put("name2", name);
-        
-        JSONObject thing = new JSONObject();
-        thing.put("value", "hello");
-        data.put("thing11", thing);
-        
-        JSONObject time = new JSONObject();
-        time.put("value", "2023-08-09 16:10:00");
-        data.put("time26", time);
+	/**
+	 * 发送服务号模版消息 AasTvAchpKA5ze5k_kOkQw
+	 */
+	public JSONObject sendServiceMsg(String accessToken, String templateId, String openid, String pagepath) {
+		JSONObject body = new JSONObject();
+		body.put("touser", openid);
+		body.put("template_id", templateId);
+		
+		JSONObject miniprogram = new JSONObject();
+		miniprogram.put("appid", appletsAppid);
+		miniprogram.put("pagepath", pagepath);
+		body.put("miniprogram", miniprogram);
 
-        jsonObject.put("data", data);
+		JSONObject data = new JSONObject();
+		JSONObject name = new JSONObject();
+		name.put("value", "hello");
+		data.put("name2", name);
 
-//        String url = SEND_SERVICE_MSG.replace("ACCESS_TOKEN", accessToken);
-//        String result = HttpClientUtils.sendPostJsonStr(url, jsonObject.toJSONString(), "text/plain");
-//        if (!StringUtils.isEmpty(result)) {
-//            return JSON.parseObject(result);
-//        }
-        return null;
-    }
+		JSONObject thing = new JSONObject();
+		thing.put("value", "hello");
+		data.put("thing11", thing);
+
+		JSONObject time = new JSONObject();
+		time.put("value", "2023-08-09 16:10:00");
+		data.put("time26", time);
+
+		body.put("data", data);
+
+		String url = SEND_SERVICE_MSG.replace("ACCESS_TOKEN", accessToken);
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
+		httpPost.setEntity(new StringEntity(body.toJSONString(), ContentType.APPLICATION_JSON.withCharset("UTF-8")));
+		try {
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			String result = EntityUtils.toString(response.getEntity(), "UTF-8");
+			System.out.println("微信返回：" + result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static void main(String[] args) {
+
+	}
 
 }

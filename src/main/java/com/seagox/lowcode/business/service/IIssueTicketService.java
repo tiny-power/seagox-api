@@ -46,33 +46,6 @@ public interface IIssueTicketService {
     ResultData update(IssueTicket issueTicket, Long userId);
 
     /**
-     * 指派整改人
-     *
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    ResultData assign(IssueTicket issueTicket, Long userId);
-
-    /**
-     * 提交整改
-     *
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    ResultData rectify(IssueTicket issueTicket, Long userId);
-
-    /**
-     * 复验问题单
-     *
-     * @param issueTicket 问题单
-     * @param userId 当前用户ID
-     * @return 操作结果
-     */
-    ResultData review(IssueTicket issueTicket, Long userId);
-
-    /**
      * 删除问题单
      *
      * @param id 问题单ID

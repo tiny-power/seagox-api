@@ -146,6 +146,12 @@ public class IssueTicket {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date reviewedAt;
 
+    /**
+     * 操作类型
+     */
+    @TableField(exist = false)
+    private String actionType;
+
     public Long getId() {
         return id;
     }
@@ -328,5 +334,13 @@ public class IssueTicket {
 
     public void setReviewedAt(Date reviewedAt) {
         this.reviewedAt = reviewedAt;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
     }
 }
