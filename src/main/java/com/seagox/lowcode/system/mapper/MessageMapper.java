@@ -23,11 +23,6 @@ public interface MessageMapper extends BaseMapper<SysMessage> {
     public int queryCount(@Param("companyId") long companyId, @Param("toUserId") long toUserId);
 
     /**
-     * 分组查询未读数量
-     */
-    public List<Map<String, Object>> queryUnreadGroup(@Param("companyId") long companyId, @Param("toUserId") long toUserId);
-
-    /**
      * 删除消息记录
      */
     public void deleteMessage(@Param("businessType") String businessType, @Param("businessKey") Long businessKey);

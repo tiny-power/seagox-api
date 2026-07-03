@@ -20,11 +20,6 @@ public interface IMessageService {
     public ResultData queryUnRead(Long companyId, Long userId);
 
     /**
-     * 分组查询未读数量
-     */
-    public ResultData queryUnreadGroup(Long companyId, Long userId);
-
-    /**
      * 处理消息
      */
     public ResultData update(Long userId, Long id);

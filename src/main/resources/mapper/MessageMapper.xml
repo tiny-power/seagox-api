@@ -64,18 +64,6 @@
 		ORDER BY a.created_at DESC
 	</select>
 
-	<!-- 分组查询未读数量 -->
-	<select id="queryUnreadGroup" resultType="camelKeyMap">
-		select a.type, COUNT(a.id) AS "unreadCount" FROM sys_message a
-		LEFT JOIN company c ON c.id = a.company_id
-		<where>
-			a.status = 0
-			AND c.id = #{companyId}
-			AND a.to_user_id = #{toUserId}
-		</where>
-		GROUP BY a.type
-	</select>
-	
 	<!-- 查询未读数量 -->
 	<select id="queryCount" resultType="int">
 		select COUNT(a.id) FROM sys_message a

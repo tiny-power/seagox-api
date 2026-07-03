@@ -2,6 +2,7 @@ package com.seagox.lowcode.business.service;
 
 import com.seagox.lowcode.business.entity.Repair;
 import com.seagox.lowcode.common.ResultData;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -32,7 +33,7 @@ public interface IRepairService {
     /**
      * 分配维修人员
      */
-    ResultData assign(Long id, Long repairMemberId, Long userId);
+    ResultData assign(Long id, Long repairMemberId, Date expectedVisitAt, Long userId);
 
     /**
      * 完成维修
@@ -43,6 +44,16 @@ public interface IRepairService {
      * 确认维修完成
      */
     ResultData confirm(Long id, Long userId);
+
+    /**
+     * 重新维修
+     */
+    ResultData rework(Long id, Long userId);
+
+    /**
+     * 取消维修
+     */
+    ResultData cancel(Long id, Long userId);
 
     /**
      * 删除维修

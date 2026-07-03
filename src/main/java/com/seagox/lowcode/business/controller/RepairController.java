@@ -4,8 +4,10 @@ import com.seagox.lowcode.annotation.LogPoint;
 import com.seagox.lowcode.business.entity.Repair;
 import com.seagox.lowcode.business.service.IRepairService;
 import com.seagox.lowcode.common.ResultData;
+import java.util.Date;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,8 +66,10 @@ public class RepairController {
      */
     @PostMapping("/assign/{id}")
     @LogPoint("指派报修维修人员")
-    public ResultData assign(@PathVariable Long id, Long repairMemberId, Long userId) {
-        return repairService.assign(id, repairMemberId, userId);
+    public ResultData assign(@PathVariable Long id, Long repairMemberId,
+                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date expectedVisitAt,
+                             Long userId) {
+        return repairService.assign(id, repairMemberId, expectedVisitAt, userId);
     }
 
     /**
@@ -84,6 +88,24 @@ public class RepairController {
     @LogPoint("确认报修完成")
     public ResultData confirm(@PathVariable Long id, Long userId) {
         return repairService.confirm(id, userId);
+    }
+
+    /**
+     * 重新维修报修单
+     */
+    @PostMapping("/rework/{id}")
+    @LogPoint("报修重新维修")
+    public ResultData rework(@PathVariable Long id, Long userId) {
+        return repairService.rework(id, userId);
+    }
+
+    /**
+     * 取消报修单
+     */
+    @PostMapping("/cancel/{id}")
+    @LogPoint("取消报修单")
+    public ResultData cancel(@PathVariable Long id, Long userId) {
+        return repairService.cancel(id, userId);
     }
 
     /**

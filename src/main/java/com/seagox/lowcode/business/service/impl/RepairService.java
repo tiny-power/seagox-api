@@ -3,15 +3,19 @@ package com.seagox.lowcode.business.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Repair;
+import com.seagox.lowcode.business.entity.ProjectMember;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
+import com.seagox.lowcode.business.mapper.ProjectMemberMapper;
 import com.seagox.lowcode.business.mapper.RepairMapper;
 import com.seagox.lowcode.business.service.IRepairService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,12 +30,16 @@ public class RepairService implements IRepairService {
     public static final int STATUS_PROCESSING = 2;
     public static final int STATUS_CONFIRMING = 3;
     public static final int STATUS_COMPLETED = 4;
+    public static final int STATUS_CANCELED = 5;
 
     @Autowired
     private RepairMapper repairMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProjectMemberMapper projectMemberMapper;
 
     /**
      * {@inheritDoc}
@@ -74,6 +82,9 @@ public class RepairService implements IRepairService {
         }
 
         Date now = new Date();
+        if (StringUtils.isEmpty(repair.getRepairNo())) {
+            repair.setRepairNo(generateRepairNo(now));
+        }
         repair.setStatus(STATUS_SUBMITTED);
         repair.setRepairAt(repair.getRepairAt() == null ? now : repair.getRepairAt());
         repair.setCreatedBy(userId);
@@ -99,15 +110,20 @@ public class RepairService implements IRepairService {
         if (Integer.valueOf(STATUS_COMPLETED).equals(original.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的报修单不可以修改");
         }
+        if (Integer.valueOf(STATUS_CANCELED).equals(original.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "已取消的报修单不可以修改");
+        }
         ResultData verifyResult = verify(repair);
         if (verifyResult != null) {
             return verifyResult;
         }
 
         repair.setStatus(original.getStatus());
+        repair.setRepairNo(original.getRepairNo());
         repair.setRepairAt(original.getRepairAt());
         repair.setAfterAttachments(original.getAfterAttachments());
         repair.setRepairMemberId(original.getRepairMemberId());
+        repair.setExpectedVisitAt(original.getExpectedVisitAt());
         repair.setCompleteAt(original.getCompleteAt());
         repair.setCreatedBy(original.getCreatedBy());
         repair.setCreatedAt(original.getCreatedAt());
@@ -121,9 +137,12 @@ public class RepairService implements IRepairService {
      * {@inheritDoc}
      */
     @Override
-    public ResultData assign(Long id, Long repairMemberId, Long userId) {
+    public ResultData assign(Long id, Long repairMemberId, Date expectedVisitAt, Long userId) {
         if (repairMemberId == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "维修人员不能为空");
+        }
+        if (expectedVisitAt == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "预计上门时间不能为空");
         }
         Repair repair = repairMapper.selectById(id);
         if (repair == null) {
@@ -132,7 +151,15 @@ public class RepairService implements IRepairService {
         if (Integer.valueOf(STATUS_COMPLETED).equals(repair.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的报修单不可以指派");
         }
+        if (Integer.valueOf(STATUS_CANCELED).equals(repair.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "已取消的报修单不可以指派");
+        }
+        ProjectMember projectMember = projectMemberMapper.selectById(repairMemberId);
+        if (projectMember == null || !repair.getProjectId().equals(projectMember.getProjectId())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "维修人员不属于当前项目");
+        }
         repair.setRepairMemberId(repairMemberId);
+        repair.setExpectedVisitAt(expectedVisitAt);
         repair.setStatus(STATUS_PROCESSING);
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
@@ -154,6 +181,7 @@ public class RepairService implements IRepairService {
         }
         Date now = new Date();
         original.setAfterAttachments(repair == null ? original.getAfterAttachments() : repair.getAfterAttachments());
+        original.setRepairResult(repair == null ? original.getRepairResult() : repair.getRepairResult());
         original.setCompleteAt(now);
         original.setStatus(STATUS_CONFIRMING);
         original.setUpdatedBy(userId);
@@ -172,9 +200,53 @@ public class RepairService implements IRepairService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "报修单不存在");
         }
         if (!Integer.valueOf(STATUS_CONFIRMING).equals(repair.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "只有待确认的报修单可以确认完成");
+            return ResultData.warn(ResultCode.OTHER_ERROR, "只有待验收的报修单可以确认完成");
         }
         repair.setStatus(STATUS_COMPLETED);
+        repair.setUpdatedBy(userId);
+        repair.setUpdatedAt(new Date());
+        repairMapper.updateById(repair);
+        return ResultData.success(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResultData rework(Long id, Long userId) {
+        Repair repair = repairMapper.selectById(id);
+        if (repair == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "报修单不存在");
+        }
+        if (!Integer.valueOf(STATUS_CONFIRMING).equals(repair.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "只有待验收的报修单可以重新维修");
+        }
+        repair.setStatus(STATUS_PROCESSING);
+        repair.setAfterAttachments(null);
+        repair.setRepairResult(null);
+        repair.setCompleteAt(null);
+        repair.setUpdatedBy(userId);
+        repair.setUpdatedAt(new Date());
+        repairMapper.updateById(repair);
+        return ResultData.success(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResultData cancel(Long id, Long userId) {
+        Repair repair = repairMapper.selectById(id);
+        if (repair == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "报修单不存在");
+        }
+        if (Integer.valueOf(STATUS_COMPLETED).equals(repair.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的报修单不可以取消");
+        }
+        if (Integer.valueOf(STATUS_CANCELED).equals(repair.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "报修单已取消");
+        }
+        repair.setStatus(STATUS_CANCELED);
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
         repairMapper.updateById(repair);
@@ -223,5 +295,10 @@ public class RepairService implements IRepairService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请填写联系电话");
         }
         return null;
+    }
+
+    private String generateRepairNo(Date now) {
+        return "BX" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(now)
+                + String.format("%04d", ThreadLocalRandom.current().nextInt(10000));
     }
 }

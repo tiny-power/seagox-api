@@ -20,6 +20,11 @@ public class Repair {
     private Long projectId;
 
     /**
+     * 报修单号
+     */
+    private String repairNo;
+
+    /**
      * 报修类型
      */
     private String type;
@@ -50,7 +55,7 @@ public class Repair {
     private String contactNumber;
 
     /**
-     * 状态(1:待受理;2:处理中;3:待确认;4:已完成;)
+     * 状态(1:待派单;2:处理中;3:待验收;4:已完成;5:已取消;)
      */
     private Integer status;
 
@@ -67,9 +72,21 @@ public class Repair {
     private String afterAttachments;
 
     /**
+     * 维修说明
+     */
+    private String repairResult;
+
+    /**
      * 维修人员ID
      */
     private Long repairMemberId;
+
+    /**
+     * 预计上门时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date expectedVisitAt;
 
     /**
      * 完成时间
@@ -116,6 +133,14 @@ public class Repair {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public String getRepairNo() {
+        return repairNo;
+    }
+
+    public void setRepairNo(String repairNo) {
+        this.repairNo = repairNo;
     }
 
     public String getType() {
@@ -190,12 +215,28 @@ public class Repair {
         this.afterAttachments = afterAttachments;
     }
 
+    public String getRepairResult() {
+        return repairResult;
+    }
+
+    public void setRepairResult(String repairResult) {
+        this.repairResult = repairResult;
+    }
+
     public Long getRepairMemberId() {
         return repairMemberId;
     }
 
     public void setRepairMemberId(Long repairMemberId) {
         this.repairMemberId = repairMemberId;
+    }
+
+    public Date getExpectedVisitAt() {
+        return expectedVisitAt;
+    }
+
+    public void setExpectedVisitAt(Date expectedVisitAt) {
+        this.expectedVisitAt = expectedVisitAt;
     }
 
     public Date getCompleteAt() {

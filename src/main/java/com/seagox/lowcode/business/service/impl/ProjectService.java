@@ -241,6 +241,26 @@ public class ProjectService implements IProjectService {
     }
 
     /**
+     * 修改项目状态
+     */
+    @Override
+    public ResultData updateStatus(Long id, Integer status, Long userId) {
+        Project project = projectMapper.selectById(id);
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
+        if (status == null || status < 1 || status > 7) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目状态不正确");
+        }
+
+        project.setStatus(status);
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(new Date());
+        projectMapper.updateById(project);
+        return ResultData.success(null);
+    }
+
+    /**
      * 校验项目保存请求
      */
     private ResultData validate(ProjectSaveRequest request, boolean update) {

@@ -39,14 +39,6 @@ public class MessageController {
     }
 
     /**
-     * 分组查询未读数量
-     */
-    @GetMapping("/queryUnreadGroup")
-    public ResultData queryUnreadGroup(Long companyId, Long userId) {
-        return messageService.queryUnreadGroup(companyId, userId);
-    }
-
-    /**
      * 处理消息
      */
     @PostMapping("/update")

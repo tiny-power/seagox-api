@@ -39,4 +39,9 @@ public interface IProjectService {
      * 启动项目
      */
     ResultData start(Long id, Long userId);
+
+    /**
+     * 修改项目状态
+     */
+    ResultData updateStatus(Long id, Integer status, Long userId);
 }

@@ -39,11 +39,6 @@ public class MessageService implements IMessageService {
         return ResultData.success(messageMapper.queryCount(companyId, userId));
     }
 
-    @Override
-    public ResultData queryUnreadGroup(Long companyId, Long userId) {
-        return ResultData.success(messageMapper.queryUnreadGroup(companyId, userId));
-    }
-
     /**
      * {@inheritDoc}
      */

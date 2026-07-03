@@ -79,4 +79,13 @@ public class ProjectController {
     public ResultData start(@PathVariable Long id, Long userId) {
         return projectService.start(id, userId);
     }
+
+    /**
+     * 修改项目状态
+     */
+    @PostMapping("/updateStatus/{id}")
+    @LogPoint("修改项目状态")
+    public ResultData updateStatus(@PathVariable Long id, Integer status, Long userId) {
+        return projectService.updateStatus(id, status, userId);
+    }
 }
