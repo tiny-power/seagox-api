@@ -5,11 +5,13 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.seagox.lowcode.business.dto.AiSecretaryChatMessage;
 import com.seagox.lowcode.business.service.IAiSecretaryService;
+import com.seagox.lowcode.business.service.IMcpToolService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +32,15 @@ public class AiSecretaryService implements IAiSecretaryService {
 
     private static final String SYSTEM_PROMPT = "你是工程项目数字化管控平台的AI小秘书。"
             + "请使用简洁、专业、可执行的中文回答，优先围绕施工进度、质量问题、材料到场、付款申请、日志和待办事项提供建议。"
+            + "当用户咨询材料到场记录时，优先通过MCP工具query_material_arrivals查询真实业务数据，再基于查询结果回答。"
+            + "如果用户说“我的记录”，将mine参数设为true。"
             + "如果信息不足，先说明需要补充哪些关键信息。";
+
+    /**
+     * MCP工具服务
+     */
+    @Autowired
+    private IMcpToolService mcpToolService;
 
     /**
      * DeepSeek API Key
@@ -56,6 +66,12 @@ public class AiSecretaryService implements IAiSecretaryService {
     @Value("${ai.deepseek.timeout:30000}")
     private Integer timeout;
 
+    /**
+     * 是否启用MCP工具
+     */
+    @Value("${ai.deepseek.mcp.enabled:true}")
+    private Boolean mcpEnabled;
+
     @Override
     public ResultData chat(String message, String history, Long userId) {
         if (!StringUtils.hasText(message)) {
@@ -67,7 +83,7 @@ public class AiSecretaryService implements IAiSecretaryService {
         }
 
         try {
-            JSONObject result = requestDeepSeek(message.trim(), history, userId);
+            JSONObject result = requestDeepSeekWithMcp(message.trim(), history, userId);
             Map<String, Object> data = new HashMap<>();
             data.put("content", extractContent(result));
             data.put("model", result.getString("model"));
@@ -80,14 +96,43 @@ public class AiSecretaryService implements IAiSecretaryService {
         }
     }
 
-    private JSONObject requestDeepSeek(String message, String history, Long userId) {
+    private JSONObject requestDeepSeekWithMcp(String message, String history, Long userId) {
+        JSONArray messages = buildMessages(message, history);
+        JSONObject result = requestDeepSeek(messages, userId, isMcpEnabled());
+        JSONArray toolCalls = extractToolCalls(result);
+        if (toolCalls == null || toolCalls.isEmpty()) {
+            return result;
+        }
+
+        JSONObject assistantMessage = extractMessage(result);
+        assistantMessage.put("content", assistantMessage.getString("content"));
+        messages.add(assistantMessage);
+
+        for (int i = 0; i < toolCalls.size(); i++) {
+            JSONObject toolCall = toolCalls.getJSONObject(i);
+            JSONObject function = toolCall.getJSONObject("function");
+            JSONObject toolResult = mcpToolService.call(
+                    function == null ? "" : function.getString("name"),
+                    function == null ? "" : function.getString("arguments"),
+                    userId);
+            JSONObject toolMessage = new JSONObject();
+            toolMessage.put("role", "tool");
+            toolMessage.put("tool_call_id", toolCall.getString("id"));
+            toolMessage.put("content", toolResult.toJSONString());
+            messages.add(toolMessage);
+        }
+
+        return requestDeepSeek(messages, userId, false);
+    }
+
+    private JSONObject requestDeepSeek(JSONArray messages, Long userId, boolean enableTools) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
         JSONObject body = new JSONObject();
         body.put("model", model);
-        body.put("messages", buildMessages(message, history));
+        body.put("messages", messages);
         body.put("temperature", 1.0);
         body.put("max_tokens", 1600);
         body.put("stream", false);
@@ -96,6 +141,13 @@ public class AiSecretaryService implements IAiSecretaryService {
         body.put("thinking", thinking);
         if (userId != null) {
             body.put("user_id", "user_" + userId);
+        }
+        if (enableTools) {
+            JSONArray tools = mcpToolService.queryDeepSeekTools();
+            if (tools != null && !tools.isEmpty()) {
+                body.put("tools", tools);
+                body.put("tool_choice", "auto");
+            }
         }
 
         HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
@@ -148,17 +200,26 @@ public class AiSecretaryService implements IAiSecretaryService {
     }
 
     private String extractContent(JSONObject result) {
-        JSONArray choices = result == null ? null : result.getJSONArray("choices");
-        if (choices == null || choices.isEmpty()) {
-            throw new RestClientException("DeepSeek response is empty");
-        }
-        JSONObject choice = choices.getJSONObject(0);
-        JSONObject message = choice.getJSONObject("message");
+        JSONObject message = extractMessage(result);
         String content = message == null ? "" : message.getString("content");
         if (!StringUtils.hasText(content)) {
             throw new RestClientException("DeepSeek message is empty");
         }
         return content;
+    }
+
+    private JSONObject extractMessage(JSONObject result) {
+        JSONArray choices = result == null ? null : result.getJSONArray("choices");
+        if (choices == null || choices.isEmpty()) {
+            throw new RestClientException("DeepSeek response is empty");
+        }
+        JSONObject choice = choices.getJSONObject(0);
+        return choice.getJSONObject("message");
+    }
+
+    private JSONArray extractToolCalls(JSONObject result) {
+        JSONObject message = extractMessage(result);
+        return message == null ? null : message.getJSONArray("tool_calls");
     }
 
     private RestTemplate createRestTemplate() {
@@ -170,5 +231,9 @@ public class AiSecretaryService implements IAiSecretaryService {
 
     private String normalizeBaseUrl() {
         return baseUrl == null ? "https://api.deepseek.com" : baseUrl.replaceAll("/+$", "");
+    }
+
+    private boolean isMcpEnabled() {
+        return Boolean.TRUE.equals(mcpEnabled);
     }
 }

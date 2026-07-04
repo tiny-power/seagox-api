@@ -53,10 +53,10 @@ logging:
 # minio、aliyun、ecloud、aws
 oss:
   type: minio
-  endpoint: http://192.168.1.8:9000
+  endpoint: http://192.168.31.52:9000
   access-key: admin
   secret-key: Tiny_minio_4512
-  url: http://192.168.1.8:9000
+  url: http://192.168.31.52:9000
 
 jodconverter:
   working-dir: /Users/X/Downloads
@@ -71,7 +71,7 @@ third-party:
 
 ai:
   deepseek:
-    api-key: ${DEEPSEEK_API_KEY:}
+    api-key: sk-6c05bdef008945f19d9a90cae4e11a5a
     base-url: https://api.deepseek.com
     model: deepseek-v4-flash
     timeout: 30000
