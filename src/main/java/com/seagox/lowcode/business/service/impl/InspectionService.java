@@ -6,9 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Inspection;
+import com.seagox.lowcode.business.entity.IssueTicket;
 import com.seagox.lowcode.business.entity.ProjectStage;
 import com.seagox.lowcode.business.entity.StageInspectionItem;
 import com.seagox.lowcode.business.mapper.InspectionMapper;
+import com.seagox.lowcode.business.mapper.IssueTicketMapper;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
 import com.seagox.lowcode.business.mapper.ProjectStageMapper;
 import com.seagox.lowcode.business.mapper.StageInspectionItemMapper;
@@ -54,6 +56,11 @@ public class InspectionService implements IInspectionService {
     private static final int STAGE_STATUS_COMPLETED = 3;
 
     /**
+     * 问题单已关闭
+     */
+    private static final int ISSUE_STATUS_CLOSED = 3;
+
+    /**
      * 验收单消息业务类型
      */
     private static final String BUSINESS_TYPE = "inspection";
@@ -86,6 +93,12 @@ public class InspectionService implements IInspectionService {
      */
     @Autowired
     private StageInspectionItemMapper stageInspectionItemMapper;
+
+    /**
+     * 问题单数据访问对象
+     */
+    @Autowired
+    private IssueTicketMapper issueTicketMapper;
 
     /**
      * 消息数据访问对象
@@ -217,6 +230,10 @@ public class InspectionService implements IInspectionService {
         ResultData participantResult = verifyParticipant(exist, userId);
         if (participantResult != null) {
             return participantResult;
+        }
+        ResultData issueResult = verifyNoOpenIssueTickets(exist.getProjectId());
+        if (issueResult != null) {
+            return issueResult;
         }
 
         Date now = new Date();
@@ -362,6 +379,24 @@ public class InspectionService implements IInspectionService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收人数据格式错误");
         }
         return ResultData.warn(ResultCode.OTHER_ERROR, "仅本单验收人可操作");
+    }
+
+    /**
+     * 校验项目下不存在未关闭的问题单
+     */
+    private ResultData verifyNoOpenIssueTickets(Long projectId) {
+        if (projectId == null) {
+            return null;
+        }
+        Long count = issueTicketMapper.selectCount(new LambdaQueryWrapper<IssueTicket>()
+                .eq(IssueTicket::getProjectId, projectId)
+                .and(wrapper -> wrapper.ne(IssueTicket::getStatus, ISSUE_STATUS_CLOSED)
+                        .or()
+                        .isNull(IssueTicket::getStatus)));
+        if (count != null && count > 0) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "当前项目存在未关闭的问题单，请关闭后再完成验收");
+        }
+        return null;
     }
 
     /**
