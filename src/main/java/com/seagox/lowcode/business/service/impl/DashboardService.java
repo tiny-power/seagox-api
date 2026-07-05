@@ -20,6 +20,7 @@ import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.mapper.AccountMapper;
+import com.seagox.lowcode.system.mapper.FlowMapper;
 import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -69,6 +70,9 @@ public class DashboardService implements IDashboardService {
 
     @Autowired
     private AccountMapper accountMapper;
+
+    @Autowired
+    private FlowMapper flowMapper;
 
     @Override
     public ResultData home(Long companyId, Long userId) {
@@ -246,17 +250,25 @@ public class DashboardService implements IDashboardService {
         }
 
         int issueCount = issueTicketMapper.selectCount(new LambdaQueryWrapper<IssueTicket>()
-                .ne(IssueTicket::getStatus, 4)).intValue();
+                .ne(IssueTicket::getStatus, 3)).intValue();
         int paymentApproval = paymentRequestMapper.selectCount(new LambdaQueryWrapper<PaymentRequest>()
                 .eq(PaymentRequest::getStatus, 1)).intValue();
         int messageApproval = queryApprovalCount(companyId, userId);
+        int todoCount = queryTodoCount(companyId, userId);
 
         return listOf(
-                reminder("red", progressCount + " 个项目需要提交月度进度"),
-                reminder("orange", paymentApproval + " 条合同收款提醒"),
-                reminder("blue", messageApproval + " 条审批事项待处理"),
-                reminder("gray", "项目经理周例会 09:30（待参加）"),
-                reminder("gray", issueCount + " 个问题单待闭环"));
+                reminder("red", progressCount + " 个项目阶段验收"),
+                reminder("orange", paymentApproval + " 条请款单提醒"),
+                reminder("blue", messageApproval + " 条消息待处理"),
+                reminder("gray", todoCount + " 条审批事项待处理"),
+                reminder("green", issueCount + " 个问题单待闭环"));
+    }
+
+    private int queryTodoCount(Long companyId, Long userId) {
+        if (companyId == null || userId == null) {
+            return 0;
+        }
+        return flowMapper.queryTodoItem(companyId, String.valueOf(userId), null, null, null, null).size();
     }
 
     private Map<String, LogReporter> buildLogReporters(List<Project> projects, List<ProjectStage> stages) {
@@ -446,13 +458,6 @@ public class DashboardService implements IDashboardService {
         return calendar.getTime();
     }
 
-    private Date addMilliseconds(Date date, int milliseconds) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.MILLISECOND, milliseconds);
-        return calendar.getTime();
-    }
-
     private boolean before(Date value, Date target) {
         return value != null && value.before(target);
     }
@@ -467,14 +472,6 @@ public class DashboardService implements IDashboardService {
     private int daysBetween(Date start, Date end) {
         long diff = startOfDay(end).getTime() - startOfDay(start).getTime();
         return (int) (diff / (24L * 60L * 60L * 1000L));
-    }
-
-    private Date nullSafeDate(Date value) {
-        return value == null ? new Date(Long.MAX_VALUE) : value;
-    }
-
-    private String formatDay(Date date) {
-        return new SimpleDateFormat("M/d").format(date);
     }
 
     private String formatLogDay(Date date) {
