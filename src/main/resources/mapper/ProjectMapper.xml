@@ -19,6 +19,8 @@
                p.planned_end_date AS "plannedEndDate",
                p.actual_start_date AS "actualStartDate",
                p.actual_end_date AS "actualEndDate",
+               p.delivered_at AS "deliveredAt",
+               p.warranty_months AS "warrantyMonths",
                p.created_by AS "createdBy",
                p.updated_by AS "updatedBy",
                p.created_at AS "createdAt",

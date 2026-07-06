@@ -252,6 +252,7 @@ COMMENT ON COLUMN "public"."job"."status" IS '状态(0:未启动;1:已启动;)';
 COMMENT ON COLUMN "public"."job"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."job"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."job" IS '任务调度';
+INSERT INTO "public"."job" ("company_id","name","cron","mark","status") VALUES (1,'项目保修到期完结','0 0 1 * * ?','com.seagox.lowcode.business.job.ProjectWarrantyJob',1);
 
 CREATE TABLE IF NOT EXISTS "public"."leave_request" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,
@@ -302,6 +303,8 @@ CREATE TABLE IF NOT EXISTS "public"."project" (
     "planned_end_date" DATE NULL,
     "actual_start_date" DATE NULL,
     "actual_end_date" DATE NULL,
+    "delivered_at" DATE NULL,
+    "warranty_months" INTEGER DEFAULT 12,
     "created_by" BIGINT NOT NULL,
     "updated_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -316,7 +319,7 @@ COMMENT ON COLUMN "public"."project"."address" IS '地址';
 COMMENT ON COLUMN "public"."project"."owner_name" IS '业主姓名';
 COMMENT ON COLUMN "public"."project"."owner_phone" IS '业主联系电话';
 COMMENT ON COLUMN "public"."project"."budget_amount" IS '预算金额';
-COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)';
+COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:已完结;6:已取消;)';
 COMMENT ON COLUMN "public"."project"."health_status" IS '健康状态(1:正常;2:预警;3:滞后;4:异常;)';
 COMMENT ON COLUMN "public"."project"."pause_reason" IS '暂停原因';
 COMMENT ON COLUMN "public"."project"."cancel_reason" IS '取消原因';
@@ -324,6 +327,8 @@ COMMENT ON COLUMN "public"."project"."planned_start_date" IS '计划开始日期
 COMMENT ON COLUMN "public"."project"."planned_end_date" IS '计划结束日期';
 COMMENT ON COLUMN "public"."project"."actual_start_date" IS '实际开始日期';
 COMMENT ON COLUMN "public"."project"."actual_end_date" IS '实际结束日期';
+COMMENT ON COLUMN "public"."project"."delivered_at" IS '交付时间';
+COMMENT ON COLUMN "public"."project"."warranty_months" IS '保修月数';
 COMMENT ON COLUMN "public"."project"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."project"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."project"."created_at" IS '创建时间';

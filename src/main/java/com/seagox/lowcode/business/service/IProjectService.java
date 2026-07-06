@@ -41,6 +41,21 @@ public interface IProjectService {
     ResultData start(Long id, Long userId);
 
     /**
+     * 取消项目
+     */
+    ResultData cancel(Long id, String cancelReason, Long userId);
+
+    /**
+     * 暂停项目
+     */
+    ResultData pause(Long id, String pauseReason, Long userId);
+
+    /**
+     * 恢复项目
+     */
+    ResultData resume(Long id, Long userId);
+
+    /**
      * 修改项目状态
      */
     ResultData updateStatus(Long id, Integer status, Long userId);

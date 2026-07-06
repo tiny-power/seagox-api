@@ -199,6 +199,7 @@ CREATE TABLE IF NOT EXISTS `job`  (
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务调度';
+INSERT INTO job (`company_id`, `name`, `cron`, `mark`, `status`) VALUES (1, '项目保修到期完结', '0 0 1 * * ?', 'com.seagox.lowcode.business.job.ProjectWarrantyJob', 1);
 
 CREATE TABLE IF NOT EXISTS `leave_request` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -227,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `project` (
     `owner_name` VARCHAR(100) NOT NULL COMMENT '业主姓名',
     `owner_phone` VARCHAR(50) NOT NULL COMMENT '业主联系电话',
     `budget_amount` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '预算金额',
-    `status` INT UNSIGNED DEFAULT 1 COMMENT '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)',
+    `status` INT UNSIGNED DEFAULT 1 COMMENT '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:已完结;6:已取消;)',
     `health_status` INT UNSIGNED DEFAULT 1 COMMENT '健康状态(1:正常;2:预警;3:滞后;4:异常;)',
     `pause_reason` VARCHAR(500) DEFAULT NULL COMMENT '暂停原因',
     `cancel_reason` VARCHAR(500) DEFAULT NULL COMMENT '取消原因',
@@ -235,6 +236,8 @@ CREATE TABLE IF NOT EXISTS `project` (
     `planned_end_date` DATE NULL COMMENT '计划结束日期',
     `actual_start_date` DATE NULL COMMENT '实际开始日期',
     `actual_end_date` DATE NULL COMMENT '实际结束日期',
+    `delivered_at` DATE NULL COMMENT '交付时间',
+	`warranty_months` INT UNSIGNED DEFAULT 12 COMMENT '保修月数',
     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

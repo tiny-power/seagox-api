@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -70,6 +71,12 @@ public class ProjectService implements IProjectService {
      */
     @Autowired
     private StageInspectionItemMapper inspectionMapper;
+
+    /**
+     * OSS访问地址
+     */
+    @Value("${oss.url}")
+    private String ossUrl;
 
     /**
      * 分页查询项目
@@ -167,8 +174,12 @@ public class ProjectService implements IProjectService {
 
         Date now = new Date();
         project.setCompanyId(companyId);
+        if (StringUtils.isEmpty(project.getCover())) {
+            project.setCover(defaultCover());
+        }
         project.setStatus(StringUtils.isEmpty(project.getStatus()) ? 1 : project.getStatus());
         project.setHealthStatus(StringUtils.isEmpty(project.getHealthStatus()) ? 1 : project.getHealthStatus());
+        project.setWarrantyMonths(project.getWarrantyMonths() == null ? 12 : project.getWarrantyMonths());
         project.setCreatedBy(userId);
         project.setUpdatedBy(userId);
         project.setCreatedAt(now);
@@ -204,6 +215,7 @@ public class ProjectService implements IProjectService {
         project.setCompanyId(original.getCompanyId());
         project.setCreatedBy(original.getCreatedBy());
         project.setCreatedAt(original.getCreatedAt());
+        project.setWarrantyMonths(project.getWarrantyMonths() == null ? 12 : project.getWarrantyMonths());
         project.setUpdatedBy(userId);
         project.setUpdatedAt(new Date());
         projectMapper.updateById(project);
@@ -247,6 +259,74 @@ public class ProjectService implements IProjectService {
     }
 
     /**
+     * 取消项目
+     */
+    @Transactional
+    @Override
+    public ResultData cancel(Long id, String cancelReason, Long userId) {
+        Project project = projectMapper.selectById(id);
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
+        if (!Integer.valueOf(1).equals(project.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅待启动项目可以取消");
+        }
+        if (StringUtils.isEmpty(cancelReason)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "取消原因不能为空");
+        }
+        project.setStatus(6);
+        project.setCancelReason(cancelReason);
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(new Date());
+        projectMapper.updateById(project);
+        return ResultData.success(null);
+    }
+
+    /**
+     * 暂停项目
+     */
+    @Transactional
+    @Override
+    public ResultData pause(Long id, String pauseReason, Long userId) {
+        Project project = projectMapper.selectById(id);
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
+        if (!Integer.valueOf(2).equals(project.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅进行中项目可以暂停");
+        }
+        if (StringUtils.isEmpty(pauseReason)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "暂停原因不能为空");
+        }
+        project.setStatus(3);
+        project.setPauseReason(pauseReason);
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(new Date());
+        projectMapper.updateById(project);
+        return ResultData.success(null);
+    }
+
+    /**
+     * 恢复项目
+     */
+    @Transactional
+    @Override
+    public ResultData resume(Long id, Long userId) {
+        Project project = projectMapper.selectById(id);
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
+        if (!Integer.valueOf(3).equals(project.getStatus())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅暂停项目可以恢复");
+        }
+        project.setStatus(2);
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(new Date());
+        projectMapper.updateById(project);
+        return ResultData.success(null);
+    }
+
+    /**
      * 修改项目状态
      */
     @Override
@@ -255,7 +335,7 @@ public class ProjectService implements IProjectService {
         if (project == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
-        if (status == null || status < 1 || status > 7) {
+        if (status == null || status < 1 || status > 6) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目状态不正确");
         }
 
@@ -301,6 +381,9 @@ public class ProjectService implements IProjectService {
         if (project.getPlannedStartDate().after(project.getPlannedEndDate())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "计划结束日期不能早于开始日期");
         }
+        if (project.getWarrantyMonths() != null && project.getWarrantyMonths() < 0) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "保修月份不能小于0");
+        }
         if (CollectionUtils.isEmpty(request.getMembers())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目角色不能为空");
         }
@@ -319,6 +402,13 @@ public class ProjectService implements IProjectService {
             }
         }
         return null;
+    }
+
+    /**
+     * 默认项目封面
+     */
+    private String defaultCover() {
+        return ossUrl.replaceAll("/$", "") + "/oss/cover.png";
     }
 
     /**

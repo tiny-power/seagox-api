@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Inspection;
 import com.seagox.lowcode.business.entity.IssueTicket;
+import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.ProjectStage;
 import com.seagox.lowcode.business.entity.StageInspectionItem;
 import com.seagox.lowcode.business.mapper.InspectionMapper;
@@ -54,6 +55,16 @@ public class InspectionService implements IInspectionService {
      * 项目阶段已完成
      */
     private static final int STAGE_STATUS_COMPLETED = 3;
+
+    /**
+     * 项目进行中
+     */
+    private static final int PROJECT_STATUS_PROCESSING = 2;
+
+    /**
+     * 项目已交付
+     */
+    private static final int PROJECT_STATUS_DELIVERED = 4;
 
     /**
      * 问题单已关闭
@@ -251,6 +262,7 @@ public class InspectionService implements IInspectionService {
         inspectionMapper.updateById(exist);
         messageMapper.deleteMessage(BUSINESS_TYPE, exist.getId());
         completeProjectStage(exist, userId, now);
+        completeProjectIfAllInspectionsCompleted(exist.getProjectId(), userId, now);
         return ResultData.success(null);
     }
 
@@ -321,6 +333,38 @@ public class InspectionService implements IInspectionService {
             passedItemIds.addAll(parseInspectionItemIds(completedInspection.getInspectionItems()));
         }
         return passedItemIds.containsAll(requiredItemIds);
+    }
+
+    /**
+     * 进行中项目下所有验收单完成后，自动交付项目
+     */
+    private void completeProjectIfAllInspectionsCompleted(Long projectId, Long userId, Date completedAt) {
+        if (projectId == null) {
+            return;
+        }
+        Project project = projectMapper.selectById(projectId);
+        if (project == null || !Integer.valueOf(PROJECT_STATUS_PROCESSING).equals(project.getStatus())) {
+            return;
+        }
+        Long total = inspectionMapper.selectCount(new LambdaQueryWrapper<Inspection>()
+                .eq(Inspection::getProjectId, projectId));
+        if (total == null || total == 0) {
+            return;
+        }
+        Long unfinished = inspectionMapper.selectCount(new LambdaQueryWrapper<Inspection>()
+                .eq(Inspection::getProjectId, projectId)
+                .ne(Inspection::getStatus, STATUS_COMPLETED));
+        if (unfinished != null && unfinished > 0) {
+            return;
+        }
+        project.setStatus(PROJECT_STATUS_DELIVERED);
+        project.setDeliveredAt(completedAt);
+        if (project.getActualEndDate() == null) {
+            project.setActualEndDate(completedAt);
+        }
+        project.setUpdatedBy(userId);
+        project.setUpdatedAt(completedAt);
+        projectMapper.updateById(project);
     }
 
     /**

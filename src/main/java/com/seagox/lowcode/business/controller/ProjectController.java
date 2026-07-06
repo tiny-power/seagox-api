@@ -81,6 +81,33 @@ public class ProjectController {
     }
 
     /**
+     * 取消项目
+     */
+    @PostMapping("/cancel/{id}")
+    @LogPoint("取消项目")
+    public ResultData cancel(@PathVariable Long id, String cancelReason, Long userId) {
+        return projectService.cancel(id, cancelReason, userId);
+    }
+
+    /**
+     * 暂停项目
+     */
+    @PostMapping("/pause/{id}")
+    @LogPoint("暂停项目")
+    public ResultData pause(@PathVariable Long id, String pauseReason, Long userId) {
+        return projectService.pause(id, pauseReason, userId);
+    }
+
+    /**
+     * 恢复项目
+     */
+    @PostMapping("/resume/{id}")
+    @LogPoint("恢复项目")
+    public ResultData resume(@PathVariable Long id, Long userId) {
+        return projectService.resume(id, userId);
+    }
+
+    /**
      * 修改项目状态
      */
     @PostMapping("/updateStatus/{id}")

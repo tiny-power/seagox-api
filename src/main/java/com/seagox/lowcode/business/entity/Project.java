@@ -105,6 +105,18 @@ public class Project {
     private Date actualEndDate;
 
     /**
+     * 交付时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date deliveredAt;
+
+    /**
+     * 保修月数
+     */
+    private Integer warrantyMonths;
+
+    /**
      * 创建人
      */
     private Long createdBy;
@@ -262,6 +274,22 @@ public class Project {
 
     public void setActualEndDate(Date actualEndDate) {
         this.actualEndDate = actualEndDate;
+    }
+
+    public Date getDeliveredAt() {
+        return deliveredAt;
+    }
+
+    public void setDeliveredAt(Date deliveredAt) {
+        this.deliveredAt = deliveredAt;
+    }
+
+    public Integer getWarrantyMonths() {
+        return warrantyMonths;
+    }
+
+    public void setWarrantyMonths(Integer warrantyMonths) {
+        this.warrantyMonths = warrantyMonths;
     }
 
     public Long getCreatedBy() {
