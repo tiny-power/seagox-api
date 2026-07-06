@@ -75,9 +75,11 @@ public class ProjectService implements IProjectService {
      * 分页查询项目
      */
     @Override
-    public ResultData queryByPage(Integer pageNo, Integer pageSize, String code, String name, String status) {
+    public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, String code, String name,
+                                  String status) {
         PageHelper.startPage(pageNo, pageSize);
         LambdaQueryWrapper<Project> query = new LambdaQueryWrapper<>();
+        query.eq(Project::getCompanyId, companyId);
         if (!StringUtils.isEmpty(code)) {
             query.like(Project::getCode, code);
         }
@@ -150,7 +152,7 @@ public class ProjectService implements IProjectService {
      */
     @Transactional
     @Override
-    public ResultData insert(ProjectSaveRequest request, Long userId) {
+    public ResultData insert(ProjectSaveRequest request, Long userId, Long companyId) {
         ResultData validationResult = validate(request, false);
         if (validationResult != null) {
             return validationResult;
@@ -158,11 +160,13 @@ public class ProjectService implements IProjectService {
 
         Project project = request.getProject();
         if (projectMapper.selectCount(new LambdaQueryWrapper<Project>()
+                .eq(Project::getCompanyId, companyId)
                 .eq(Project::getCode, project.getCode())) > 0) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目编号已存在");
         }
 
         Date now = new Date();
+        project.setCompanyId(companyId);
         project.setStatus(StringUtils.isEmpty(project.getStatus()) ? 1 : project.getStatus());
         project.setHealthStatus(StringUtils.isEmpty(project.getHealthStatus()) ? 1 : project.getHealthStatus());
         project.setCreatedBy(userId);
@@ -179,7 +183,7 @@ public class ProjectService implements IProjectService {
      */
     @Transactional
     @Override
-    public ResultData update(ProjectSaveRequest request, Long userId) {
+    public ResultData update(ProjectSaveRequest request, Long userId, Long companyId) {
         ResultData validationResult = validate(request, true);
         if (validationResult != null) {
             return validationResult;
@@ -191,11 +195,13 @@ public class ProjectService implements IProjectService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
         if (projectMapper.selectCount(new LambdaQueryWrapper<Project>()
+                .eq(Project::getCompanyId, companyId)
                 .eq(Project::getCode, project.getCode())
                 .ne(Project::getId, project.getId())) > 0) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目编号已存在");
         }
 
+        project.setCompanyId(original.getCompanyId());
         project.setCreatedBy(original.getCreatedBy());
         project.setCreatedAt(original.getCreatedAt());
         project.setUpdatedBy(userId);

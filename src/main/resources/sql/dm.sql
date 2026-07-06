@@ -285,6 +285,7 @@ COMMENT ON TABLE "public"."leave_request" IS '请假单';
 
 CREATE TABLE IF NOT EXISTS "public"."project" (
     "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    "company_id" BIGINT NOT NULL,
     "code" VARCHAR(150) NOT NULL,
     "cover" VARCHAR(600) NOT NULL,
     "name" VARCHAR(600) NOT NULL,
@@ -306,6 +307,7 @@ CREATE TABLE IF NOT EXISTS "public"."project" (
     "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."project"."id" IS '主键';
+COMMENT ON COLUMN "public"."project"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."project"."code" IS '项目编号';
 COMMENT ON COLUMN "public"."project"."cover" IS '封面图';
 COMMENT ON COLUMN "public"."project"."name" IS '项目名称';

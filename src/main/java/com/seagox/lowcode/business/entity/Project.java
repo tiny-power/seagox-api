@@ -17,6 +17,11 @@ public class Project {
     private Long id;
 
     /**
+     * 公司id
+     */
+    private Long companyId;
+
+    /**
      * 项目编号
      */
     private String code;
@@ -129,6 +134,14 @@ public class Project {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public String getCode() {

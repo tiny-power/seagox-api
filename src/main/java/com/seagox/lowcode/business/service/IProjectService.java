@@ -11,7 +11,7 @@ public interface IProjectService {
     /**
      * 分页查询项目
      */
-    ResultData queryByPage(Integer pageNo, Integer pageSize, String code, String name, String status);
+    ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, String code, String name, String status);
 
     ResultData queryFinanceByPage(Integer pageNo, Integer pageSize, Long projectId);
 
@@ -23,12 +23,12 @@ public interface IProjectService {
     /**
      * 新增项目及其关联数据
      */
-    ResultData insert(ProjectSaveRequest request, Long userId);
+    ResultData insert(ProjectSaveRequest request, Long userId, Long companyId);
 
     /**
      * 修改项目及其关联数据
      */
-    ResultData update(ProjectSaveRequest request, Long userId);
+    ResultData update(ProjectSaveRequest request, Long userId, Long companyId);
 
     /**
      * 删除项目及其关联数据

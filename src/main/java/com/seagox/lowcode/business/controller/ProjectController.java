@@ -32,8 +32,8 @@ public class ProjectController {
     @GetMapping("/queryByPage")
     public ResultData queryByPage(@RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
-                                  String code, String name, String status) {
-        return projectService.queryByPage(pageNo, pageSize, code, name, status);
+                                  Long companyId, String code, String name, String status) {
+        return projectService.queryByPage(pageNo, pageSize, companyId, code, name, status);
     }
 
     /**
@@ -49,8 +49,8 @@ public class ProjectController {
      */
     @PostMapping("/insert")
     @LogPoint("新增项目")
-    public ResultData insert(String projectData, Long userId) {
-        return projectService.insert(JSON.parseObject(projectData, ProjectSaveRequest.class), userId);
+    public ResultData insert(String projectData, Long userId, Long companyId) {
+        return projectService.insert(JSON.parseObject(projectData, ProjectSaveRequest.class), userId, companyId);
     }
 
     /**
@@ -58,8 +58,8 @@ public class ProjectController {
      */
     @PostMapping("/update")
     @LogPoint("修改项目")
-    public ResultData update(String projectData, Long userId) {
-        return projectService.update(JSON.parseObject(projectData, ProjectSaveRequest.class), userId);
+    public ResultData update(String projectData, Long userId, Long companyId) {
+        return projectService.update(JSON.parseObject(projectData, ProjectSaveRequest.class), userId, companyId);
     }
 
     /**
