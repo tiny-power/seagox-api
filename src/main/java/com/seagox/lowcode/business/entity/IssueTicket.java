@@ -63,6 +63,11 @@ public class IssueTicket {
     private Integer status;
 
     /**
+     * 验收单ID
+     */
+    private Long inspectionId;
+
+    /**
      * 创建人
      */
     private Long createdBy;
@@ -230,6 +235,14 @@ public class IssueTicket {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getInspectionId() {
+        return inspectionId;
+    }
+
+    public void setInspectionId(Long inspectionId) {
+        this.inspectionId = inspectionId;
     }
 
     public Long getCreatedBy() {

@@ -22,6 +22,7 @@ import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,16 @@ public class InspectionService implements IInspectionService {
      * 已完成
      */
     private static final int STATUS_COMPLETED = 3;
+
+    /**
+     * 整改中
+     */
+    private static final int STATUS_RECTIFYING = 4;
+
+    /**
+     * 待复验
+     */
+    private static final int STATUS_RECHECK_PENDING = 5;
 
     /**
      * 项目阶段已完成
@@ -137,6 +148,27 @@ public class InspectionService implements IInspectionService {
         if (data == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
+        Map<String, Object> issueParams = new HashMap<>();
+        issueParams.put("inspectionId", id);
+        List<Map<String, Object>> issueTickets = issueTicketMapper.queryIssueTickets(issueParams);
+        MapDateFormatUtils.formatDateValues(issueTickets);
+        data.put("issueTickets", issueTickets);
+        if (isBlank(data.get("inspectionItems")) && data.get("stageId") != null) {
+            List<StageInspectionItem> stageItems = stageInspectionItemMapper.selectList(
+                    new LambdaQueryWrapper<StageInspectionItem>()
+                            .eq(StageInspectionItem::getStageId, data.get("stageId")));
+            JSONArray inspectionItems = new JSONArray();
+            for (StageInspectionItem item : stageItems) {
+                JSONObject inspectionItem = new JSONObject();
+                inspectionItem.put("id", item.getId());
+                inspectionItem.put("title", item.getName());
+                inspectionItem.put("label", item.getName());
+                inspectionItem.put("status", item.getStatus());
+                inspectionItems.add(inspectionItem);
+            }
+            data.put("inspectionItems", inspectionItems);
+            data.put("items", inspectionItems);
+        }
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
     }
@@ -162,12 +194,15 @@ public class InspectionService implements IInspectionService {
         if (Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus()) && inspection.getPassedAt() == null) {
             inspection.setPassedAt(now);
         }
+        if (Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus()) && inspection.getResult() == null) {
+            inspection.setResult("pass");
+        }
         inspection.setCreatedBy(userId);
         inspection.setUpdatedBy(userId);
         inspection.setCreatedAt(now);
         inspection.setUpdatedAt(now);
         inspectionMapper.insert(inspection);
-        refreshParticipantMessages(inspection, userId, companyId, now);
+        refreshInspectionMessages(inspection, userId, companyId, now);
         return ResultData.success(inspection.getId());
     }
 
@@ -191,22 +226,36 @@ public class InspectionService implements IInspectionService {
         if (projectMapper.selectById(inspection.getProjectId()) == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
+        if (Integer.valueOf(STATUS_RECHECK_PENDING).equals(inspection.getStatus())) {
+            ResultData issueResult = verifyNoOpenInspectionIssueTickets(exist.getId());
+            if (issueResult != null) {
+                return issueResult;
+            }
+        }
 
         Date now = new Date();
         if (inspection.getStatus() == null) {
             inspection.setStatus(exist.getStatus());
         }
+        boolean startRecheck = Integer.valueOf(STATUS_RECHECK_PENDING).equals(exist.getStatus())
+                && Integer.valueOf(STATUS_PROCESSING).equals(inspection.getStatus());
         if (!Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())) {
             inspection.setPassedAt(null);
         } else if (inspection.getPassedAt() == null) {
             inspection.setPassedAt(exist.getPassedAt() == null ? now : exist.getPassedAt());
+        }
+        if (startRecheck) {
+            inspection.setResult("");
+            inspection.setAcceptanceComments("");
+        } else if (inspection.getResult() == null) {
+            inspection.setResult(exist.getResult());
         }
         inspection.setCreatedBy(exist.getCreatedBy());
         inspection.setCreatedAt(exist.getCreatedAt());
         inspection.setUpdatedBy(userId);
         inspection.setUpdatedAt(now);
         inspectionMapper.updateById(inspection);
-        refreshParticipantMessages(inspection, userId, companyId, now);
+        refreshInspectionMessages(inspection, userId, companyId, now);
         return ResultData.success(null);
     }
 
@@ -224,9 +273,9 @@ public class InspectionService implements IInspectionService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
         if (Integer.valueOf(STATUS_COMPLETED).equals(exist.getStatus())) {
-            ResultData participantResult = verifyParticipant(exist, userId);
-            if (participantResult != null) {
-                return participantResult;
+            ResultData operatorResult = verifyCompleteOperator(exist, inspection, userId);
+            if (operatorResult != null) {
+                return operatorResult;
             }
             if (inspection.getInspectionItems() != null && inspection.getInspectionItems().trim().length() > 0) {
                 Date now = new Date();
@@ -238,9 +287,9 @@ public class InspectionService implements IInspectionService {
             }
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单已完成");
         }
-        ResultData participantResult = verifyParticipant(exist, userId);
-        if (participantResult != null) {
-            return participantResult;
+        ResultData operatorResult = verifyCompleteOperator(exist, inspection, userId);
+        if (operatorResult != null) {
+            return operatorResult;
         }
         ResultData issueResult = verifyNoOpenIssueTickets(exist.getProjectId());
         if (issueResult != null) {
@@ -255,6 +304,7 @@ public class InspectionService implements IInspectionService {
         exist.setSignatures(inspection.getSignatures() == null ? exist.getSignatures() : inspection.getSignatures());
         exist.setAcceptanceComments(inspection.getAcceptanceComments() == null ? exist.getAcceptanceComments() : inspection.getAcceptanceComments());
         exist.setRemark(inspection.getRemark() == null ? exist.getRemark() : inspection.getRemark());
+        exist.setResult(inspection.getResult() == null ? "pass" : inspection.getResult());
         exist.setStatus(STATUS_COMPLETED);
         exist.setPassedAt(inspection.getPassedAt() == null ? now : inspection.getPassedAt());
         exist.setUpdatedBy(userId);
@@ -426,6 +476,55 @@ public class InspectionService implements IInspectionService {
     }
 
     /**
+     * 校验当前操作人是否为质检员
+     */
+    private ResultData verifyInspector(Inspection inspection, Long userId) {
+        if (inspection.getInspectorId() == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "质检员不能为空");
+        }
+        if (!inspection.getInspectorId().equals(userId)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅本单质检员可操作");
+        }
+        return null;
+    }
+
+    private ResultData verifyCompleteOperator(Inspection exist, Inspection submitted, Long userId) {
+        ResultData inspectorResult = verifyInspector(exist, userId);
+        if (inspectorResult == null) {
+            return null;
+        }
+        String signatures = submitted == null || submitted.getSignatures() == null
+                ? exist.getSignatures()
+                : submitted.getSignatures();
+        if (allSignaturesSigned(signatures) && isSignedByUser(signatures, userId)) {
+            return null;
+        }
+        return inspectorResult;
+    }
+
+    private boolean isSignedByUser(String signatures, Long userId) {
+        if (userId == null || signatures == null || signatures.trim().length() == 0) {
+            return false;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(signatures);
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (item == null || !Boolean.TRUE.equals(item.getBoolean("signed"))) {
+                    continue;
+                }
+                Long signerUserId = parseMemberUserId(item);
+                if (userId.equals(signerUserId)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
      * 校验项目下不存在未关闭的问题单
      */
     private ResultData verifyNoOpenIssueTickets(Long projectId) {
@@ -444,6 +543,24 @@ public class InspectionService implements IInspectionService {
     }
 
     /**
+     * 校验验收单下不存在未关闭的问题单
+     */
+    private ResultData verifyNoOpenInspectionIssueTickets(Long inspectionId) {
+        if (inspectionId == null) {
+            return null;
+        }
+        Long count = issueTicketMapper.selectCount(new LambdaQueryWrapper<IssueTicket>()
+                .eq(IssueTicket::getInspectionId, inspectionId)
+                .and(wrapper -> wrapper.ne(IssueTicket::getStatus, ISSUE_STATUS_CLOSED)
+                        .or()
+                        .isNull(IssueTicket::getStatus)));
+        if (count != null && count > 0) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "当前验收单存在未关闭的问题单，请关闭后再提交复验");
+        }
+        return null;
+    }
+
+    /**
      * 删除验收单
      */
     @Override
@@ -457,34 +574,102 @@ public class InspectionService implements IInspectionService {
     }
 
     /**
-     * 重建验收人消息
+     * 重建验收单待办消息
      */
-    private void refreshParticipantMessages(Inspection inspection, Long userId, Long companyId, Date now) {
+    private void refreshInspectionMessages(Inspection inspection, Long userId, Long companyId, Date now) {
         messageMapper.deleteMessage(BUSINESS_TYPE, inspection.getId());
         if (companyId == null || inspection.getId() == null
-                || Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())) {
+                || Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())
+                || Integer.valueOf(STATUS_RECTIFYING).equals(inspection.getStatus())) {
             return;
         }
-        Set<Long> participantUserIds = parseParticipantUserIds(inspection.getParticipants());
-        for (Long toUserId : participantUserIds) {
-            if (toUserId == null || toUserId.equals(userId)) {
-                continue;
+        if (isWaitingForSignatures(inspection)) {
+            Set<Long> signerUserIds = parseUnsignedSignerUserIds(inspection.getSignatures());
+            if (signerUserIds.size() == 0) {
+                signerUserIds = parseParticipantUserIds(inspection.getParticipants());
             }
-            SysMessage message = new SysMessage();
-            message.setCompanyId(companyId);
-            message.setType(MESSAGE_TYPE_INSPECTION);
-            message.setFromUserId(userId);
-            message.setToUserId(toUserId);
-            message.setTitle("您有一条验收单待处理");
-            message.setBusinessType(BUSINESS_TYPE);
-            message.setBusinessKey(inspection.getId());
-            message.setStatus(0);
-            message.setCreatedBy(userId);
-            message.setCreatedAt(now);
-            message.setUpdatedBy(userId);
-            message.setUpdatedAt(now);
-            messageMapper.insert(message);
+            for (Long toUserId : signerUserIds) {
+                insertInspectionMessage(companyId, userId, toUserId, inspection.getId(), now, "您有一条验收单待签名");
+            }
+            return;
         }
+        Long inspectorId = inspection.getInspectorId();
+        String title = Integer.valueOf(STATUS_RECHECK_PENDING).equals(inspection.getStatus())
+                ? "您有一条验收单待复验"
+                : "您有一条验收单待质检";
+        insertInspectionMessage(companyId, userId, inspectorId, inspection.getId(), now, title);
+    }
+
+    private void insertInspectionMessage(Long companyId, Long fromUserId, Long toUserId, Long inspectionId, Date now, String title) {
+        if (toUserId == null || toUserId.equals(fromUserId)) {
+            return;
+        }
+        SysMessage message = new SysMessage();
+        message.setCompanyId(companyId);
+        message.setType(MESSAGE_TYPE_INSPECTION);
+        message.setFromUserId(fromUserId);
+        message.setToUserId(toUserId);
+        message.setTitle(title);
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(inspectionId);
+        message.setStatus(0);
+        message.setCreatedBy(fromUserId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(fromUserId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
+    }
+
+    private boolean isWaitingForSignatures(Inspection inspection) {
+        return Integer.valueOf(STATUS_PROCESSING).equals(inspection.getStatus())
+                && "pass".equals(inspection.getResult())
+                && inspection.getSignatures() != null
+                && inspection.getSignatures().trim().length() > 0
+                && !allSignaturesSigned(inspection.getSignatures());
+    }
+
+    private boolean allSignaturesSigned(String signatures) {
+        if (signatures == null || signatures.trim().length() == 0) {
+            return false;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(signatures);
+            if (items.size() == 0) {
+                return false;
+            }
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (item == null || !Boolean.TRUE.equals(item.getBoolean("signed"))) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Set<Long> parseUnsignedSignerUserIds(String signatures) {
+        Set<Long> userIds = new HashSet<>();
+        if (signatures == null || signatures.trim().length() == 0) {
+            return userIds;
+        }
+        try {
+            JSONArray items = JSONArray.parseArray(signatures);
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (item == null || Boolean.TRUE.equals(item.getBoolean("signed"))) {
+                    continue;
+                }
+                Long userId = parseMemberUserId(item);
+                if (userId != null) {
+                    userIds.add(userId);
+                }
+            }
+        } catch (Exception e) {
+            return userIds;
+        }
+        return userIds;
     }
 
     /**
@@ -502,21 +687,47 @@ public class InspectionService implements IInspectionService {
                 if (item == null) {
                     continue;
                 }
-                Object userId = item.get("userId");
-                if (userId == null) {
-                    userId = item.get("accountId");
-                }
-                if (userId == null) {
-                    userId = item.get("backendUserId");
-                }
-                if (userId != null) {
-                    userIds.add(Long.valueOf(String.valueOf(userId)));
+                Long parsedUserId = parseMemberUserId(item);
+                if (parsedUserId != null) {
+                    userIds.add(parsedUserId);
                 }
             }
         } catch (Exception e) {
             return userIds;
         }
         return userIds;
+    }
+
+    private boolean isBlank(Object value) {
+        if (value == null) {
+            return true;
+        }
+        String text = String.valueOf(value).trim();
+        return text.length() == 0 || "[]".equals(text) || "null".equalsIgnoreCase(text);
+    }
+
+    private Long parseMemberUserId(JSONObject item) {
+        if (item == null) {
+            return null;
+        }
+        Object userId = item.get("userId");
+        if (userId == null) {
+            userId = item.get("accountId");
+        }
+        if (userId == null) {
+            userId = item.get("backendUserId");
+        }
+        if (userId == null) {
+            userId = item.get("id");
+        }
+        if (userId == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(String.valueOf(userId));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -529,11 +740,22 @@ public class InspectionService implements IInspectionService {
         if (inspection.getProjectId() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "所属项目不能为空");
         }
+        if (inspection.getInspectorId() == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "质检员不能为空");
+        }
         if (inspection.getStatus() != null
                 && !Integer.valueOf(STATUS_PENDING).equals(inspection.getStatus())
                 && !Integer.valueOf(STATUS_PROCESSING).equals(inspection.getStatus())
-                && !Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())) {
+                && !Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus())
+                && !Integer.valueOf(STATUS_RECTIFYING).equals(inspection.getStatus())
+                && !Integer.valueOf(STATUS_RECHECK_PENDING).equals(inspection.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收状态不正确");
+        }
+        if (inspection.getResult() != null
+                && inspection.getResult().trim().length() > 0
+                && !"pass".equals(inspection.getResult())
+                && !"fail".equals(inspection.getResult())) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "验收结果不正确");
         }
         return null;
     }

@@ -69,6 +69,16 @@ public class Inspection {
     private String remark;
 
     /**
+     * 质检员
+     */
+    private Long inspectorId;
+
+    /**
+     * 验收结果(pass:通过;fail:不通过;)
+     */
+    private String result;
+
+    /**
      * 状态
      */
     private Integer status;
@@ -183,6 +193,22 @@ public class Inspection {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getInspectorId() {
+        return inspectorId;
+    }
+
+    public void setInspectorId(Long inspectorId) {
+        this.inspectorId = inspectorId;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     public Integer getStatus() {

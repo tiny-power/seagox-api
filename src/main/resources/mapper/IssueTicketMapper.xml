@@ -13,6 +13,7 @@
                a.confirmed,
                a.resolution,
                a.status,
+               a.inspection_id AS "inspectionId",
                a.created_by AS "createdBy",
                a.created_at AS "createdAt",
                a.updated_by AS "updatedBy",
@@ -27,6 +28,7 @@
         LEFT JOIN sys_account assignee ON assignee.id = a.assignee
         <where>
             <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.inspectionId != null and params.inspectionId != ''">AND a.inspection_id = #{params.inspectionId}</if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
@@ -55,6 +57,7 @@
                a.confirmed,
                a.resolution,
                a.status,
+               a.inspection_id AS "inspectionId",
                a.created_by AS "createdBy",
                a.created_at AS "createdAt",
                a.updated_by AS "updatedBy",
