@@ -152,9 +152,14 @@ public class AuthController {
     public ResultData sendTextCode(@PathVariable String phone) {
     	if (!ValidatorUtils.isMobile(phone)) {
     		return ResultData.warn(ResultCode.PARAMETER_ERROR, "手机号格式不对");
-    	} else {
-    		return phoneCodeService.sendTextCode(phone);
     	}
+
+    	ResultData validateResult = authService.validateMiniTextCodePhone(phone);
+    	if (validateResult.getCode() != ResultCode.SUCCESS.getCode()) {
+    		return validateResult;
+    	}
+
+    	return phoneCodeService.sendTextCode(phone);
     }
 
 }

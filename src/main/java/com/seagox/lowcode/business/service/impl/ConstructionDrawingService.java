@@ -14,10 +14,15 @@ import com.seagox.lowcode.business.service.IConstructionDrawingService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +37,17 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
     public static final int STATUS_DRAFT = 1;
     public static final int STATUS_PENDING = 2;
     public static final int STATUS_ARCHIVED = 3;
+    private static final String BUSINESS_TYPE = "construction_drawing";
+    private static final int MESSAGE_TYPE_CONSTRUCTION_DRAWING = 6;
 
     @Autowired
     private ConstructionDrawingMapper constructionDrawingMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * {@inheritDoc}
@@ -159,6 +169,10 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         if (detail == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "施工图出图详情不存在");
         }
+        Project project = projectMapper.selectById(constructionDrawing.getProjectId());
+        if (project == null) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
+        }
         Date now = new Date();
         detail.setConfirmMembers(resetConfirmMembers(detail.getConfirmMembers()));
         detail.setUpdatedBy(userId);
@@ -168,6 +182,7 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         constructionDrawing.setUpdatedBy(userId);
         constructionDrawing.setUpdatedAt(now);
         constructionDrawingMapper.updateById(constructionDrawing);
+        refreshConfirmMessages(constructionDrawing.getId(), detail.getConfirmMembers(), userId, project.getCompanyId(), now);
         return ResultData.success(null);
     }
 
@@ -176,8 +191,8 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
      */
     @Override
     public ResultData confirmRead(Long id, String roleKey, Long userId) {
-        if (!"owner".equals(roleKey) && !"builder".equals(roleKey)) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "确认角色不正确");
+        if (!StringUtils.hasText(roleKey)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "确认人员不正确");
         }
         ResultData userResult = checkUserId(userId);
         if (userResult != null) {
@@ -197,11 +212,16 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
 
         Date now = new Date();
         JSONObject confirmMembers = parseConfirmMembers(detail.getConfirmMembers());
-        String confirmRoleKey = resolveConfirmRoleKey(confirmMembers, roleKey, userId);
-        JSONObject confirmation = confirmMembers.getJSONObject(confirmRoleKey);
+        JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
+        if (confirmation == null || !hasSelectedMember(confirmation)) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "确认人员不正确");
+        }
+        if (!String.valueOf(userId).equals(String.valueOf(confirmation.get("userId")))) {
+            return ResultData.warn(ResultCode.OTHER_ERROR, "当前账号不在确认人员中");
+        }
         confirmation.put("confirmed", true);
         confirmation.put("confirmedAt", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now));
-        confirmMembers.put(confirmRoleKey, confirmation);
+        confirmMembers.put(roleKey, confirmation);
 
         detail.setConfirmMembers(confirmMembers.toJSONString());
         detail.setUpdatedBy(userId);
@@ -209,6 +229,9 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         constructionDrawingMapper.updateDetailById(detail);
         if (isAllSelectedConfirmed(confirmMembers)) {
             constructionDrawing.setStatus(STATUS_ARCHIVED);
+            messageMapper.deleteMessage(BUSINESS_TYPE, id);
+        } else {
+            markConfirmMessageRead(id, userId, now);
         }
         constructionDrawing.setUpdatedBy(userId);
         constructionDrawing.setUpdatedAt(now);
@@ -244,6 +267,7 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         constructionDrawing.setUpdatedBy(userId);
         constructionDrawing.setUpdatedAt(now);
         constructionDrawingMapper.updateById(constructionDrawing);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
     }
 
@@ -261,7 +285,68 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         }
         constructionDrawingMapper.deleteDetailsByConstructionDrawingId(id);
         constructionDrawingMapper.deleteById(id);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 重建确认人员待办消息
+     */
+    private void refreshConfirmMessages(Long constructionDrawingId, String confirmMembersText, Long userId, Long companyId, Date now) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, constructionDrawingId);
+        if (constructionDrawingId == null || companyId == null) {
+            return;
+        }
+        JSONObject confirmMembers = parseConfirmMembers(confirmMembersText);
+        Set<Long> sentUserIds = new HashSet<>();
+        for (String roleKey : confirmMembers.keySet()) {
+            JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
+            if (confirmation == null || !hasSelectedMember(confirmation)) {
+                continue;
+            }
+            Long toUserId = confirmation.getLong("userId");
+            if (toUserId == null || sentUserIds.contains(toUserId)) {
+                continue;
+            }
+            sentUserIds.add(toUserId);
+            insertConfirmMessage(companyId, userId, toUserId, constructionDrawingId, now);
+        }
+    }
+
+    /**
+     * 插入确认人员待办消息
+     */
+    private void insertConfirmMessage(Long companyId, Long fromUserId, Long toUserId, Long constructionDrawingId, Date now) {
+        SysMessage message = new SysMessage();
+        message.setCompanyId(companyId);
+        message.setType(MESSAGE_TYPE_CONSTRUCTION_DRAWING);
+        message.setFromUserId(fromUserId);
+        message.setToUserId(toUserId);
+        message.setTitle("您有一条施工图出图待确认");
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(constructionDrawingId);
+        message.setStatus(0);
+        message.setCreatedBy(fromUserId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(fromUserId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
+    }
+
+    /**
+     * 标记当前确认人的待办消息为已读
+     */
+    private void markConfirmMessageRead(Long constructionDrawingId, Long userId, Date now) {
+        SysMessage message = new SysMessage();
+        message.setStatus(1);
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(now);
+        LambdaQueryWrapper<SysMessage> updateWrapper = new LambdaQueryWrapper<>();
+        updateWrapper.eq(SysMessage::getBusinessType, BUSINESS_TYPE)
+                .eq(SysMessage::getBusinessKey, constructionDrawingId)
+                .eq(SysMessage::getToUserId, userId)
+                .eq(SysMessage::getStatus, 0);
+        messageMapper.update(message, updateWrapper);
     }
 
     /**
@@ -370,10 +455,7 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
      * 构建默认确认成员信息
      */
     private String defaultConfirmMembers() {
-        JSONObject data = new JSONObject();
-        data.put("owner", confirmation(false, ""));
-        data.put("builder", confirmation(false, ""));
-        return data.toJSONString();
+        return new JSONObject().toJSONString();
     }
 
     /**
@@ -388,11 +470,19 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
             if (data == null) {
                 return JSON.parseObject(defaultConfirmMembers());
             }
-            if (data.getJSONObject("owner") == null) {
-                data.put("owner", confirmation(false, ""));
-            }
-            if (data.getJSONObject("builder") == null) {
-                data.put("builder", confirmation(false, ""));
+            for (String roleKey : new ArrayList<>(data.keySet())) {
+                JSONObject item = data.getJSONObject(roleKey);
+                if (item == null) {
+                    data.put(roleKey, confirmation(false, ""));
+                } else {
+                    if (!item.containsKey("confirmed")) {
+                        item.put("confirmed", false);
+                    }
+                    if (!item.containsKey("confirmedAt")) {
+                        item.put("confirmedAt", "");
+                    }
+                    data.put(roleKey, item);
+                }
             }
             return data;
         } catch (Exception e) {
@@ -405,18 +495,19 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
      */
     private String resetConfirmMembers(String value) {
         JSONObject data = parseConfirmMembers(value);
-        resetConfirmation(data, "owner");
-        resetConfirmation(data, "builder");
+        for (String roleKey : new ArrayList<>(data.keySet())) {
+            resetConfirmation(data, roleKey);
+        }
         return data.toJSONString();
     }
 
     /**
-     * 重置指定角色确认状态
+     * 重置指定确认人员状态
      */
     private void resetConfirmation(JSONObject data, String roleKey) {
         JSONObject item = data.getJSONObject(roleKey);
         if (item == null) {
-            item = confirmation(false, "");
+            return;
         }
         item.put("confirmed", false);
         item.put("confirmedAt", "");
@@ -434,19 +525,11 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
     }
 
     /**
-     * 判断指定角色是否已确认
-     */
-    private boolean isConfirmed(JSONObject confirmMembers, String roleKey) {
-        JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
-        return confirmation != null && Boolean.TRUE.equals(confirmation.getBoolean("confirmed"));
-    }
-
-    /**
      * 判断已选择的确认成员是否都已确认
      */
     private boolean isAllSelectedConfirmed(JSONObject confirmMembers) {
         boolean hasSelectedMember = false;
-        for (String roleKey : new String[]{"owner", "builder"}) {
+        for (String roleKey : confirmMembers.keySet()) {
             JSONObject confirmation = confirmMembers.getJSONObject(roleKey);
             if (confirmation == null || !hasSelectedMember(confirmation)) {
                 continue;
@@ -468,24 +551,4 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
                 || StringUtils.hasText(confirmation.getString("name"));
     }
 
-    /**
-     * 兼容确认成员槽位与当前角色不一致的历史数据
-     */
-    private String resolveConfirmRoleKey(JSONObject confirmMembers, String roleKey, Long userId) {
-        JSONObject roleConfirmation = confirmMembers.getJSONObject(roleKey);
-        if (roleConfirmation != null && hasSelectedMember(roleConfirmation)) {
-            return roleKey;
-        }
-
-        String userIdText = String.valueOf(userId);
-        for (String itemRoleKey : new String[]{"owner", "builder"}) {
-            JSONObject confirmation = confirmMembers.getJSONObject(itemRoleKey);
-            if (confirmation != null
-                    && hasSelectedMember(confirmation)
-                    && userIdText.equals(String.valueOf(confirmation.get("userId")))) {
-                return itemRoleKey;
-            }
-        }
-        return roleKey;
-    }
 }

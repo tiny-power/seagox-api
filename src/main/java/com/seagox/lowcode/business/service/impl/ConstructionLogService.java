@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.ConstructionLog;
+import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.mapper.ConstructionLogMapper;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
 import com.seagox.lowcode.business.service.IConstructionLogService;
@@ -79,9 +80,11 @@ public class ConstructionLogService implements IConstructionLogService {
         if (verifyResult != null) {
             return verifyResult;
         }
-        if (projectMapper.selectById(constructionLog.getProjectId()) == null) {
+        Project project = projectMapper.selectById(constructionLog.getProjectId());
+        if (project == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
+        companyId = companyId == null ? project.getCompanyId() : companyId;
 
         Date now = new Date();
         if (constructionLog.getFilledBy() == null) {
@@ -121,9 +124,11 @@ public class ConstructionLogService implements IConstructionLogService {
         if (exist == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "施工日志不存在");
         }
-        if (projectMapper.selectById(constructionLog.getProjectId()) == null) {
+        Project project = projectMapper.selectById(constructionLog.getProjectId());
+        if (project == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "项目不存在");
         }
+        companyId = companyId == null ? project.getCompanyId() : companyId;
 
         Date now = new Date();
         if (constructionLog.getFilledBy() == null) {
@@ -207,15 +212,35 @@ public class ConstructionLogService implements IConstructionLogService {
             JSONArray items = JSONArray.parseArray(assistants);
             for (int i = 0; i < items.size(); i++) {
                 JSONObject item = items.getJSONObject(i);
-                if (item == null || item.get("userId") == null) {
-                    continue;
+                Long userId = getAssistantUserId(item);
+                if (userId != null) {
+                    userIds.add(userId);
                 }
-                userIds.add(Long.valueOf(String.valueOf(item.get("userId"))));
             }
         } catch (Exception e) {
             return userIds;
         }
         return userIds;
+    }
+
+    /**
+     * 获取相关人员账号ID
+     */
+    private Long getAssistantUserId(JSONObject item) {
+        if (item == null) {
+            return null;
+        }
+        Object value = item.get("userId");
+        if (value == null) {
+            value = item.get("accountId");
+        }
+        if (value == null) {
+            value = item.get("backendUserId");
+        }
+        if (value == null || StringUtils.isEmpty(String.valueOf(value))) {
+            return null;
+        }
+        return Long.valueOf(String.valueOf(value));
     }
 
     /**

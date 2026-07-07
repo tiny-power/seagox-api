@@ -38,6 +38,13 @@ public interface IAuthService {
 	public ResultData miniLogin(String phone, String credential, String loginMode, String openid, String avatar, String unionid);
 
 	/**
+	 * 校验手机号是否可发送小程序验证码
+	 *
+	 * @param phone 手机号
+	 */
+	public ResultData validateMiniTextCodePhone(String phone);
+
+	/**
 	 * 验证登陆
 	 *
 	 * @param org       组织

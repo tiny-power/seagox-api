@@ -2,6 +2,7 @@ package com.seagox.lowcode.business.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.Repair;
 import com.seagox.lowcode.business.entity.ProjectMember;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
@@ -11,6 +12,8 @@ import com.seagox.lowcode.business.service.IRepairService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +35,9 @@ public class RepairService implements IRepairService {
     public static final int STATUS_COMPLETED = 4;
     public static final int STATUS_CANCELED = 5;
 
+    private static final String BUSINESS_TYPE = "repair";
+    private static final int MESSAGE_TYPE_REPAIR_ASSIGN = 3;
+
     @Autowired
     private RepairMapper repairMapper;
 
@@ -40,6 +46,9 @@ public class RepairService implements IRepairService {
 
     @Autowired
     private ProjectMemberMapper projectMemberMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * {@inheritDoc}
@@ -160,10 +169,12 @@ public class RepairService implements IRepairService {
         }
         repair.setRepairMemberId(repairMemberId);
         repair.setExpectedVisitAt(expectedVisitAt);
+        Date now = new Date();
         repair.setStatus(STATUS_PROCESSING);
         repair.setUpdatedBy(userId);
-        repair.setUpdatedAt(new Date());
+        repair.setUpdatedAt(now);
         repairMapper.updateById(repair);
+        refreshRepairAssignMessage(repair, projectMember, userId, now);
         return ResultData.success(null);
     }
 
@@ -187,6 +198,8 @@ public class RepairService implements IRepairService {
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
         repairMapper.updateById(original);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
+        insertRepairMessage(original, userId, original.getCreatedBy(), "您有一条维修工单待验收", now);
         return ResultData.success(null);
     }
 
@@ -206,6 +219,7 @@ public class RepairService implements IRepairService {
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
         repairMapper.updateById(repair);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
     }
 
@@ -228,6 +242,7 @@ public class RepairService implements IRepairService {
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
         repairMapper.updateById(repair);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
     }
 
@@ -250,6 +265,7 @@ public class RepairService implements IRepairService {
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
         repairMapper.updateById(repair);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
     }
 
@@ -266,7 +282,66 @@ public class RepairService implements IRepairService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已完成的报修单不可以删除");
         }
         repairMapper.deleteById(id);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 刷新维修指派待办消息
+     */
+    private void refreshRepairAssignMessage(Repair repair, ProjectMember projectMember, Long userId, Date now) {
+        if (repair.getId() == null) {
+            return;
+        }
+        messageMapper.deleteMessage(BUSINESS_TYPE, repair.getId());
+        if (projectMember.getUserId() == null || projectMember.getUserId().equals(userId)) {
+            return;
+        }
+        Project project = projectMapper.selectById(repair.getProjectId());
+        if (project == null || project.getCompanyId() == null) {
+            return;
+        }
+        SysMessage message = new SysMessage();
+        message.setCompanyId(project.getCompanyId());
+        message.setType(MESSAGE_TYPE_REPAIR_ASSIGN);
+        message.setFromUserId(userId);
+        message.setToUserId(projectMember.getUserId());
+        message.setTitle("您有一条新的维修工单");
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(repair.getId());
+        message.setStatus(0);
+        message.setCreatedBy(userId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(userId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
+    }
+
+    /**
+     * 插入维修待办消息
+     */
+    private void insertRepairMessage(Repair repair, Long fromUserId, Long toUserId, String title, Date now) {
+        if (repair.getId() == null || toUserId == null || toUserId.equals(fromUserId)) {
+            return;
+        }
+        Project project = projectMapper.selectById(repair.getProjectId());
+        if (project == null || project.getCompanyId() == null) {
+            return;
+        }
+        SysMessage message = new SysMessage();
+        message.setCompanyId(project.getCompanyId());
+        message.setType(MESSAGE_TYPE_REPAIR_ASSIGN);
+        message.setFromUserId(fromUserId);
+        message.setToUserId(toUserId);
+        message.setTitle(title);
+        message.setBusinessType(BUSINESS_TYPE);
+        message.setBusinessKey(repair.getId());
+        message.setStatus(0);
+        message.setCreatedBy(fromUserId);
+        message.setCreatedAt(now);
+        message.setUpdatedBy(fromUserId);
+        message.setUpdatedAt(now);
+        messageMapper.insert(message);
     }
 
     /**

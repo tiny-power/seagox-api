@@ -280,6 +280,23 @@ public class AuthService implements IAuthService {
 	}
 
 	@Override
+	public ResultData validateMiniTextCodePhone(String phone) {
+		LambdaQueryWrapper<SysAccount> queryWrapper = new LambdaQueryWrapper<SysAccount>();
+		queryWrapper.eq(SysAccount::getStatus, 1).eq(SysAccount::getPhone, phone);
+		SysAccount queryUser = userMapper.selectOne(queryWrapper);
+		if (queryUser == null) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号不存在或已禁用");
+		}
+
+		List<ProjectMember> projectMembers = queryMiniProjectMembers(queryUser.getId());
+		if (projectMembers.size() == 0) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未加入项目角色");
+		}
+
+		return ResultData.success(null);
+	}
+
+	@Override
 	public ResultData verifyLogin(String orgstr, String account, String noncestr, String timestamp, String sign) {
 		String key = "yVwlsbIrY3q22EnoYYM4nR5zqTmqed05";
 		String ratioSign = EncryptUtils.md5Encode("account=" + account + "&noncestr=" + noncestr + "&org=" + orgstr
