@@ -71,7 +71,7 @@ third-party:
 
 ai:
   deepseek:
-    api-key: sk-6c05bdef008945f19d9a90cae4e11a5a
+    api-key: sk-bcbd97a02cd145298b40721baf80ddc4
     base-url: https://api.deepseek.com
     model: deepseek-v4-flash
     timeout: 30000
