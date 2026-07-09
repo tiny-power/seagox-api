@@ -1,11 +1,12 @@
 package com.seagox.lowcode.system.service.impl;
 
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.seagox.lowcode.common.SmsConfig;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.service.IPhoneCodeService;
 import com.seagox.lowcode.system.entity.*;
 import com.seagox.lowcode.system.mapper.*;
+import com.seagox.lowcode.util.SmsResult;
 import com.seagox.lowcode.util.SmsUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,18 @@ import java.util.*;
 public class PhoneCodeService implements IPhoneCodeService {
 	@Autowired
 	private PhoneCodeMapper phoneCodeMapper;
-	
+
+	@Autowired
+	private SmsConfig smsConfig;
+		
 	@Override
 	public ResultData sendTextCode(String phone) {
 		String code = String.valueOf((int)((Math.random()*9+1)*1000));
-		SendSmsResponse sendSmsResponse = SmsUtils.sendSms(phone, code);
-		if (sendSmsResponse  == null) {
+		SmsResult smsResult = SmsUtils.sendSms(phone, code, smsConfig);
+		if (smsResult  == null) {
 			return ResultData.error(ResultCode.INTERNAL_SERVER_ERROR);
 		} else {
-			if(sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
+			if(smsResult.isSuccess()) {
 				PhoneCode phoneCode = new PhoneCode();
 				phoneCode.setCode(code);
 				phoneCode.setPhone(phone);
@@ -34,7 +38,7 @@ public class PhoneCodeService implements IPhoneCodeService {
 				phoneCodeMapper.insert(phoneCode);
 				return ResultData.success(null);
 			} else {
-				return ResultData.warn(ResultCode.OTHER_ERROR, "请求太频繁，请稍后再试!");
+				return ResultData.warn(ResultCode.OTHER_ERROR, smsResult.getMessage() == null ? "请求太频繁，请稍后再试!" : smsResult.getMessage());
 			}
 		}
 	}

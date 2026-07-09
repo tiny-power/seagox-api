@@ -127,7 +127,7 @@ public class UploadUtils {
 	}
 
 	/**
-	 * 移动云oss上传
+	 * S3上传
 	 */
 	public static String ecloudOss(String endpoint, String accessKey, String secretKey, String url, String bucketName,
 			String originalFilename, InputStream inputStream, String contentType, Long size) {

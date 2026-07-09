@@ -58,6 +58,16 @@ oss:
   secret-key: Tiny_minio_4512
   url: http://192.168.31.52:9000
 
+sms:
+  tencent:
+    secret-id: AKIDv6RksoiaMMEMUfqz7JVizHYn4EJH6nOt
+    secret-key: Rl2EJGF5nU3Qjy74oLchZHm6D7oKdlhY
+    endpoint: sms.tencentcloudapi.com
+    region: ap-guangzhou
+    sdk-app-id: 123
+    sign-name: 123
+    template-id: 123
+
 jodconverter:
   working-dir: /Users/X/Downloads
 

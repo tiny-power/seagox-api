@@ -252,7 +252,6 @@ COMMENT ON COLUMN "public"."job"."status" IS '状态(0:未启动;1:已启动;)';
 COMMENT ON COLUMN "public"."job"."create_time" IS '创建时间';
 COMMENT ON COLUMN "public"."job"."update_time" IS '更新时间';
 COMMENT ON TABLE "public"."job" IS '任务调度';
-INSERT INTO "public"."job" ("company_id","name","cron","mark","status") VALUES (1,'项目保修到期完结','0 0 1 * * ?','com.seagox.lowcode.business.job.ProjectWarrantyJob',1);
 
 CREATE TABLE IF NOT EXISTS "public"."leave_request" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -286,7 +285,6 @@ COMMENT ON TABLE "public"."leave_request" IS '请假单';
 
 CREATE TABLE IF NOT EXISTS "public"."project" (
     "id" BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    "company_id" BIGINT NOT NULL,
     "code" VARCHAR(150) NOT NULL,
     "cover" VARCHAR(600) NOT NULL,
     "name" VARCHAR(600) NOT NULL,
@@ -302,15 +300,12 @@ CREATE TABLE IF NOT EXISTS "public"."project" (
     "planned_end_date" DATE NULL,
     "actual_start_date" DATE NULL,
     "actual_end_date" DATE NULL,
-    "delivered_at" DATE NULL,
-    "warranty_months" INTEGER DEFAULT 12,
     "created_by" BIGINT NOT NULL,
     "updated_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."project"."id" IS '主键';
-COMMENT ON COLUMN "public"."project"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."project"."code" IS '项目编号';
 COMMENT ON COLUMN "public"."project"."cover" IS '封面图';
 COMMENT ON COLUMN "public"."project"."name" IS '项目名称';
@@ -318,7 +313,7 @@ COMMENT ON COLUMN "public"."project"."address" IS '地址';
 COMMENT ON COLUMN "public"."project"."owner_name" IS '业主姓名';
 COMMENT ON COLUMN "public"."project"."owner_phone" IS '业主联系电话';
 COMMENT ON COLUMN "public"."project"."budget_amount" IS '预算金额';
-COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:已完结;6:已取消;)';
+COMMENT ON COLUMN "public"."project"."status" IS '项目状态(1:待启动;2:进行中;3:暂停;4:已交付;5:售后中;6:已完结;7:已取消;)';
 COMMENT ON COLUMN "public"."project"."health_status" IS '健康状态(1:正常;2:预警;3:滞后;4:异常;)';
 COMMENT ON COLUMN "public"."project"."pause_reason" IS '暂停原因';
 COMMENT ON COLUMN "public"."project"."cancel_reason" IS '取消原因';
@@ -326,8 +321,6 @@ COMMENT ON COLUMN "public"."project"."planned_start_date" IS '计划开始日期
 COMMENT ON COLUMN "public"."project"."planned_end_date" IS '计划结束日期';
 COMMENT ON COLUMN "public"."project"."actual_start_date" IS '实际开始日期';
 COMMENT ON COLUMN "public"."project"."actual_end_date" IS '实际结束日期';
-COMMENT ON COLUMN "public"."project"."delivered_at" IS '交付时间';
-COMMENT ON COLUMN "public"."project"."warranty_months" IS '保修月数';
 COMMENT ON COLUMN "public"."project"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."project"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."project"."created_at" IS '创建时间';
@@ -718,7 +711,9 @@ CREATE TABLE IF NOT EXISTS "public"."sys_account" (
 	"position" VARCHAR(150),
 	"status" INTEGER DEFAULT 1 NOT NULL,
 	"type" INTEGER DEFAULT 1,
-	"openid" VARCHAR(100),
+	"mini_openid" VARCHAR(100),
+	"mp_openid" VARCHAR(100),
+	"unionid" VARCHAR(100),
 	"sort" INTEGER DEFAULT 0,
 	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -736,7 +731,9 @@ COMMENT ON COLUMN "public"."sys_account"."update_time" IS '更新时间';
 COMMENT ON COLUMN "public"."sys_account"."type" IS '类型(1:普通成员;2:管理员;)';
 COMMENT ON COLUMN "public"."sys_account"."email" IS '邮箱';
 COMMENT ON COLUMN "public"."sys_account"."phone" IS '手机号';
-COMMENT ON COLUMN "public"."sys_account"."openid" IS 'openid';
+COMMENT ON COLUMN "public"."sys_account"."mini_openid" IS '小程序openid';
+COMMENT ON COLUMN "public"."sys_account"."mp_openid" IS '服务号openid';
+COMMENT ON COLUMN "public"."sys_account"."unionid" IS '开放平台unionid';
 COMMENT ON COLUMN "public"."sys_account"."sort" IS '排序';
 COMMENT ON TABLE "public"."sys_account" IS '用户';
 
@@ -876,7 +873,7 @@ INSERT INTO "public"."department" VALUES (1, 1, NULL, '101', '默认部门', NUL
 
 INSERT INTO "public"."sys_role" VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35', now(), now());
 
-INSERT INTO "public"."sys_account" VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
+INSERT INTO "public"."sys_account" VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, NULL, NULL, 0, now(), now());
 
 INSERT INTO "public"."user_role" VALUES (1, 1, 1, 1, now(), now());
 

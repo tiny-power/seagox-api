@@ -146,6 +146,12 @@
 		  	<artifactId>aliyun-sdk-oss</artifactId>
 		  	<version>2.8.2</version>
 		</dependency>
+		<!-- 腾讯云短信 -->
+		<dependency>
+			<groupId>com.tencentcloudapi</groupId>
+			<artifactId>tencentcloud-sdk-java</artifactId>
+			<version>3.1.1032</version>
+		</dependency>
 		<!-- xml解析 -->
 		<dependency>
 		    <groupId>org.dom4j</groupId>
@@ -264,18 +270,7 @@
 		<dependency>
 		    <groupId>app.tinybrief</groupId>
 		    <artifactId>weave-spring-boot-starter</artifactId>
-		    <version>1.1.5</version>
-		</dependency>
-		<!-- 阿里短信 -->
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-core</artifactId>
-			<version>3.2.10</version>
-		</dependency>
-		<dependency>
-			<groupId>com.aliyun</groupId>
-			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-			<version>1.1.0</version>
+		    <version>1.1.6</version>
 		</dependency>
 	</dependencies>
 	<build>

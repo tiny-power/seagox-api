@@ -448,7 +448,9 @@ CREATE TABLE IF NOT EXISTS `sys_account` (
   `position` varchar(50) DEFAULT NULL COMMENT '职位',
   `status` int(4) DEFAULT 1 COMMENT '状态(1:启用;2:禁用;)',
   `type` int(4) DEFAULT 1 COMMENT '类型(1:普通成员;2:管理员;)',
-  `openid` varchar(50) DEFAULT NULL COMMENT 'openid',
+  `mini_openid` varchar(100) DEFAULT NULL COMMENT '小程序openid',
+  `mp_openid` varchar(100) DEFAULT NULL COMMENT '服务号openid',
+  `unionid` varchar(100) DEFAULT NULL COMMENT '开放平台unionid',
   `sort` int(4) DEFAULT 0 COMMENT '排序',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -537,7 +539,7 @@ BEGIN;
 INSERT INTO company VALUES (1, NULL, 'seagox', '1001', '默认单位', '默认单位', NULL, 1, now(), now());
 INSERT INTO department VALUES (1, 1, NULL, '101', '默认部门', NULL, NULL, 0, now(), now());
 INSERT INTO sys_role VALUES (1, 1, '管理员', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35', now(), now());
-INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, 0, now(), now());
+INSERT INTO sys_account VALUES (1, NULL, 'admin', NULL, NULL, '管理员', 1, '$2a$10$Y.j6uP.zc9Lpb1vk26IlOOihWA/xc/sEFpfEWE6Dlvcko14vpyVyu', NULL, 1, 2, NULL, NULL, NULL, 0, now(), now());
 INSERT INTO user_role VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO dept_user VALUES (1, 1, 1, 1, now(), now());
 INSERT INTO sys_menu VALUES (1,1,NULL, 1, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
