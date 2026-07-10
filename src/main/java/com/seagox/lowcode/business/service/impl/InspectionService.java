@@ -73,11 +73,6 @@ public class InspectionService implements IInspectionService {
     private static final int PROJECT_STATUS_PROCESSING = 2;
 
     /**
-     * 项目已交付
-     */
-    private static final int PROJECT_STATUS_DELIVERED = 4;
-
-    /**
      * 问题单已关闭
      */
     private static final int ISSUE_STATUS_CLOSED = 3;
@@ -312,7 +307,6 @@ public class InspectionService implements IInspectionService {
         inspectionMapper.updateById(exist);
         messageMapper.deleteMessage(BUSINESS_TYPE, exist.getId());
         completeProjectStage(exist, userId, now);
-        completeProjectIfAllInspectionsCompleted(exist.getProjectId(), userId, now);
         return ResultData.success(null);
     }
 
@@ -386,38 +380,6 @@ public class InspectionService implements IInspectionService {
     }
 
     /**
-     * 进行中项目下所有验收单完成后，自动交付项目
-     */
-    private void completeProjectIfAllInspectionsCompleted(Long projectId, Long userId, Date completedAt) {
-        if (projectId == null) {
-            return;
-        }
-        Project project = projectMapper.selectById(projectId);
-        if (project == null || !Integer.valueOf(PROJECT_STATUS_PROCESSING).equals(project.getStatus())) {
-            return;
-        }
-        Long total = inspectionMapper.selectCount(new LambdaQueryWrapper<Inspection>()
-                .eq(Inspection::getProjectId, projectId));
-        if (total == null || total == 0) {
-            return;
-        }
-        Long unfinished = inspectionMapper.selectCount(new LambdaQueryWrapper<Inspection>()
-                .eq(Inspection::getProjectId, projectId)
-                .ne(Inspection::getStatus, STATUS_COMPLETED));
-        if (unfinished != null && unfinished > 0) {
-            return;
-        }
-        project.setStatus(PROJECT_STATUS_DELIVERED);
-        project.setDeliveredAt(completedAt);
-        if (project.getActualEndDate() == null) {
-            project.setActualEndDate(completedAt);
-        }
-        project.setUpdatedBy(userId);
-        project.setUpdatedAt(completedAt);
-        projectMapper.updateById(project);
-    }
-
-    /**
      * 解析验收单覆盖的阶段验收条目ID
      */
     private Set<String> parseInspectionItemIds(String inspectionItems) {
@@ -476,14 +438,14 @@ public class InspectionService implements IInspectionService {
     }
 
     /**
-     * 校验当前操作人是否为质检员
+     * 校验当前操作人是否为验收负责人
      */
     private ResultData verifyInspector(Inspection inspection, Long userId) {
         if (inspection.getInspectorId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "质检员不能为空");
+            return ResultData.warn(ResultCode.OTHER_ERROR, "验收负责人不能为空");
         }
         if (!inspection.getInspectorId().equals(userId)) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "仅本单质检员可操作");
+            return ResultData.warn(ResultCode.OTHER_ERROR, "仅本单验收负责人可操作");
         }
         return null;
     }
@@ -741,7 +703,7 @@ public class InspectionService implements IInspectionService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "所属项目不能为空");
         }
         if (inspection.getInspectorId() == null) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "质检员不能为空");
+            return ResultData.warn(ResultCode.OTHER_ERROR, "验收负责人不能为空");
         }
         if (inspection.getStatus() != null
                 && !Integer.valueOf(STATUS_PENDING).equals(inspection.getStatus())
