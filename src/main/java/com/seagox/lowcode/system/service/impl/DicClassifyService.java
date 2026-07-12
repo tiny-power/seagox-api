@@ -27,7 +27,7 @@ public class DicClassifyService implements IDicClassifyService {
     public ResultData queryDisplay(Long companyId) {
     	LambdaQueryWrapper<DicClassify> qw = new LambdaQueryWrapper<>();
     	qw.eq(DicClassify::getCompanyId, companyId)
-    	.orderByDesc(DicClassify::getCreateTime);
+    	.orderByDesc(DicClassify::getCreatedAt);
         List<DicClassify> list = dicClassifyMapper.selectList(qw);
         return ResultData.success(list);
     }

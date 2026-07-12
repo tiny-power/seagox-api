@@ -31,7 +31,7 @@ public class PhoneCode {
 	 */
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date createTime;
+	private Date createdAt;
 	
 	/**
 	 * 过期时间
@@ -58,11 +58,11 @@ public class PhoneCode {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	public Date getCreateTime() {
-		return createTime;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 	public Date getExpireTime() {
 		return expireTime;

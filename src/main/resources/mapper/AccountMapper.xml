@@ -69,7 +69,7 @@
             </if>
         </where>
         GROUP BY a.id
-        ORDER BY a.sort,a.create_time DESC
+        ORDER BY a.sort,a.created_at DESC
     </select>
 
     <!--通过部门id查询用户-->
@@ -79,7 +79,7 @@
         <where>
             a.department_id = #{deptId}
         </where>
-        ORDER BY b.create_time DESC
+        ORDER BY b.created_at DESC
     </select>
 
     <!--查询用户根据公司ids以及姓名-->
@@ -142,7 +142,7 @@
                 AND b.name LIKE '%' + #{userName} + '%'
             </if>
         </where>
-        ORDER BY b.create_time DESC
+        ORDER BY b.created_at DESC
     </select>
 
     <!--通过公司id导出-->

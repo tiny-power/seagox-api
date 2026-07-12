@@ -140,7 +140,7 @@ public class UserService implements IUserService {
 			return ResultData.warn(ResultCode.PARAMETER_ERROR, "新密码不可以跟旧密码一样");
 		} else {
 			user.setPassword(EncryptUtils.hashpw(newPassword));
-			user.setUpdateTime(new Date());
+			user.setUpdatedAt(new Date());
 			userMapper.updateById(user);
 			return ResultData.success(null);
 		}
@@ -151,7 +151,7 @@ public class UserService implements IUserService {
 		SysAccount user = new SysAccount();
 		user.setId(id);
 		user.setPassword(EncryptUtils.hashpw(password));
-		user.setUpdateTime(new Date());
+		user.setUpdatedAt(new Date());
 		userMapper.updateById(user);
 		return ResultData.success(null);
 	}

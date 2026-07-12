@@ -12,7 +12,7 @@
         i.business_key AS businessKey,
         i.status,
         u.name AS assigneeName,
-        DATE_FORMAT(d.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(d.created_at, '%Y-%m-%d %H:%i:%s') AS createTime,
         DATE_FORMAT(d.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM sea_node_detail d
         INNER JOIN sea_node n ON n.id = d.node_id
@@ -33,7 +33,7 @@
                 AND FIND_IN_SET(i.business_type, #{businessTypeStr})
             </if>
         </where>
-        ORDER BY d.create_time DESC, d.id DESC
+        ORDER BY d.created_at DESC, d.id DESC
     </select>
 
     <!-- 查询已办事项 -->
@@ -46,7 +46,7 @@
         i.business_key AS businessKey,
         i.status,
         u.name AS assigneeName,
-        DATE_FORMAT(d.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(d.created_at, '%Y-%m-%d %H:%i:%s') AS createTime,
         DATE_FORMAT(d.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM sea_node_detail d
         INNER JOIN sea_node n ON n.id = d.node_id
@@ -85,7 +85,7 @@
         i.business_key AS businessKey,
         i.status,
         u.name AS assigneeName,
-        DATE_FORMAT(d.create_time, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(d.created_at, '%Y-%m-%d %H:%i:%s') AS createTime,
         DATE_FORMAT(d.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM sea_node_detail d
         INNER JOIN sea_node n ON n.id = d.node_id
@@ -103,7 +103,7 @@
                 AND FIND_IN_SET(i.business_type, #{businessTypeStr})
             </if>
         </where>
-        ORDER BY d.create_time DESC, d.id DESC
+        ORDER BY d.created_at DESC, d.id DESC
     </select>
 
     <!-- 查询我发起的 -->
@@ -114,7 +114,7 @@
             i.business_type AS businessType,
             i.business_key AS businessKey,
             i.status,
-            DATE_FORMAT(i.create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+            DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS createTime
         FROM sea_instance i
         <where>
             i.company_id = #{companyId}
@@ -126,7 +126,7 @@
                 AND FIND_IN_SET(i.business_type, #{businessTypeStr})
             </if>
         </where>
-        ORDER BY i.create_time DESC, i.id DESC
+        ORDER BY i.created_at DESC, i.id DESC
     </select>
 
     <!-- 查询待发事项 -->

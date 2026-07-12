@@ -7,7 +7,7 @@
 		<where>
 	    	phone = #{phone}
 		</where>
-		order by create_time desc
+		order by created_at desc
 		limit 1
 	</select>
 </mapper>

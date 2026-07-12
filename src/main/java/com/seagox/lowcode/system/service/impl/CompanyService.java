@@ -409,7 +409,7 @@ public class CompanyService implements ICompanyService {
 		LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
 		deptUserQw.eq(DeptUser::getUserId, userId).eq(DeptUser::getCompanyId, changeCompanyId);
 		DeptUser deptUser = deptUserMapper.selectOne(deptUserQw);
-		deptUser.setUpdateTime(new Date());
+		deptUser.setUpdatedAt(new Date());
 		deptUserMapper.updateById(deptUser);
 		claims.put("departmentId", deptUser.getDepartmentId());
 

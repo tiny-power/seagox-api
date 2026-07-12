@@ -283,7 +283,7 @@ public class LeaveRequestService implements ILeaveRequestService {
         data.put("attachments", leaveRequest.getAttachments());
         data.put("status", leaveRequest.getStatus());
         data.put("submitTime", formatDate(leaveRequest.getSubmitTime()));
-        data.put("createTime", formatDate(leaveRequest.getCreateTime()));
+        data.put("createdAt", formatDate(leaveRequest.getCreatedAt()));
         return ResultData.success(data);
     }
 

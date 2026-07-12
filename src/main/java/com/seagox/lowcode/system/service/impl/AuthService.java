@@ -112,7 +112,7 @@ public class AuthService implements IAuthService {
 			payload.put("userId", queryUser.getId());
 			LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
 			deptUserQw.eq(DeptUser::getUserId, queryUser.getId())
-			.orderByDesc(DeptUser::getUpdateTime);
+			.orderByDesc(DeptUser::getUpdatedAt);
 			List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
 			List<String> companyIds = new ArrayList<>();
 			for(int i=0;i<deptUserList.size();i++) {
@@ -191,7 +191,7 @@ public class AuthService implements IAuthService {
 			
 			LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
 			deptUserQw.eq(DeptUser::getUserId, queryUser.getId())
-			.orderByDesc(DeptUser::getUpdateTime);
+			.orderByDesc(DeptUser::getUpdatedAt);
 			List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
 			List<String> companyIds = new ArrayList<>();
 			for(int i=0;i<deptUserList.size();i++) {
@@ -320,7 +320,7 @@ public class AuthService implements IAuthService {
 				claims.put("userId", queryUser.getId());
 				LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
 				deptUserQw.eq(DeptUser::getUserId, queryUser.getId())
-				.orderByDesc(DeptUser::getUpdateTime);
+				.orderByDesc(DeptUser::getUpdatedAt);
 				List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
 				List<String> companyIds = new ArrayList<>();
 				for(int i=0;i<deptUserList.size();i++) {
@@ -476,7 +476,7 @@ public class AuthService implements IAuthService {
 	private ResultData fillOrganizationClaims(SysAccount queryUser, Map<String, Object> claims,
 			Map<String, Object> payload) {
 		LambdaQueryWrapper<DeptUser> deptUserQw = new LambdaQueryWrapper<>();
-		deptUserQw.eq(DeptUser::getUserId, queryUser.getId()).orderByDesc(DeptUser::getUpdateTime);
+		deptUserQw.eq(DeptUser::getUserId, queryUser.getId()).orderByDesc(DeptUser::getUpdatedAt);
 		List<DeptUser> deptUserList = deptUserMapper.selectList(deptUserQw);
 		if (deptUserList.size() == 0) {
 			return ResultData.warn(ResultCode.PARAMETER_ERROR, "账号未绑定部门");

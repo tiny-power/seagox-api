@@ -15,22 +15,22 @@
             code,
             sort,
         	<if test="_databaseId == 'mysql'">
-            	DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            	DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS "createdAt"
             </if>
             <if test="_databaseId == 'postgresql'">
-            	to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            	to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'kingbase'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'dm'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'oracle'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'sqlserver'">
-            	CONVERT(varchar, create_time, 120 ) AS "createTime"
+            	CONVERT(varchar, created_at, 120 ) AS "createdAt"
             </if>
         FROM company 
         <where>
@@ -71,22 +71,22 @@
             alias,
             logo,
             <if test="_databaseId == 'mysql'">
-                DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS "createdAt"
             </if>
             <if test="_databaseId == 'postgresql'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'kingbase'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'dm'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'oracle'">
-                to_char(create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'sqlserver'">
-                CONVERT(varchar, create_time, 120 ) AS "createTime"
+                CONVERT(varchar, created_at, 120 ) AS "createdAt"
             </if>
         FROM company
         <where>

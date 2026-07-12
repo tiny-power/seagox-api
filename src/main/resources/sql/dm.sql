@@ -139,8 +139,8 @@ CREATE TABLE IF NOT EXISTS "public"."company" (
 	"alias" VARCHAR(100) NOT NULL,
 	"logo" VARCHAR(300) DEFAULT NULL,
     "sort" INTEGER DEFAULT 0,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."company"."id" IS '主键';
 COMMENT ON COLUMN "public"."company"."parent_id" IS '上级id';
@@ -150,8 +150,8 @@ COMMENT ON COLUMN "public"."company"."name" IS '名称';
 COMMENT ON COLUMN "public"."company"."alias" IS '简称';
 COMMENT ON COLUMN "public"."company"."logo" IS 'logo';
 COMMENT ON COLUMN "public"."company"."sort" IS '排序';
-COMMENT ON COLUMN "public"."company"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."company"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."company"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."company"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."company" IS '公司';
 
 CREATE TABLE IF NOT EXISTS "public"."department" (
@@ -163,8 +163,8 @@ CREATE TABLE IF NOT EXISTS "public"."department" (
 	"director" VARCHAR(1500),
 	"charge_leader" VARCHAR(1500),
 	"sort" INTEGER DEFAULT 0,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."department"."id" IS '主键';
 COMMENT ON COLUMN "public"."department"."company_id" IS '公司id';
@@ -174,8 +174,8 @@ COMMENT ON COLUMN "public"."department"."name" IS '名称';
 COMMENT ON COLUMN "public"."department"."director" IS '直接主管';
 COMMENT ON COLUMN "public"."department"."charge_leader" IS '分管领导';
 COMMENT ON COLUMN "public"."department"."sort" IS '排序';
-COMMENT ON COLUMN "public"."department"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."department"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."department"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."department"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."department" IS '部门';
 
 CREATE TABLE IF NOT EXISTS "public"."dept_user" (
@@ -183,29 +183,29 @@ CREATE TABLE IF NOT EXISTS "public"."dept_user" (
 	"company_id" BIGINT NOT NULL,
 	"department_id" BIGINT NOT NULL,
 	"user_id" BIGINT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."dept_user"."id" IS '主键';
 COMMENT ON COLUMN "public"."dept_user"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."dept_user"."department_id" IS '部门id';
 COMMENT ON COLUMN "public"."dept_user"."user_id" IS '用户id';
-COMMENT ON COLUMN "public"."dept_user"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."dept_user"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."dept_user"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."dept_user"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."dept_user" IS '部门用户';
 
 CREATE TABLE IF NOT EXISTS "public"."dic_classify" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
 	"name" VARCHAR(100) NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."dic_classify"."id" IS '主键';
 COMMENT ON COLUMN "public"."dic_classify"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."dic_classify"."name" IS '名称';
-COMMENT ON COLUMN "public"."dic_classify"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."dic_classify"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."dic_classify"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."dic_classify"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."dic_classify" IS '字典分类';
 
 CREATE TABLE IF NOT EXISTS "public"."dic_detail" (
@@ -217,8 +217,8 @@ CREATE TABLE IF NOT EXISTS "public"."dic_detail" (
 	"sort" INTEGER DEFAULT 1,
 	"status" INTEGER DEFAULT 1,
 	"last_stage" INTEGER DEFAULT 1,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."dic_detail"."id" IS '主键';
 COMMENT ON COLUMN "public"."dic_detail"."parent_id" IS '上级id';
@@ -228,8 +228,8 @@ COMMENT ON COLUMN "public"."dic_detail"."name" IS '名称';
 COMMENT ON COLUMN "public"."dic_detail"."sort" IS '排序';
 COMMENT ON COLUMN "public"."dic_detail"."status" IS '状态(0:禁用;1:启用)';
 COMMENT ON COLUMN "public"."dic_detail"."last_stage" IS '末级(0:否;1:是)';
-COMMENT ON COLUMN "public"."dic_detail"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."dic_detail"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."dic_detail"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."dic_detail"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."dic_detail" IS '字典详情';
 
 
@@ -240,8 +240,8 @@ CREATE TABLE IF NOT EXISTS "public"."job" (
 	"cron" VARCHAR(100) NOT NULL,
 	"mark" VARCHAR(500) NOT NULL,
 	"status" INTEGER DEFAULT 0,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."job"."id" IS '主键';
 COMMENT ON COLUMN "public"."job"."company_id" IS '公司id';
@@ -249,8 +249,8 @@ COMMENT ON COLUMN "public"."job"."name" IS '名称';
 COMMENT ON COLUMN "public"."job"."cron" IS '表达式';
 COMMENT ON COLUMN "public"."job"."mark" IS '标识';
 COMMENT ON COLUMN "public"."job"."status" IS '状态(0:未启动;1:已启动;)';
-COMMENT ON COLUMN "public"."job"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."job"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."job"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."job"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."job" IS '任务调度';
 
 CREATE TABLE IF NOT EXISTS "public"."leave_request" (
@@ -265,8 +265,8 @@ CREATE TABLE IF NOT EXISTS "public"."leave_request" (
     "attachments" CLOB DEFAULT NULL,
 	"status" INTEGER DEFAULT 0,
 	"submit_time" TIMESTAMP,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."leave_request"."id" IS '主键';
 COMMENT ON COLUMN "public"."leave_request"."company_id" IS '公司id';
@@ -279,8 +279,8 @@ COMMENT ON COLUMN "public"."leave_request"."reason" IS '请假事由';
 COMMENT ON COLUMN "public"."leave_request"."attachments" IS '附件';
 COMMENT ON COLUMN "public"."leave_request"."status" IS '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)';
 COMMENT ON COLUMN "public"."leave_request"."submit_time" IS '提交时间';
-COMMENT ON COLUMN "public"."leave_request"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."leave_request"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."leave_request"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."leave_request"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."leave_request" IS '请假单';
 
 CREATE TABLE IF NOT EXISTS "public"."project" (
@@ -689,13 +689,13 @@ CREATE TABLE IF NOT EXISTS "public"."phone_code" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"phone" VARCHAR(100) NOT NULL,
 	"code" VARCHAR(30) NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	"expire_time" TIMESTAMP NOT NULL
 );
 COMMENT ON COLUMN "public"."phone_code"."id" IS '主键';
 COMMENT ON COLUMN "public"."phone_code"."phone" IS '手机号';
 COMMENT ON COLUMN "public"."phone_code"."code" IS '验证码';
-COMMENT ON COLUMN "public"."phone_code"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."phone_code"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."phone_code"."expire_time" IS '过期时间';
 COMMENT ON TABLE "public"."phone_code" IS '手机验证码';
 
@@ -715,8 +715,8 @@ CREATE TABLE IF NOT EXISTS "public"."sys_account" (
 	"mp_openid" VARCHAR(100),
 	"unionid" VARCHAR(100),
 	"sort" INTEGER DEFAULT 0,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."sys_account"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_account"."avatar" IS '头像';
@@ -726,8 +726,8 @@ COMMENT ON COLUMN "public"."sys_account"."sex" IS '性别(1:男;2:女;)';
 COMMENT ON COLUMN "public"."sys_account"."password" IS '密码';
 COMMENT ON COLUMN "public"."sys_account"."position" IS '职位';
 COMMENT ON COLUMN "public"."sys_account"."status" IS '状态(1:启用;2:禁用;)';
-COMMENT ON COLUMN "public"."sys_account"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_account"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."sys_account"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_account"."updated_at" IS '更新时间';
 COMMENT ON COLUMN "public"."sys_account"."type" IS '类型(1:普通成员;2:管理员;)';
 COMMENT ON COLUMN "public"."sys_account"."email" IS '邮箱';
 COMMENT ON COLUMN "public"."sys_account"."phone" IS '手机号';
@@ -759,7 +759,7 @@ CREATE TABLE IF NOT EXISTS "public"."sys_log" (
 	"status" INTEGER DEFAULT 1,
 	"cost_time" INTEGER NOT NULL,
 	"result" TEXT,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	"ua" VARCHAR(1000)
 );
 COMMENT ON COLUMN "public"."sys_log"."id" IS '主键';
@@ -773,7 +773,7 @@ COMMENT ON COLUMN "public"."sys_log"."params" IS '请求参数';
 COMMENT ON COLUMN "public"."sys_log"."status" IS '状态(1:成功;2:失败;)';
 COMMENT ON COLUMN "public"."sys_log"."cost_time" IS '花费时间';
 COMMENT ON COLUMN "public"."sys_log"."result" IS '返回结果';
-COMMENT ON COLUMN "public"."sys_log"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_log"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_log"."ua" IS '浏览器信息';
 COMMENT ON TABLE "public"."sys_log" IS '操作日记';
 
@@ -787,8 +787,8 @@ CREATE TABLE IF NOT EXISTS "public"."sys_menu" (
 	"path" VARCHAR(150),
 	"status" INTEGER DEFAULT 1,
 	"sort" INTEGER DEFAULT 1,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."sys_menu"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_menu"."company_id" IS '公司id';
@@ -799,8 +799,8 @@ COMMENT ON COLUMN "public"."sys_menu"."icon" IS '图标';
 COMMENT ON COLUMN "public"."sys_menu"."path" IS '路径';
 COMMENT ON COLUMN "public"."sys_menu"."status" IS '状态(1:启用;2:禁用;)';
 COMMENT ON COLUMN "public"."sys_menu"."sort" IS '排序';
-COMMENT ON COLUMN "public"."sys_menu"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_menu"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."sys_menu"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_menu"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."sys_menu" IS '菜单';
 
 CREATE TABLE IF NOT EXISTS "public"."sys_message" (
@@ -838,15 +838,15 @@ CREATE TABLE IF NOT EXISTS "public"."sys_role" (
 	"company_id" BIGINT NOT NULL,
 	"name" VARCHAR(100) NOT NULL,
 	"path" TEXT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."sys_role"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_role"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."sys_role"."name" IS '名称';
 COMMENT ON COLUMN "public"."sys_role"."path" IS '菜单权限(以,隔开)';
-COMMENT ON COLUMN "public"."sys_role"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_role"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."sys_role"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_role"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."sys_role" IS '系统角色';
 
 
@@ -855,15 +855,15 @@ CREATE TABLE IF NOT EXISTS "public"."user_role" (
 	"company_id" BIGINT NOT NULL,
 	"user_id" BIGINT NOT NULL,
 	"role_id" BIGINT NOT NULL,
-	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON COLUMN "public"."user_role"."id" IS '主键';
 COMMENT ON COLUMN "public"."user_role"."company_id" IS '公司id';
 COMMENT ON COLUMN "public"."user_role"."user_id" IS '用户id';
 COMMENT ON COLUMN "public"."user_role"."role_id" IS '角色id';
-COMMENT ON COLUMN "public"."user_role"."create_time" IS '创建时间';
-COMMENT ON COLUMN "public"."user_role"."update_time" IS '更新时间';
+COMMENT ON COLUMN "public"."user_role"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."user_role"."updated_at" IS '更新时间';
 COMMENT ON TABLE "public"."user_role" IS '用户角色';
 
 BEGIN;
@@ -879,41 +879,41 @@ INSERT INTO "public"."user_role" VALUES (1, 1, 1, 1, now(), now());
 
 INSERT INTO "public"."dept_user" VALUES (1, 1, 1, 1, now(), now());
 
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (1, 1, NULL, 1, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (2, 1, 1, 2, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (3, 1, 1, 2, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (4, 1, 2, 3, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (5, 1, 2, 3, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (6, 1, 2, 3, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (7, 1, 2, 3, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (8, 1, 2, 3, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (9, 1, 2, 3, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (10, 1, 2, 3, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (11, 1, 2, 3, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (12, 1, 2, 3, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (13, 1, 2, 3, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (14, 1, 2, 3, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (15, 1, 3, 3, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (16, 1, 3, 3, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (17, 1, 3, 3, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (18, 1, 2, 3, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (19, 1, 3, 3, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (20, 1, NULL, 1, '我的工作', 'iconfont icon-xihuan', 'myWork', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (21, 1, 20, 2, '待办事项', 'iconfont icon-xihuan', 'todoItem', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (22, 1, 20, 2, '待发事项', 'iconfont icon-xihuan', 'readyItem', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (23, 1, 20, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (24, 1, 20, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 4, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (25, 1, 20, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (26, 1, NULL, 1, '协同办公', 'iconfont icon-xihuan', 'office', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (27, 1, 26, 2, '请假单', 'iconfont icon-xihuan', 'leave', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (28, 1, 27, 3, '新增', 'iconfont icon-xihuan', 'leave:add', 1, 1, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (29, 1, 27, 3, '编辑', 'iconfont icon-xihuan', 'leave:edit', 1, 2, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (30, 1, 27, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (31, 1, 27, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (32, 1, 27, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (33, 1, 27, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (34, 1, 27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "create_time", "update_time") VALUES (35, 1, 27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (1, 1, NULL, 1, '组织架构', 'iconfont icon-xihuan', 'organization', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (2, 1, 1, 2, '人员管理', 'iconfont icon-xihuan', 'contact', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (3, 1, 1, 2, '角色管理', 'iconfont icon-xihuan', 'role', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (4, 1, 2, 3, '导出用户', 'iconfont icon-xihuan', 'user:export', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (5, 1, 2, 3, '导出用户模板', 'iconfont icon-xihuan', 'user:download', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (6, 1, 2, 3, '导出部门模板', 'iconfont icon-xihuan', 'dept:download', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (7, 1, 2, 3, '新增用户', 'iconfont icon-xihuan', 'user:add', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (8, 1, 2, 3, '编辑用户', 'iconfont icon-xihuan', 'user:edit', 1, 5, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (9, 1, 2, 3, '删除用户', 'iconfont icon-xihuan', 'user:delete', 1, 6, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (10, 1, 2, 3, '密码重置', 'iconfont icon-xihuan', 'user:reset', 1, 7, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (11, 1, 2, 3, '导入用户', 'iconfont icon-xihuan', 'user:import', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (12, 1, 2, 3, '新增部门', 'iconfont icon-xihuan', 'dept:add', 1, 8, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (13, 1, 2, 3, '编辑部门', 'iconfont icon-xihuan', 'dept:edit', 1, 9, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (14, 1, 2, 3, '删除部门', 'iconfont icon-xihuan', 'dept:delete', 1, 10, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (15, 1, 3, 3, '新增', 'iconfont icon-xihuan', 'role:add', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (16, 1, 3, 3, '编辑', 'iconfont icon-xihuan', 'role:edit', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (17, 1, 3, 3, '删除', 'iconfont icon-xihuan', 'role:delete', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (18, 1, 2, 3, '导入部门', 'iconfont icon-xihuan', 'dept:import', 1, 11, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (19, 1, 3, 3, '授权', 'iconfont icon-xihuan', 'role:authorize', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (20, 1, NULL, 1, '我的工作', 'iconfont icon-xihuan', 'myWork', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (21, 1, 20, 2, '待办事项', 'iconfont icon-xihuan', 'todoItem', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (22, 1, 20, 2, '待发事项', 'iconfont icon-xihuan', 'readyItem', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (23, 1, 20, 2, '已办事项', 'iconfont icon-xihuan', 'doneItem', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (24, 1, 20, 2, '抄送事项', 'iconfont icon-xihuan', 'copyItem', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (25, 1, 20, 2, '我发起的', 'iconfont icon-xihuan', 'selfItem', 1, 5, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (26, 1, NULL, 1, '协同办公', 'iconfont icon-xihuan', 'office', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (27, 1, 26, 2, '请假单', 'iconfont icon-xihuan', 'leave', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (28, 1, 27, 3, '新增', 'iconfont icon-xihuan', 'leave:add', 1, 1, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (29, 1, 27, 3, '编辑', 'iconfont icon-xihuan', 'leave:edit', 1, 2, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (30, 1, 27, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (31, 1, 27, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (32, 1, 27, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (33, 1, 27, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (34, 1, 27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
+INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (35, 1, 27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
 INSERT INTO "public"."sys_menu" VALUES (36,1,NULL,1,'工程管理','iconfont icon-xihuan','engineering',1,4,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (37,1,36,2,'项目管理','iconfont icon-xihuan','project',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (38,1,37,3,'新增','iconfont icon-xihuan','project:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);

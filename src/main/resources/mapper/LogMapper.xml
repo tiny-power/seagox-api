@@ -8,22 +8,22 @@
         	b.account, a.name, a.ip, a.uri, a.method, a.params,
         	a.ua, a.status, a.cost_time, a.result,
         	<if test="_databaseId == 'mysql'">
-            	DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') AS "createTime"
+            	DATE_FORMAT(a.created_at, '%Y-%m-%d %H:%i:%s') AS "createdAt"
             </if>
             <if test="_databaseId == 'postgresql'">
-            	to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+            	to_char(a.created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'kingbase'">
-                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(a.created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'dm'">
-                to_char(a.create_time,'yyyy-MM-dd HH24:MI:ss') AS "createTime"
+                to_char(a.created_at,'yyyy-MM-dd HH24:MI:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'oracle'">
-            	to_char(a.create_time,'yyyy-MM-dd hh24:mi:ss') AS "createTime"
+            	to_char(a.created_at,'yyyy-MM-dd hh24:mi:ss') AS "createdAt"
             </if>
             <if test="_databaseId == 'sqlserver'">
-                CONVERT(varchar, a.create_time, 120 ) AS "createTime"
+                CONVERT(varchar, a.created_at, 120 ) AS "createdAt"
             </if>
         FROM sys_log a
         LEFT JOIN sys_account b ON b.id = a.user_id
@@ -47,7 +47,7 @@
                 AND a.status = #{status}
             </if>
         </where>
-        ORDER BY a.create_time DESC
+        ORDER BY a.created_at DESC
     </select>
     
 </mapper>
