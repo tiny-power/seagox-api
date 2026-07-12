@@ -262,9 +262,6 @@ public class ConstructionLogService implements IConstructionLogService {
         if (constructionLog.getExpectedCompletionAt() == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "预计完成时间不能为空");
         }
-        if (StringUtils.isEmpty(constructionLog.getNextDayPlan())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "明日计划不能为空");
-        }
         return null;
     }
 }

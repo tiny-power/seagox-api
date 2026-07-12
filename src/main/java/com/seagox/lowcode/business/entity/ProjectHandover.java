@@ -73,7 +73,7 @@ public class ProjectHandover {
     /**
      * 附件
      */
-    private String attachment;
+    private String attachments;
 
     /**
      * 创建人
@@ -187,12 +187,12 @@ public class ProjectHandover {
         this.receiverSignedAt = receiverSignedAt;
     }
 
-    public String getAttachment() {
-        return attachment;
+    public String getAttachments() {
+        return attachments;
     }
 
-    public void setAttachment(String attachment) {
-        this.attachment = attachment;
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
     }
 
     public Long getCreatedBy() {

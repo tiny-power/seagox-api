@@ -133,7 +133,8 @@ public class RepairService implements IRepairService {
         repair.setAfterAttachments(original.getAfterAttachments());
         repair.setRepairMemberId(original.getRepairMemberId());
         repair.setExpectedVisitAt(original.getExpectedVisitAt());
-        repair.setCompleteAt(original.getCompleteAt());
+        repair.setRepairedAt(original.getRepairedAt());
+        repair.setAcceptedAt(original.getAcceptedAt());
         repair.setCreatedBy(original.getCreatedBy());
         repair.setCreatedAt(original.getCreatedAt());
         repair.setUpdatedBy(userId);
@@ -193,7 +194,8 @@ public class RepairService implements IRepairService {
         Date now = new Date();
         original.setAfterAttachments(repair == null ? original.getAfterAttachments() : repair.getAfterAttachments());
         original.setRepairResult(repair == null ? original.getRepairResult() : repair.getRepairResult());
-        original.setCompleteAt(now);
+        original.setRepairedAt(now);
+        original.setAcceptedAt(null);
         original.setStatus(STATUS_CONFIRMING);
         original.setUpdatedBy(userId);
         original.setUpdatedAt(now);
@@ -215,9 +217,11 @@ public class RepairService implements IRepairService {
         if (!Integer.valueOf(STATUS_CONFIRMING).equals(repair.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "只有待验收的报修单可以确认完成");
         }
+        Date now = new Date();
         repair.setStatus(STATUS_COMPLETED);
+        repair.setAcceptedAt(now);
         repair.setUpdatedBy(userId);
-        repair.setUpdatedAt(new Date());
+        repair.setUpdatedAt(now);
         repairMapper.updateById(repair);
         messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
@@ -238,7 +242,8 @@ public class RepairService implements IRepairService {
         repair.setStatus(STATUS_PROCESSING);
         repair.setAfterAttachments(null);
         repair.setRepairResult(null);
-        repair.setCompleteAt(null);
+        repair.setRepairedAt(null);
+        repair.setAcceptedAt(null);
         repair.setUpdatedBy(userId);
         repair.setUpdatedAt(new Date());
         repairMapper.updateById(repair);

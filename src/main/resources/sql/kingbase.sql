@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS "public"."requirement" (
 COMMENT ON COLUMN "public"."requirement"."id" IS '主键';
 COMMENT ON COLUMN "public"."requirement"."project_id" IS '所属项目ID';
 COMMENT ON COLUMN "public"."requirement"."style" IS '风格偏好';
-COMMENT ON COLUMN "public"."requirement"."budget" IS '预算范围接';
+COMMENT ON COLUMN "public"."requirement"."budget" IS '预算范围';
 COMMENT ON COLUMN "public"."requirement"."member" IS '家庭成员';
 COMMENT ON COLUMN "public"."requirement"."mark" IS '特殊需求';
 COMMENT ON COLUMN "public"."requirement"."signature_url" IS '签字文件url';
@@ -398,7 +398,6 @@ CREATE TABLE IF NOT EXISTS "public"."project_member" (
     "user_id" BIGINT NOT NULL,
     "role_code" INTEGER DEFAULT 1,
     "joined_at" TIMESTAMP NOT NULL,
-    "left_at" TIMESTAMP NULL,
     "status" INTEGER DEFAULT 1,
     "created_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -410,7 +409,6 @@ COMMENT ON COLUMN "public"."project_member"."project_id" IS '项目id';
 COMMENT ON COLUMN "public"."project_member"."user_id" IS '用户id';
 COMMENT ON COLUMN "public"."project_member"."role_code" IS '项目角色(1:设计师;2:设计助理;3:土建项目经理;4:精装项目经理;5:施工员;6:质检员;7:成控人员;8:财务人员;9:老板/管理层;10:业主;11:业主家属;)';
 COMMENT ON COLUMN "public"."project_member"."joined_at" IS '加入项目时间';
-COMMENT ON COLUMN "public"."project_member"."left_at" IS '退出项目时间';
 COMMENT ON COLUMN "public"."project_member"."status" IS '状态(1:有效;2:禁用;)';
 COMMENT ON COLUMN "public"."project_member"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."project_member"."created_at" IS '创建时间';
@@ -426,7 +424,7 @@ CREATE TABLE IF NOT EXISTS "public"."construction_log" (
     "filled_by" BIGINT NOT NULL,
     "current_progress_summary" VARCHAR(1000) DEFAULT NULL,
     "expected_completion_at" TIMESTAMP DEFAULT NULL,
-    "next_day_plan" TEXT NOT NULL,
+    "next_day_plan" TEXT DEFAULT NULL,
     "site_issues" JSONB DEFAULT NULL,
     "has_issue" SMALLINT NOT NULL DEFAULT 0,
     "assistants" JSONB DEFAULT NULL,
@@ -616,7 +614,7 @@ CREATE TABLE IF NOT EXISTS "public"."project_handover" (
     "receiver_signature_url" VARCHAR(500) DEFAULT NULL,
     "handover_signed_at" TIMESTAMP DEFAULT NULL,
     "receiver_signed_at" TIMESTAMP DEFAULT NULL,
-    "attachment" JSONB,
+    "attachments" JSONB,
     "created_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_by" BIGINT DEFAULT NULL,
@@ -633,7 +631,7 @@ COMMENT ON COLUMN "public"."project_handover"."handover_signature_url" IS '移�
 COMMENT ON COLUMN "public"."project_handover"."receiver_signature_url" IS '接收方签字文件url';
 COMMENT ON COLUMN "public"."project_handover"."handover_signed_at" IS '移交方签字时间';
 COMMENT ON COLUMN "public"."project_handover"."receiver_signed_at" IS '接收方签字时间';
-COMMENT ON COLUMN "public"."project_handover"."attachment" IS '附件';
+COMMENT ON COLUMN "public"."project_handover"."attachments" IS '附件';
 COMMENT ON COLUMN "public"."project_handover"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."project_handover"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."project_handover"."updated_by" IS '修改人';
@@ -656,7 +654,8 @@ CREATE TABLE IF NOT EXISTS "public"."repair" (
     "repair_result" VARCHAR(1000) DEFAULT NULL,
     "repair_member_id" BIGINT DEFAULT NULL,
     "expected_visit_at" TIMESTAMP DEFAULT NULL,
-    "complete_at" TIMESTAMP DEFAULT NULL,
+    "repaired_at" TIMESTAMP DEFAULT NULL,
+    "accepted_at" TIMESTAMP DEFAULT NULL,
     "created_by" BIGINT NOT NULL,
     "updated_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -677,7 +676,8 @@ COMMENT ON COLUMN "public"."repair"."after_attachments" IS '维修后附件';
 COMMENT ON COLUMN "public"."repair"."repair_result" IS '维修说明';
 COMMENT ON COLUMN "public"."repair"."repair_member_id" IS '维修人员ID';
 COMMENT ON COLUMN "public"."repair"."expected_visit_at" IS '预计上门时间';
-COMMENT ON COLUMN "public"."repair"."complete_at" IS '完成时间';
+COMMENT ON COLUMN "public"."repair"."repaired_at" IS '维修完成时间';
+COMMENT ON COLUMN "public"."repair"."accepted_at" IS '验收时间';
 COMMENT ON COLUMN "public"."repair"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."repair"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."repair"."created_at" IS '创建时间';

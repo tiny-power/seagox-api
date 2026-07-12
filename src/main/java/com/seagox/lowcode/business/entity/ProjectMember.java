@@ -37,13 +37,6 @@ public class ProjectMember {
     private Date joinedAt;
 
     /**
-     * 退出时间
-     */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date leftAt;
-
-    /**
      * 成员状态
      */
     private Integer status;
@@ -110,14 +103,6 @@ public class ProjectMember {
 
     public void setJoinedAt(Date joinedAt) {
         this.joinedAt = joinedAt;
-    }
-
-    public Date getLeftAt() {
-        return leftAt;
-    }
-
-    public void setLeftAt(Date leftAt) {
-        this.leftAt = leftAt;
     }
 
     public Integer getStatus() {

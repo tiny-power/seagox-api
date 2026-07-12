@@ -89,11 +89,18 @@ public class Repair {
     private Date expectedVisitAt;
 
     /**
-     * 完成时间
+     * 维修完成时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date completeAt;
+    private Date repairedAt;
+
+    /**
+     * 验收时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date acceptedAt;
 
     /**
      * 创建人ID
@@ -239,12 +246,20 @@ public class Repair {
         this.expectedVisitAt = expectedVisitAt;
     }
 
-    public Date getCompleteAt() {
-        return completeAt;
+    public Date getRepairedAt() {
+        return repairedAt;
     }
 
-    public void setCompleteAt(Date completeAt) {
-        this.completeAt = completeAt;
+    public void setRepairedAt(Date repairedAt) {
+        this.repairedAt = repairedAt;
+    }
+
+    public Date getAcceptedAt() {
+        return acceptedAt;
+    }
+
+    public void setAcceptedAt(Date acceptedAt) {
+        this.acceptedAt = acceptedAt;
     }
 
     public Long getCreatedBy() {
