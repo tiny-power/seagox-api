@@ -65,7 +65,7 @@ sms:
     endpoint: sms.tencentcloudapi.com
     region: ap-guangzhou
     sdk-app-id: 1299853
-    sign-name: 正初建筑
+    sign-name: 福建泉州正初建筑装饰有限
     template-id: 2680083
 
 jodconverter:

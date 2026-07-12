@@ -35,14 +35,22 @@
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
         <where>
-            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.projectId != null and params.projectId != ''">
+                AND a.project_id = #{params.projectId}
+            </if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
-                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
-                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                    <when test="_databaseId == 'mysql'">
+                        AND p.name LIKE CONCAT('%', #{params.projectName}, '%')
+                    </when>
+                    <otherwise>
+                        AND p.name LIKE '%' || #{params.projectName} || '%'
+                    </otherwise>
                 </choose>
             </if>
-            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.status != null and params.status != ''">
+                AND a.status = #{params.status}
+            </if>
         </where>
         ORDER BY a.updated_at DESC, a.id DESC
     </select>
@@ -79,7 +87,9 @@
         LEFT JOIN project p ON p.id = a.project_id
         LEFT JOIN sys_account creator ON creator.id = a.created_by
         LEFT JOIN sys_account updater ON updater.id = a.updated_by
-        WHERE a.id = #{id}
+        <where>
+            AND a.id = #{id}
+        </where>
     </select>
     <!-- 查询施工图出图版本明细 -->
     <select id="queryConstructionDrawingDetails" resultType="camelKeyMap">
@@ -101,7 +111,9 @@
         FROM construction_drawing_detail d
         LEFT JOIN sys_account creator ON creator.id = d.created_by
         LEFT JOIN sys_account updater ON updater.id = d.updated_by
-        WHERE d.construction_drawing_id = #{constructionDrawingId}
+        <where>
+            AND d.construction_drawing_id = #{constructionDrawingId}
+        </where>
         ORDER BY d.version DESC, d.id DESC
     </select>
     <!-- 查询最新版本明细 -->
@@ -120,16 +132,18 @@
                created_at AS "createdAt",
                updated_at AS "updatedAt"
         FROM construction_drawing_detail
-        WHERE id = (
-            SELECT MAX(cdd.id)
-            FROM construction_drawing_detail cdd
-            WHERE cdd.construction_drawing_id = #{constructionDrawingId}
-              AND cdd.version = (
-                  SELECT MAX(cddv.version)
-                  FROM construction_drawing_detail cddv
-                  WHERE cddv.construction_drawing_id = #{constructionDrawingId}
-              )
-        )
+        <where>
+            AND id = (
+                SELECT MAX(cdd.id)
+                FROM construction_drawing_detail cdd
+                WHERE cdd.construction_drawing_id = #{constructionDrawingId}
+                  AND cdd.version = (
+                      SELECT MAX(cddv.version)
+                      FROM construction_drawing_detail cddv
+                      WHERE cddv.construction_drawing_id = #{constructionDrawingId}
+                  )
+            )
+        </where>
     </select>
     <!-- 新增版本明细 -->
     <insert id="insertDetail" parameterType="com.seagox.lowcode.business.entity.ConstructionDrawingDetail" useGeneratedKeys="true" keyProperty="id">
@@ -173,10 +187,15 @@
             confirm_members = #{confirmMembers},
             updated_by = #{updatedBy},
             updated_at = #{updatedAt}
-        WHERE id = #{id}
+        <where>
+            AND id = #{id}
+        </where>
     </update>
     <!-- 删除施工图出图版本明细 -->
     <delete id="deleteDetailsByConstructionDrawingId">
-        DELETE FROM construction_drawing_detail WHERE construction_drawing_id = #{constructionDrawingId}
+        DELETE FROM construction_drawing_detail
+        <where>
+            AND construction_drawing_id = #{constructionDrawingId}
+        </where>
     </delete>
 </mapper>

@@ -34,8 +34,12 @@
         LEFT JOIN project_member pm ON pm.id = a.project_member_id
         LEFT JOIN sys_account u ON u.id = a.created_by
         <where>
-            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
-            <if test="params.type != null and params.type != ''">AND a.type = #{params.type}</if>
+            <if test="params.projectId != null and params.projectId != ''">
+                AND a.project_id = #{params.projectId}
+            </if>
+            <if test="params.type != null and params.type != ''">
+                AND a.type = #{params.type}
+            </if>
         </where>
         ORDER BY a.created_at ASC, a.id ASC
     </select>

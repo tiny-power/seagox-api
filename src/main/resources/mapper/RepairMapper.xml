@@ -62,21 +62,35 @@
         LEFT JOIN sys_account member_user ON member_user.id = repair_member.user_id
         LEFT JOIN sys_account legacy_member_user ON legacy_member_user.id = a.repair_member_id
         <where>
-            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
+            <if test="params.projectId != null and params.projectId != ''">
+                AND a.project_id = #{params.projectId}
+            </if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
-                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
-                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                    <when test="_databaseId == 'mysql'">
+                        AND p.name LIKE CONCAT('%', #{params.projectName}, '%')
+                    </when>
+                    <otherwise>
+                        AND p.name LIKE '%' || #{params.projectName} || '%'
+                    </otherwise>
                 </choose>
             </if>
             <if test="params.keyword != null and params.keyword != ''">
                 <choose>
-                    <when test="_databaseId == 'mysql'">AND (a.repair_no LIKE CONCAT('%', #{params.keyword}, '%') OR a.description LIKE CONCAT('%', #{params.keyword}, '%') OR a.type LIKE CONCAT('%', #{params.keyword}, '%'))</when>
-                    <otherwise>AND (a.repair_no LIKE '%' || #{params.keyword} || '%' OR a.description LIKE '%' || #{params.keyword} || '%' OR a.type LIKE '%' || #{params.keyword} || '%')</otherwise>
+                    <when test="_databaseId == 'mysql'">
+                        AND (a.repair_no LIKE CONCAT('%', #{params.keyword}, '%') OR a.description LIKE CONCAT('%', #{params.keyword}, '%') OR a.type LIKE CONCAT('%', #{params.keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        AND (a.repair_no LIKE '%' || #{params.keyword} || '%' OR a.description LIKE '%' || #{params.keyword} || '%' OR a.type LIKE '%' || #{params.keyword} || '%')
+                    </otherwise>
                 </choose>
             </if>
-            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
-            <if test="params.createdBy != null and params.createdBy != ''">AND a.created_by = #{params.createdBy}</if>
+            <if test="params.status != null and params.status != ''">
+                AND a.status = #{params.status}
+            </if>
+            <if test="params.createdBy != null and params.createdBy != ''">
+                AND a.created_by = #{params.createdBy}
+            </if>
         </where>
         ORDER BY a.repair_at DESC, a.id DESC
     </select>
@@ -140,6 +154,8 @@
         LEFT JOIN project_member repair_member ON repair_member.id = a.repair_member_id
         LEFT JOIN sys_account member_user ON member_user.id = repair_member.user_id
         LEFT JOIN sys_account legacy_member_user ON legacy_member_user.id = a.repair_member_id
-        WHERE a.id = #{id}
+        <where>
+            AND a.id = #{id}
+        </where>
     </select>
 </mapper>

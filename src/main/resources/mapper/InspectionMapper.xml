@@ -51,9 +51,15 @@
         LEFT JOIN sys_account u ON u.id = a.created_by
         LEFT JOIN sys_account inspector ON inspector.id = a.inspector_id
         <where>
-            <if test="params.projectId != null and params.projectId != ''">AND a.project_id = #{params.projectId}</if>
-            <if test="params.stageId != null and params.stageId != ''">AND a.stage_id = #{params.stageId}</if>
-            <if test="params.createdBy != null and params.createdBy != ''">AND a.created_by = #{params.createdBy}</if>
+            <if test="params.projectId != null and params.projectId != ''">
+                AND a.project_id = #{params.projectId}
+            </if>
+            <if test="params.stageId != null and params.stageId != ''">
+                AND a.stage_id = #{params.stageId}
+            </if>
+            <if test="params.createdBy != null and params.createdBy != ''">
+                AND a.created_by = #{params.createdBy}
+            </if>
             <if test="params.viewerUserId != null and params.viewerUserId != ''">
                 <choose>
                     <when test="_databaseId == 'mysql'">
@@ -78,15 +84,25 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="params.status != null and params.status != ''">AND a.status = #{params.status}</if>
+            <if test="params.status != null and params.status != ''">
+                AND a.status = #{params.status}
+            </if>
             <if test="params.projectName != null and params.projectName != ''">
                 <choose>
-                    <when test="_databaseId == 'mysql'">AND p.name LIKE CONCAT('%', #{params.projectName}, '%')</when>
-                    <otherwise>AND p.name LIKE '%' || #{params.projectName} || '%'</otherwise>
+                    <when test="_databaseId == 'mysql'">
+                        AND p.name LIKE CONCAT('%', #{params.projectName}, '%')
+                    </when>
+                    <otherwise>
+                        AND p.name LIKE '%' || #{params.projectName} || '%'
+                    </otherwise>
                 </choose>
             </if>
-            <if test="params.startDate != null and params.startDate != ''">AND a.plan_inspection_time &gt;= #{params.startDate}</if>
-            <if test="params.endDate != null and params.endDate != ''">AND a.plan_inspection_time &lt;= #{params.endDate}</if>
+            <if test="params.startDate != null and params.startDate != ''">
+                AND a.plan_inspection_time &gt;= #{params.startDate}
+            </if>
+            <if test="params.endDate != null and params.endDate != ''">
+                AND a.plan_inspection_time &lt;= #{params.endDate}
+            </if>
         </where>
         ORDER BY a.plan_inspection_time DESC, a.id DESC
     </select>
@@ -139,6 +155,8 @@
         LEFT JOIN project_stage s ON s.id = a.stage_id
         LEFT JOIN sys_account u ON u.id = a.created_by
         LEFT JOIN sys_account inspector ON inspector.id = a.inspector_id
-        WHERE a.id = #{id}
+        <where>
+            AND a.id = #{id}
+        </where>
     </select>
 </mapper>

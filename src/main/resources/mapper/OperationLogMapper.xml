@@ -14,8 +14,10 @@
                a.created_at AS "createdAt"
         FROM operation_log a
         LEFT JOIN sys_account account ON account.id = a.actor_id
-        WHERE a.object_type = #{objectType}
-          AND a.object_id = #{objectId}
+        <where>
+            AND a.object_type = #{objectType}
+            AND a.object_id = #{objectId}
+        </where>
         ORDER BY a.created_at ASC, a.id ASC
     </select>
 </mapper>
