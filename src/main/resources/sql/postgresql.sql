@@ -400,6 +400,7 @@ CREATE TABLE IF NOT EXISTS "public"."project_member" (
     "user_id" BIGINT NOT NULL,
     "role_code" INTEGER DEFAULT 1,
     "joined_at" TIMESTAMP NOT NULL,
+    "left_at" TIMESTAMP NULL,
     "status" INTEGER DEFAULT 1,
     "created_by" BIGINT NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -411,6 +412,7 @@ COMMENT ON COLUMN "public"."project_member"."project_id" IS '项目id';
 COMMENT ON COLUMN "public"."project_member"."user_id" IS '用户id';
 COMMENT ON COLUMN "public"."project_member"."role_code" IS '项目角色(1:设计师;2:设计助理;3:土建项目经理;4:精装项目经理;5:施工员;6:质检员;7:成控人员;8:财务人员;9:老板/管理层;10:业主;11:业主家属;)';
 COMMENT ON COLUMN "public"."project_member"."joined_at" IS '加入项目时间';
+COMMENT ON COLUMN "public"."project_member"."left_at" IS '退出项目时间';
 COMMENT ON COLUMN "public"."project_member"."status" IS '状态(1:有效;2:禁用;)';
 COMMENT ON COLUMN "public"."project_member"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."project_member"."created_at" IS '创建时间';
@@ -531,7 +533,6 @@ CREATE TABLE IF NOT EXISTS "public"."operation_log" (
     "object_type" VARCHAR(50) NOT NULL,
     "object_id" BIGINT NOT NULL,
     "action" VARCHAR(50) NOT NULL,
-    "actor_id" BIGINT NOT NULL,
     "actor_name" VARCHAR(100) DEFAULT NULL,
     "comment" TEXT DEFAULT NULL,
     "extra" JSONB DEFAULT NULL,
@@ -542,7 +543,6 @@ COMMENT ON COLUMN "public"."operation_log"."id" IS '主键';
 COMMENT ON COLUMN "public"."operation_log"."object_type" IS '对象类型:issue问题/task任务';
 COMMENT ON COLUMN "public"."operation_log"."object_id" IS '对象ID';
 COMMENT ON COLUMN "public"."operation_log"."action" IS '操作类型:edited编辑/assigned指派/resolved解决/closed关闭/commented备注/activated激活';
-COMMENT ON COLUMN "public"."operation_log"."actor_id" IS '操作人ID';
 COMMENT ON COLUMN "public"."operation_log"."actor_name" IS '操作人名称';
 COMMENT ON COLUMN "public"."operation_log"."comment" IS '备注/评论内容';
 COMMENT ON COLUMN "public"."operation_log"."extra" IS '扩展信息，比如IP、附件、来源端';

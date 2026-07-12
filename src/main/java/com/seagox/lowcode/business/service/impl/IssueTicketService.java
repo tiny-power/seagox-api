@@ -201,7 +201,6 @@ public class IssueTicketService implements IIssueTicketService {
         log.setObjectType(OBJECT_TYPE_ISSUE);
         log.setObjectId(objectId);
         log.setAction(action);
-        log.setActorId(userId);
         log.setActorName(getActorName(userId));
         log.setComment(comment);
         log.setExtra(extra);

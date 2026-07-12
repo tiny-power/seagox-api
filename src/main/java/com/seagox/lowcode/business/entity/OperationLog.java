@@ -17,7 +17,6 @@ public class OperationLog {
 
     private String action;
 
-    private Long actorId;
 
     private String actorName;
 
@@ -63,13 +62,6 @@ public class OperationLog {
         this.action = action;
     }
 
-    public Long getActorId() {
-        return actorId;
-    }
-
-    public void setActorId(Long actorId) {
-        this.actorId = actorId;
-    }
 
     public String getActorName() {
         return actorName;
