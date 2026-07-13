@@ -6,11 +6,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.Inspection;
+import com.seagox.lowcode.business.entity.InspectionItem;
+import com.seagox.lowcode.business.entity.InspectionParticipant;
 import com.seagox.lowcode.business.entity.IssueTicket;
 import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.ProjectStage;
 import com.seagox.lowcode.business.entity.StageInspectionItem;
+import com.seagox.lowcode.business.mapper.InspectionItemMapper;
 import com.seagox.lowcode.business.mapper.InspectionMapper;
+import com.seagox.lowcode.business.mapper.InspectionParticipantMapper;
 import com.seagox.lowcode.business.mapper.IssueTicketMapper;
 import com.seagox.lowcode.business.mapper.ProjectMapper;
 import com.seagox.lowcode.business.mapper.ProjectStageMapper;
@@ -21,9 +25,11 @@ import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.mapper.MessageMapper;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,6 +100,18 @@ public class InspectionService implements IInspectionService {
     private InspectionMapper inspectionMapper;
 
     /**
+     * 验收单验收项数据访问对象
+     */
+    @Autowired
+    private InspectionItemMapper inspectionItemMapper;
+
+    /**
+     * 验收单参与者数据访问对象
+     */
+    @Autowired
+    private InspectionParticipantMapper inspectionParticipantMapper;
+
+    /**
      * 项目数据访问对象
      */
     @Autowired
@@ -130,6 +148,9 @@ public class InspectionService implements IInspectionService {
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Map<String, Object> params) {
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = inspectionMapper.queryInspections(params);
+        for (Map<String, Object> item : list) {
+            fillInspectionChildren(item);
+        }
         MapDateFormatUtils.formatDateValues(list);
         return ResultData.success(new PageInfo<>(list));
     }
@@ -148,24 +169,26 @@ public class InspectionService implements IInspectionService {
         List<Map<String, Object>> issueTickets = issueTicketMapper.queryIssueTickets(issueParams);
         MapDateFormatUtils.formatDateValues(issueTickets);
         data.put("issueTickets", issueTickets);
-        if (isBlank(data.get("inspectionItems")) && data.get("stageId") != null) {
-            List<StageInspectionItem> stageItems = stageInspectionItemMapper.selectList(
-                    new LambdaQueryWrapper<StageInspectionItem>()
-                            .eq(StageInspectionItem::getStageId, data.get("stageId")));
-            JSONArray inspectionItems = new JSONArray();
-            for (StageInspectionItem item : stageItems) {
-                JSONObject inspectionItem = new JSONObject();
-                inspectionItem.put("id", item.getId());
-                inspectionItem.put("title", item.getName());
-                inspectionItem.put("label", item.getName());
-                inspectionItem.put("status", item.getStatus());
-                inspectionItems.add(inspectionItem);
-            }
-            data.put("inspectionItems", inspectionItems);
-            data.put("items", inspectionItems);
-        }
+        fillInspectionChildren(data);
         MapDateFormatUtils.formatDateValues(data);
         return ResultData.success(data);
+    }
+
+    /**
+     * 组装验收单子表数据
+     */
+    private void fillInspectionChildren(Map<String, Object> data) {
+        Object idValue = data.get("id");
+        if (idValue == null) {
+            return;
+        }
+        Long inspectionId = Long.valueOf(String.valueOf(idValue));
+        List<Map<String, Object>> inspectionItems = inspectionItemMapper.queryByInspectionId(inspectionId);
+        List<Map<String, Object>> participants = inspectionParticipantMapper.queryByInspectionId(inspectionId);
+        data.put("inspectionItems", inspectionItems);
+        data.put("items", inspectionItems);
+        data.put("participants", participants);
+        data.put("signatures", participants);
     }
 
     /**
@@ -197,6 +220,8 @@ public class InspectionService implements IInspectionService {
         inspection.setCreatedAt(now);
         inspection.setUpdatedAt(now);
         inspectionMapper.insert(inspection);
+        saveInspectionItems(inspection, userId, now, Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus()));
+        saveInspectionParticipants(inspection, now);
         refreshInspectionMessages(inspection, userId, companyId, now);
         return ResultData.success(inspection.getId());
     }
@@ -250,6 +275,8 @@ public class InspectionService implements IInspectionService {
         inspection.setUpdatedBy(userId);
         inspection.setUpdatedAt(now);
         inspectionMapper.updateById(inspection);
+        saveInspectionItems(inspection, userId, now, Integer.valueOf(STATUS_COMPLETED).equals(inspection.getStatus()));
+        saveInspectionParticipants(inspection, now);
         refreshInspectionMessages(inspection, userId, companyId, now);
         return ResultData.success(null);
     }
@@ -274,7 +301,7 @@ public class InspectionService implements IInspectionService {
             }
             if (inspection.getInspectionItems() != null && inspection.getInspectionItems().trim().length() > 0) {
                 Date now = new Date();
-                exist.setInspectionItems(markInspectionItemsCompleted(inspection.getInspectionItems()));
+                saveInspectionItems(inspection, userId, now, true);
                 exist.setUpdatedBy(userId);
                 exist.setUpdatedAt(now);
                 inspectionMapper.updateById(exist);
@@ -292,11 +319,7 @@ public class InspectionService implements IInspectionService {
         }
 
         Date now = new Date();
-        String inspectionItems = inspection.getInspectionItems() == null ? exist.getInspectionItems() : inspection.getInspectionItems();
-        exist.setInspectionItems(markInspectionItemsCompleted(inspectionItems));
         exist.setSitePhotos(inspection.getSitePhotos() == null ? exist.getSitePhotos() : inspection.getSitePhotos());
-        exist.setParticipants(inspection.getParticipants() == null ? exist.getParticipants() : inspection.getParticipants());
-        exist.setSignatures(inspection.getSignatures() == null ? exist.getSignatures() : inspection.getSignatures());
         exist.setAcceptanceComments(inspection.getAcceptanceComments() == null ? exist.getAcceptanceComments() : inspection.getAcceptanceComments());
         exist.setRemark(inspection.getRemark() == null ? exist.getRemark() : inspection.getRemark());
         exist.setResult(inspection.getResult() == null ? "pass" : inspection.getResult());
@@ -305,32 +328,219 @@ public class InspectionService implements IInspectionService {
         exist.setUpdatedBy(userId);
         exist.setUpdatedAt(now);
         inspectionMapper.updateById(exist);
+        inspection.setId(exist.getId());
+        saveInspectionItems(inspection, userId, now, true);
+        saveInspectionParticipants(inspection, now);
         messageMapper.deleteMessage(BUSINESS_TYPE, exist.getId());
         completeProjectStage(exist, userId, now);
         return ResultData.success(null);
     }
 
     /**
-     * 验收完成后同步本次验收项目状态
+     * 保存验收单验收项
      */
-    private String markInspectionItemsCompleted(String inspectionItems) {
-        if (inspectionItems == null || inspectionItems.trim().length() == 0) {
-            return inspectionItems;
+    private void saveInspectionItems(Inspection inspection, Long userId, Date now, boolean completed) {
+        if (inspection.getInspectionItems() == null) {
+            return;
+        }
+        inspectionItemMapper.delete(new LambdaQueryWrapper<InspectionItem>()
+                .eq(InspectionItem::getInspectionId, inspection.getId()));
+        if (inspection.getInspectionItems().trim().length() == 0) {
+            return;
+        }
+        JSONArray items = JSONArray.parseArray(inspection.getInspectionItems());
+        for (int i = 0; i < items.size(); i++) {
+            JSONObject item = toJSONObject(items.get(i));
+            if (item == null) {
+                continue;
+            }
+            InspectionItem inspectionItem = new InspectionItem();
+            inspectionItem.setInspectionId(inspection.getId());
+            inspectionItem.setSourceItemId(parseLong(firstNotNull(item, "sourceItemId", "sourceId", "value", "id")));
+            inspectionItem.setName(parseString(firstNotNull(item, "name", "title", "label", "inspectionName")));
+            if (isBlank(inspectionItem.getName())) {
+                continue;
+            }
+            Integer result = parseInspectionItemResult(item);
+            if (completed && (result == null || result == 0)) {
+                result = 1;
+            }
+            inspectionItem.setResult(result == null ? 0 : result);
+            inspectionItem.setRemark(parseString(item.get("remark")));
+            inspectionItem.setAttachments(toJsonString(item.get("attachments")));
+            inspectionItem.setInspectedBy(parseLong(firstNotNull(item, "inspectedBy", "inspectorId")));
+            inspectionItem.setInspectedAt(parseDate(firstNotNull(item, "inspectedAt", "inspectionTime")));
+            if (completed && inspectionItem.getInspectedBy() == null) {
+                inspectionItem.setInspectedBy(userId);
+            }
+            if (completed && inspectionItem.getInspectedAt() == null) {
+                inspectionItem.setInspectedAt(now);
+            }
+            inspectionItem.setCreatedBy(userId);
+            inspectionItem.setCreatedAt(now);
+            inspectionItem.setUpdatedBy(userId);
+            inspectionItem.setUpdatedAt(now);
+            inspectionItemMapper.insert(inspectionItem);
+        }
+    }
+
+    /**
+     * 保存验收单参与者与签名
+     */
+    private void saveInspectionParticipants(Inspection inspection, Date now) {
+        if (inspection.getParticipants() == null && inspection.getSignatures() == null) {
+            return;
+        }
+        inspectionParticipantMapper.delete(new LambdaQueryWrapper<InspectionParticipant>()
+                .eq(InspectionParticipant::getInspectionId, inspection.getId()));
+        Map<String, JSONObject> participantMap = new LinkedHashMap<>();
+        mergeParticipants(participantMap, inspection.getParticipants());
+        mergeParticipants(participantMap, inspection.getSignatures());
+        for (JSONObject item : participantMap.values()) {
+            Long userId = parseMemberUserId(item);
+            if (userId == null) {
+                continue;
+            }
+            InspectionParticipant participant = new InspectionParticipant();
+            participant.setInspectionId(inspection.getId());
+            participant.setUserId(userId);
+            participant.setProjectMemberId(parseLong(firstNotNull(item, "projectMemberId", "memberId")));
+            participant.setRoleName(parseString(firstNotNull(item, "roleName", "role")));
+            participant.setSignatureUrl(parseString(firstNotNull(item, "signatureUrl", "signaturePath", "url", "fileUrl", "filePath")));
+            participant.setSignedAt(parseDate(firstNotNull(item, "signedAt", "signTime")));
+            if (!isBlank(participant.getSignatureUrl()) && participant.getSignedAt() == null) {
+                participant.setSignedAt(now);
+            }
+            participant.setCreatedAt(now);
+            participant.setUpdatedAt(now);
+            inspectionParticipantMapper.insert(participant);
+        }
+    }
+
+    private void mergeParticipants(Map<String, JSONObject> participantMap, String json) {
+        if (json == null || json.trim().length() == 0) {
+            return;
+        }
+        JSONArray items = JSONArray.parseArray(json);
+        for (int i = 0; i < items.size(); i++) {
+            JSONObject item = toJSONObject(items.get(i));
+            if (item == null) {
+                continue;
+            }
+            Long userId = parseMemberUserId(item);
+            if (userId == null) {
+                continue;
+            }
+            String key = String.valueOf(userId);
+            JSONObject merged = participantMap.get(key);
+            if (merged == null) {
+                participantMap.put(key, item);
+            } else {
+                merged.putAll(item);
+            }
+        }
+    }
+
+    private List<InspectionParticipant> queryInspectionParticipants(Long inspectionId) {
+        if (inspectionId == null) {
+            return new ArrayList<>();
+        }
+        return inspectionParticipantMapper.selectList(new LambdaQueryWrapper<InspectionParticipant>()
+                .eq(InspectionParticipant::getInspectionId, inspectionId));
+    }
+
+    private JSONObject toJSONObject(Object value) {
+        if (value instanceof JSONObject) {
+            return (JSONObject) value;
+        }
+        if (value == null) {
+            return null;
+        }
+        JSONObject item = new JSONObject();
+        item.put("name", value);
+        return item;
+    }
+
+    private Object firstNotNull(JSONObject item, String... keys) {
+        for (String key : keys) {
+            Object value = item.get(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private Integer parseInspectionItemResult(JSONObject item) {
+        Integer result = parseInteger(item.get("result"));
+        if (result != null) {
+            return result;
+        }
+        String status = parseString(item.get("status"));
+        if ("completed".equals(status) || "pass".equals(status) || "passed".equals(status)) {
+            return 1;
+        }
+        if ("failed".equals(status) || "fail".equals(status)) {
+            return 2;
+        }
+        if ("notApplicable".equals(status)) {
+            return 3;
+        }
+        return 0;
+    }
+
+    private String toJsonString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof String) {
+            return (String) value;
+        }
+        return JSONObject.toJSONString(value);
+    }
+
+    private String parseString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        return String.valueOf(value);
+    }
+
+    private Long parseLong(Object value) {
+        if (value == null || String.valueOf(value).trim().length() == 0) {
+            return null;
         }
         try {
-            JSONArray items = JSONArray.parseArray(inspectionItems);
-            for (int i = 0; i < items.size(); i++) {
-                Object raw = items.get(i);
-                if (!(raw instanceof JSONObject)) {
-                    continue;
-                }
-                JSONObject item = (JSONObject) raw;
-                item.put("status", "completed");
-                item.put("statusText", "验收完成");
-            }
-            return items.toJSONString();
+            return Long.valueOf(String.valueOf(value));
         } catch (Exception e) {
-            return inspectionItems;
+            return null;
+        }
+    }
+
+    private Integer parseInteger(Object value) {
+        if (value == null || String.valueOf(value).trim().length() == 0) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(String.valueOf(value));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Date parseDate(Object value) {
+        if (value instanceof Date) {
+            return (Date) value;
+        }
+        if (value == null || String.valueOf(value).trim().length() == 0) {
+            return null;
+        }
+        try {
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("value", value);
+            return wrapper.getDate("value");
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -374,67 +584,16 @@ public class InspectionService implements IInspectionService {
                 .eq(Inspection::getStageId, stageId)
                 .eq(Inspection::getStatus, STATUS_COMPLETED));
         for (Inspection completedInspection : completedInspections) {
-            passedItemIds.addAll(parseInspectionItemIds(completedInspection.getInspectionItems()));
+            List<InspectionItem> completedItems = inspectionItemMapper.selectList(
+                    new LambdaQueryWrapper<InspectionItem>()
+                            .eq(InspectionItem::getInspectionId, completedInspection.getId()));
+            for (InspectionItem completedItem : completedItems) {
+                if (completedItem.getSourceItemId() != null) {
+                    passedItemIds.add(String.valueOf(completedItem.getSourceItemId()));
+                }
+            }
         }
         return passedItemIds.containsAll(requiredItemIds);
-    }
-
-    /**
-     * 解析验收单覆盖的阶段验收条目ID
-     */
-    private Set<String> parseInspectionItemIds(String inspectionItems) {
-        Set<String> itemIds = new HashSet<>();
-        if (inspectionItems == null || inspectionItems.trim().length() == 0) {
-            return itemIds;
-        }
-        try {
-            JSONArray items = JSONArray.parseArray(inspectionItems);
-            for (int i = 0; i < items.size(); i++) {
-                Object raw = items.get(i);
-                if (raw instanceof String || raw instanceof Number) {
-                    itemIds.add(String.valueOf(raw));
-                    continue;
-                }
-                JSONObject item = items.getJSONObject(i);
-                Object id = item.get("id");
-                if (id == null) {
-                    id = item.get("sourceId");
-                }
-                if (id == null) {
-                    id = item.get("value");
-                }
-                if (id != null) {
-                    itemIds.add(String.valueOf(id));
-                }
-            }
-        } catch (Exception e) {
-            return itemIds;
-        }
-        return itemIds;
-    }
-
-    /**
-     * 校验当前操作人是否为验收人
-     */
-    private ResultData verifyParticipant(Inspection inspection, Long userId) {
-        if (inspection.getParticipants() == null || inspection.getParticipants().trim().length() == 0) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "验收人不能为空");
-        }
-        try {
-            JSONArray participants = JSONArray.parseArray(inspection.getParticipants());
-            for (int i = 0; i < participants.size(); i++) {
-                JSONObject participant = participants.getJSONObject(i);
-                if (participant == null || participant.get("userId") == null) {
-                    continue;
-                }
-                if (String.valueOf(userId).equals(String.valueOf(participant.get("userId")))) {
-                    return null;
-                }
-            }
-        } catch (Exception e) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "验收人数据格式错误");
-        }
-        return ResultData.warn(ResultCode.OTHER_ERROR, "仅本单验收人可操作");
     }
 
     /**
@@ -455,13 +614,40 @@ public class InspectionService implements IInspectionService {
         if (inspectorResult == null) {
             return null;
         }
-        String signatures = submitted == null || submitted.getSignatures() == null
-                ? exist.getSignatures()
-                : submitted.getSignatures();
-        if (allSignaturesSigned(signatures) && isSignedByUser(signatures, userId)) {
+        String signatures = submitted == null ? null : submitted.getSignatures();
+        if (signatures != null && allSignaturesSigned(signatures) && isSignedByUser(signatures, userId)) {
+            return null;
+        }
+        if (signatures == null && allParticipantsSigned(exist.getId()) && isParticipantSignedByUser(exist.getId(), userId)) {
             return null;
         }
         return inspectorResult;
+    }
+
+    private boolean allParticipantsSigned(Long inspectionId) {
+        List<InspectionParticipant> participants = queryInspectionParticipants(inspectionId);
+        if (participants.size() == 0) {
+            return false;
+        }
+        for (InspectionParticipant participant : participants) {
+            if (isBlank(participant.getSignatureUrl())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isParticipantSignedByUser(Long inspectionId, Long userId) {
+        if (userId == null) {
+            return false;
+        }
+        List<InspectionParticipant> participants = queryInspectionParticipants(inspectionId);
+        for (InspectionParticipant participant : participants) {
+            if (userId.equals(participant.getUserId()) && !isBlank(participant.getSignatureUrl())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isSignedByUser(String signatures, Long userId) {
@@ -526,10 +712,15 @@ public class InspectionService implements IInspectionService {
      * 删除验收单
      */
     @Override
+    @Transactional
     public ResultData delete(Long id) {
         if (inspectionMapper.selectById(id) == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "验收单不存在");
         }
+        inspectionItemMapper.delete(new LambdaQueryWrapper<InspectionItem>()
+                .eq(InspectionItem::getInspectionId, id));
+        inspectionParticipantMapper.delete(new LambdaQueryWrapper<InspectionParticipant>()
+                .eq(InspectionParticipant::getInspectionId, id));
         inspectionMapper.deleteById(id);
         messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
@@ -546,10 +737,7 @@ public class InspectionService implements IInspectionService {
             return;
         }
         if (isWaitingForSignatures(inspection)) {
-            Set<Long> signerUserIds = parseUnsignedSignerUserIds(inspection.getSignatures());
-            if (signerUserIds.size() == 0) {
-                signerUserIds = parseParticipantUserIds(inspection.getParticipants());
-            }
+            Set<Long> signerUserIds = queryUnsignedSignerUserIds(inspection.getId());
             for (Long toUserId : signerUserIds) {
                 insertInspectionMessage(companyId, userId, toUserId, inspection.getId(), now, "您有一条验收单待签名");
             }
@@ -585,9 +773,12 @@ public class InspectionService implements IInspectionService {
     private boolean isWaitingForSignatures(Inspection inspection) {
         return Integer.valueOf(STATUS_PROCESSING).equals(inspection.getStatus())
                 && "pass".equals(inspection.getResult())
-                && inspection.getSignatures() != null
-                && inspection.getSignatures().trim().length() > 0
-                && !allSignaturesSigned(inspection.getSignatures());
+                && hasInspectionParticipants(inspection.getId())
+                && !allParticipantsSigned(inspection.getId());
+    }
+
+    private boolean hasInspectionParticipants(Long inspectionId) {
+        return queryInspectionParticipants(inspectionId).size() > 0;
     }
 
     private boolean allSignaturesSigned(String signatures) {
@@ -611,51 +802,13 @@ public class InspectionService implements IInspectionService {
         }
     }
 
-    private Set<Long> parseUnsignedSignerUserIds(String signatures) {
+    private Set<Long> queryUnsignedSignerUserIds(Long inspectionId) {
         Set<Long> userIds = new HashSet<>();
-        if (signatures == null || signatures.trim().length() == 0) {
-            return userIds;
-        }
-        try {
-            JSONArray items = JSONArray.parseArray(signatures);
-            for (int i = 0; i < items.size(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                if (item == null || Boolean.TRUE.equals(item.getBoolean("signed"))) {
-                    continue;
-                }
-                Long userId = parseMemberUserId(item);
-                if (userId != null) {
-                    userIds.add(userId);
-                }
+        List<InspectionParticipant> participants = queryInspectionParticipants(inspectionId);
+        for (InspectionParticipant participant : participants) {
+            if (participant.getUserId() != null && isBlank(participant.getSignatureUrl())) {
+                userIds.add(participant.getUserId());
             }
-        } catch (Exception e) {
-            return userIds;
-        }
-        return userIds;
-    }
-
-    /**
-     * 解析验收人用户ID
-     */
-    private Set<Long> parseParticipantUserIds(String participants) {
-        Set<Long> userIds = new HashSet<>();
-        if (participants == null || participants.trim().length() == 0) {
-            return userIds;
-        }
-        try {
-            JSONArray items = JSONArray.parseArray(participants);
-            for (int i = 0; i < items.size(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                if (item == null) {
-                    continue;
-                }
-                Long parsedUserId = parseMemberUserId(item);
-                if (parsedUserId != null) {
-                    userIds.add(parsedUserId);
-                }
-            }
-        } catch (Exception e) {
-            return userIds;
         }
         return userIds;
     }

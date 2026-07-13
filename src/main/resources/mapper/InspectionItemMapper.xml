@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.InspectionItemMapper">
+    <select id="queryByInspectionId" resultType="camelKeyMap">
+        SELECT a.id AS "recordId",
+               a.source_item_id AS "id",
+               a.source_item_id AS "sourceItemId",
+               a.name,
+               a.name AS "title",
+               a.name AS "label",
+               a.result,
+               CASE
+                   WHEN a.result = 1 THEN 'completed'
+                   WHEN a.result = 2 THEN 'failed'
+                   WHEN a.result = 3 THEN 'notApplicable'
+                   ELSE 'pending'
+               END AS "status",
+               CASE
+                   WHEN a.result = 1 THEN '验收完成'
+                   WHEN a.result = 2 THEN '不通过'
+                   WHEN a.result = 3 THEN '不适用'
+                   ELSE '待验收'
+               END AS "statusText",
+               a.remark,
+               a.attachments,
+               a.inspected_by AS "inspectedBy",
+               inspector.name AS "inspectedByName",
+               a.inspected_at AS "inspectedAt",
+               a.created_by AS "createdBy",
+               a.created_at AS "createdAt",
+               a.updated_by AS "updatedBy",
+               a.updated_at AS "updatedAt"
+        FROM inspection_item a
+        LEFT JOIN sys_account inspector ON inspector.id = a.inspected_by
+        WHERE a.inspection_id = #{inspectionId}
+        ORDER BY a.id ASC
+    </select>
+</mapper>

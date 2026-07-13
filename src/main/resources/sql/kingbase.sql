@@ -462,15 +462,14 @@ CREATE TABLE IF NOT EXISTS "public"."inspection" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,
     "project_id" BIGINT NOT NULL,
     "stage_id" BIGINT DEFAULT NULL,
-    "inspection_items" JSONB DEFAULT NULL,
     "plan_inspection_time" TIMESTAMP DEFAULT NULL,
     "site_photos" JSONB DEFAULT NULL,
-    "participants" JSONB DEFAULT NULL,
-    "signatures" JSONB DEFAULT NULL,
     "passed_at" TIMESTAMP DEFAULT NULL,
     "acceptance_comments" VARCHAR(1000) DEFAULT NULL,
     "remark" VARCHAR(1000) DEFAULT NULL,
     "status" INTEGER DEFAULT 1,
+    "inspector_id" BIGINT NOT NULL,
+    "result" VARCHAR(100) DEFAULT NULL,
     "created_by" BIGINT DEFAULT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_by" BIGINT DEFAULT NULL,
@@ -479,20 +478,65 @@ CREATE TABLE IF NOT EXISTS "public"."inspection" (
 COMMENT ON COLUMN "public"."inspection"."id" IS '主键';
 COMMENT ON COLUMN "public"."inspection"."project_id" IS '项目id';
 COMMENT ON COLUMN "public"."inspection"."stage_id" IS '项目阶段ID';
-COMMENT ON COLUMN "public"."inspection"."inspection_items" IS '项目阶段条目，格式为条目ID、条目名称、条目状态等';
 COMMENT ON COLUMN "public"."inspection"."plan_inspection_time" IS '计划验收时间';
 COMMENT ON COLUMN "public"."inspection"."site_photos" IS '验收现场总体照片';
-COMMENT ON COLUMN "public"."inspection"."participants" IS '参与人员，格式为用户ID、姓名、角色等';
-COMMENT ON COLUMN "public"."inspection"."signatures" IS '签字信息，包含签字人、角色、签字文件、签字时间';
 COMMENT ON COLUMN "public"."inspection"."passed_at" IS '验收通过时间';
 COMMENT ON COLUMN "public"."inspection"."acceptance_comments" IS '验收意见';
 COMMENT ON COLUMN "public"."inspection"."remark" IS '备注';
-COMMENT ON COLUMN "public"."inspection"."status" IS '状态(1:待验收;2:验收中;3:已完成;)';
+COMMENT ON COLUMN "public"."inspection"."status" IS '状态(1:待验收;2:验收中;3:已完成;4:整改中;5:待复验;)';
+COMMENT ON COLUMN "public"."inspection"."inspector_id" IS '质检员';
+COMMENT ON COLUMN "public"."inspection"."result" IS '验收结果(pass:通过;fail:不通过)';
 COMMENT ON COLUMN "public"."inspection"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."inspection"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."inspection"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."inspection"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."inspection" IS '验收单';
+
+CREATE TABLE IF NOT EXISTS "public"."inspection_item" (
+    "id" BIGSERIAL NOT NULL PRIMARY KEY,
+    "inspection_id" BIGINT NOT NULL,
+    "source_item_id" BIGINT DEFAULT NULL,
+    "name" VARCHAR(200) NOT NULL,
+    "result" INTEGER DEFAULT 0,
+    "remark" VARCHAR(1000) DEFAULT NULL,
+    "attachments" JSONB DEFAULT NULL,
+    "inspected_by" BIGINT DEFAULT NULL,
+    "inspected_at" TIMESTAMP DEFAULT NULL,
+    "created_by" BIGINT DEFAULT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_by" BIGINT DEFAULT NULL,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."inspection_item"."id" IS '主键';
+COMMENT ON COLUMN "public"."inspection_item"."inspection_id" IS '验收单ID';
+COMMENT ON COLUMN "public"."inspection_item"."source_item_id" IS '来源阶段验收项ID';
+COMMENT ON COLUMN "public"."inspection_item"."name" IS '验收项名称';
+COMMENT ON COLUMN "public"."inspection_item"."result" IS '验收结果(0:待验收;1:通过;2:不通过;3:不适用;)';
+COMMENT ON COLUMN "public"."inspection_item"."remark" IS '验收备注';
+COMMENT ON COLUMN "public"."inspection_item"."attachments" IS '验收附件';
+COMMENT ON COLUMN "public"."inspection_item"."inspected_by" IS '实际验收人';
+COMMENT ON COLUMN "public"."inspection_item"."inspected_at" IS '实际验收时间';
+COMMENT ON TABLE "public"."inspection_item" IS '验收单验收项';
+
+CREATE TABLE IF NOT EXISTS "public"."inspection_participant" (
+    "id" BIGSERIAL NOT NULL PRIMARY KEY,
+    "inspection_id" BIGINT NOT NULL,
+    "user_id" BIGINT NOT NULL,
+    "project_member_id" BIGINT DEFAULT NULL,
+    "role_name" VARCHAR(100) DEFAULT NULL,
+    "signature_url" VARCHAR(500) DEFAULT NULL,
+    "signed_at" TIMESTAMP DEFAULT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."inspection_participant"."id" IS '主键';
+COMMENT ON COLUMN "public"."inspection_participant"."inspection_id" IS '验收单ID';
+COMMENT ON COLUMN "public"."inspection_participant"."user_id" IS '系统用户ID';
+COMMENT ON COLUMN "public"."inspection_participant"."project_member_id" IS '项目成员ID';
+COMMENT ON COLUMN "public"."inspection_participant"."role_name" IS '项目角色名称';
+COMMENT ON COLUMN "public"."inspection_participant"."signature_url" IS '签字文件url';
+COMMENT ON COLUMN "public"."inspection_participant"."signed_at" IS '签字时间';
+COMMENT ON TABLE "public"."inspection_participant" IS '验收单参与者';
 
 CREATE TABLE IF NOT EXISTS "public"."issue_ticket" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,

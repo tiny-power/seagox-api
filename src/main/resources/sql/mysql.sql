@@ -2,11 +2,11 @@ CREATE TABLE IF NOT EXISTS `disk`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
     `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '上级id',
-    `name` varchar(255) NOT NULL COMMENT '名称',
-    `url` varchar(500) DEFAULT NULL COMMENT '链接',
+    `name` VARCHAR(255) NOT NULL COMMENT '名称',
+    `url` VARCHAR(500) DEFAULT NULL COMMENT '链接',
     `path` VARCHAR(1000) NOT NULL COMMENT '完整节点路径，例如 /1/5/12/',
     `level` INT NOT NULL DEFAULT 1 COMMENT '目录层级',
-    `size` BIGINT NOT NULL DEFAULT 0 COMMENT '大小',
+    `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '大小',
     `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)',
     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS `disk`  (
 CREATE TABLE IF NOT EXISTS `requirement`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
-    `style` varchar(255) NOT NULL COMMENT '风格偏好',
-    `budget` varchar(255) NOT NULL COMMENT '预算范围',
+    `style` VARCHAR(255) NOT NULL COMMENT '风格偏好',
+    `budget` VARCHAR(255) NOT NULL COMMENT '预算范围',
     `member` VARCHAR(255) NOT NULL COMMENT '家庭成员',
     `mark` VARCHAR(500) DEFAULT NULL COMMENT '特殊需求',
     `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
@@ -131,14 +131,14 @@ CREATE TABLE IF NOT EXISTS `repair`  (
 CREATE TABLE IF NOT EXISTS `company`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '上级id',
-    `mark` varchar(30) NOT NULL COMMENT '标识',
-    `code` varchar(30) NOT NULL COMMENT '编码',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `alias` varchar(30) NOT NULL COMMENT '简称',
-    `logo` varchar(100) DEFAULT NULL COMMENT 'logo',
+    `mark` VARCHAR(30) NOT NULL COMMENT '标识',
+    `code` VARCHAR(30) NOT NULL COMMENT '编码',
+    `name` VARCHAR(30) NOT NULL COMMENT '名称',
+    `alias` VARCHAR(30) NOT NULL COMMENT '简称',
+    `logo` VARCHAR(100) DEFAULT NULL COMMENT 'logo',
     `sort` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '公司';
 
@@ -146,32 +146,32 @@ CREATE TABLE IF NOT EXISTS `department` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
     `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '上级id',
-    `code` varchar(30) NOT NULL COMMENT '编码',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `director` varchar(500) DEFAULT NULL COMMENT '直接主管',
-    `charge_leader` varchar(500) DEFAULT NULL COMMENT '分管领导',
+    `code` VARCHAR(30) NOT NULL COMMENT '编码',
+    `name` VARCHAR(30) NOT NULL COMMENT '名称',
+    `director` VARCHAR(500) DEFAULT NULL COMMENT '直接主管',
+    `charge_leader` VARCHAR(500) DEFAULT NULL COMMENT '分管领导',
     `sort` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '部门';
 
-CREATE TABLE IF NOT EXISTS`dept_user` (
+CREATE TABLE IF NOT EXISTS `dept_user` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
     `department_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '部门id',
     `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '部门用户';
 
 CREATE TABLE IF NOT EXISTS `dic_classify`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `name` VARCHAR(30) NOT NULL COMMENT '名称',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典分类';
 
@@ -179,25 +179,25 @@ CREATE TABLE IF NOT EXISTS `dic_detail`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '上级id',
     `classify_id` BIGINT UNSIGNED NOT NULL COMMENT '字典分类id',
-    `code` varchar(30) NOT NULL COMMENT '编码',
-    `name` varchar(30) NOT NULL COMMENT '名称',
+    `code` VARCHAR(30) NOT NULL COMMENT '编码',
+    `name` VARCHAR(30) NOT NULL COMMENT '名称',
     `sort` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '排序',
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态(0:禁用;1:启用)',
     `last_stage` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '末级(0:否;1:是)',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典详情';
 
 CREATE TABLE IF NOT EXISTS `job`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
-    `name` varchar(30) NOT NULL COMMENT '名称',
-    `cron` varchar(100) NOT NULL COMMENT '表达式',
-    `mark` varchar(500) NOT NULL COMMENT '标识',
+    `name` VARCHAR(30) NOT NULL COMMENT '名称',
+    `cron` VARCHAR(100) NOT NULL COMMENT '表达式',
+    `mark` VARCHAR(500) NOT NULL COMMENT '标识',
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态(0:未启动;1:已启动;)',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务调度';
 INSERT INTO job (`company_id`, `name`, `cron`, `mark`, `status`) VALUES (1, '项目保修到期完结', '0 0 1 * * ?', 'com.seagox.lowcode.business.job.ProjectWarrantyJob', 1);
@@ -207,15 +207,15 @@ CREATE TABLE IF NOT EXISTS `leave_request` (
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
     `applicant_id` BIGINT UNSIGNED NOT NULL COMMENT '申请人id',
     `leave_type` TINYINT UNSIGNED  NOT NULL COMMENT '请假类型(1:事假;2:病假;3:年假;4:调休;5:婚假;6:产假;7:丧假;8:其他;)',
-    `start_time` datetime NOT NULL COMMENT '开始时间',
-    `end_time` datetime NOT NULL COMMENT '结束时间',
+    `start_time` DATETIME NOT NULL COMMENT '开始时间',
+    `end_time` DATETIME NOT NULL COMMENT '结束时间',
     `duration` decimal(10,2) NOT NULL COMMENT '请假时长',
-    `reason` varchar(500) NOT NULL COMMENT '请假事由',
+    `reason` VARCHAR(500) NOT NULL COMMENT '请假事由',
     `attachments` JSON DEFAULT NULL COMMENT '附件',
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)',
-    `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `submit_time` DATETIME DEFAULT NULL COMMENT '提交时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '请假单';
 
@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS `project_stage` (
     `manager_user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '阶段负责人用户ID',
     `planned_start_date` DATE DEFAULT NULL COMMENT '计划开始日期',
     `planned_end_date` DATE DEFAULT NULL COMMENT '计划完成日期',
-    `planned_days` TINYINT UNSIGNED DEFAULT NULL COMMENT '计划工期天数',
+    `planned_days` SMALLINT UNSIGNED DEFAULT NULL COMMENT '计划工期天数',
     `actual_start_date` DATE DEFAULT NULL COMMENT '实际开始日期',
     `actual_end_date` DATE DEFAULT NULL COMMENT '实际完成日期',
     `completed_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '完成人用户ID',
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS `stage_inspection_item` (
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目ID',
     `stage_id` BIGINT UNSIGNED NOT NULL COMMENT '当前阶段ID',
     `name` VARCHAR(200) NOT NULL COMMENT '名称',
-    `status` TINYINT UNSIGNED DEFAULT 0 COMMENT '状态(0:未开始;1:进行中;2:已完成;)',
+    `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态(0:未开始;1:进行中;2:已完成;)',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='阶段验收条目';
 
@@ -326,11 +326,8 @@ CREATE TABLE IF NOT EXISTS `inspection` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '项目id',
     `stage_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '项目阶段ID',
-    `inspection_items` JSON DEFAULT NULL COMMENT '项目阶段条目，格式为条目ID、条目名称、条目状态等',
     `plan_inspection_time` DATETIME DEFAULT NULL COMMENT '计划验收时间',
     `site_photos` JSON DEFAULT NULL COMMENT '验收现场总体照片',
-    `participants` JSON DEFAULT NULL COMMENT '参与人员，格式为用户ID、姓名、角色等',
-    `signatures` JSON DEFAULT NULL COMMENT '签字信息，包含签字人、角色、签字文件、签字时间',
     `passed_at` DATETIME DEFAULT NULL COMMENT '验收通过时间',
     `acceptance_comments` VARCHAR(1000) DEFAULT NULL COMMENT '验收意见',
     `remark` VARCHAR(1000) DEFAULT NULL COMMENT '备注',
@@ -343,6 +340,36 @@ CREATE TABLE IF NOT EXISTS `inspection` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='验收单';
+
+CREATE TABLE IF NOT EXISTS `inspection_item` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `inspection_id` BIGINT UNSIGNED NOT NULL COMMENT '验收单ID',
+    `source_item_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '来源阶段验收项ID',
+    `name` VARCHAR(200) NOT NULL COMMENT '验收项名称',
+    `result` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '验收结果(0:待验收;1:通过;2:不通过;3:不适用;)',
+    `remark` VARCHAR(1000) DEFAULT NULL COMMENT '验收备注',
+    `attachments` JSON DEFAULT NULL COMMENT '验收附件',
+    `inspected_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '实际验收人',
+    `inspected_at` DATETIME DEFAULT NULL COMMENT '实际验收时间',
+    `created_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '创建人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '更新人',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='验收单验收项';
+
+CREATE TABLE IF NOT EXISTS `inspection_participant` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `inspection_id` BIGINT UNSIGNED NOT NULL COMMENT '验收单ID',
+    `user_id` BIGINT UNSIGNED NOT NULL COMMENT '系统用户ID',
+    `project_member_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '项目成员ID',
+    `role_name` VARCHAR(100) DEFAULT NULL COMMENT '项目角色名称',
+    `signature_url` VARCHAR(500) DEFAULT NULL COMMENT '签字文件url',
+    `signed_at` DATETIME DEFAULT NULL COMMENT '签字时间',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='验收单参与者';
 
 CREATE TABLE IF NOT EXISTS `issue_ticket` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -429,38 +456,38 @@ CREATE TABLE IF NOT EXISTS `project_handover` (
 
 CREATE TABLE IF NOT EXISTS `phone_code` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `phone` varchar(30) NOT NULL COMMENT '手机号',
-  `code` varchar(10) NOT NULL COMMENT '验证码',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `expire_at` datetime NOT NULL COMMENT '过期时间',
+  `phone` VARCHAR(30) NOT NULL COMMENT '手机号',
+  `code` VARCHAR(10) NOT NULL COMMENT '验证码',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `expire_at` DATETIME NOT NULL COMMENT '过期时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='手机验证码';
 
 CREATE TABLE IF NOT EXISTS `sys_account` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
-  `account` varchar(50) NOT NULL COMMENT '账号',
-  `email` varchar(50) DEFAULT NULL COMMENT '邮箱',
-  `phone` varchar(30) DEFAULT NULL COMMENT '手机号',
-  `name` varchar(50) NOT NULL COMMENT '姓名',
-  `sex` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '性别(1:男;2:女;)',
-  `password` varchar(255) NOT NULL COMMENT '密码',
-  `position` varchar(50) DEFAULT NULL COMMENT '职位',
+  `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像',
+  `account` VARCHAR(50) NOT NULL COMMENT '账号',
+  `email` VARCHAR(50) DEFAULT NULL COMMENT '邮箱',
+  `phone` VARCHAR(30) DEFAULT NULL COMMENT '手机号',
+  `name` VARCHAR(50) NOT NULL COMMENT '姓名',
+  `sex` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '性别(0:未知;1:男;2:女;)',
+  `password` VARCHAR(255) NOT NULL COMMENT '密码',
+  `position` VARCHAR(50) DEFAULT NULL COMMENT '职位',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态(1:启用;2:禁用;)',
   `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:普通成员;2:管理员;)',
-  `mini_openid` varchar(100) DEFAULT NULL COMMENT '小程序openid',
-  `mp_openid` varchar(100) DEFAULT NULL COMMENT '服务号openid',
-  `unionid` varchar(100) DEFAULT NULL COMMENT '开放平台unionid',
+  `mini_openid` VARCHAR(100) DEFAULT NULL COMMENT '小程序openid',
+  `mp_openid` VARCHAR(100) DEFAULT NULL COMMENT '服务号openid',
+  `unionid` VARCHAR(100) DEFAULT NULL COMMENT '开放平台unionid',
   `sort` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户';
 
 CREATE TABLE IF NOT EXISTS `sys_icon`  (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name` varchar(30) NOT NULL COMMENT '名称',
-  `font` varchar(50) NOT NULL COMMENT 'font_class',
+  `name` VARCHAR(30) NOT NULL COMMENT '名称',
+  `font` VARCHAR(50) NOT NULL COMMENT 'font_class',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'icon数据';
 
@@ -468,16 +495,16 @@ CREATE TABLE IF NOT EXISTS `sys_log` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
   `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id',
-  `name` varchar(50) NOT NULL COMMENT '操作名称',
-  `ip` varchar(50) NOT NULL COMMENT 'ip',
-  `uri` varchar(200) NOT NULL COMMENT 'uri',
-  `method` varchar(255) NOT NULL COMMENT '方法',
-  `params` longtext NULL COMMENT '请求参数',
-  `ua` varchar(500) DEFAULT NULL COMMENT '浏览器信息',
+  `name` VARCHAR(50) NOT NULL COMMENT '操作名称',
+  `ip` VARCHAR(50) NOT NULL COMMENT 'ip',
+  `uri` VARCHAR(200) NOT NULL COMMENT 'uri',
+  `method` VARCHAR(255) NOT NULL COMMENT '方法',
+  `params` LONGTEXT NULL COMMENT '请求参数',
+  `ua` VARCHAR(500) DEFAULT NULL COMMENT '浏览器信息',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态(1:成功;2:失败;)',
   `cost_time` INT UNSIGNED NOT NULL COMMENT '花费时间',
-  `result` longtext NULL COMMENT '返回结果',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `result` LONGTEXT NULL COMMENT '返回结果',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日记';
 
@@ -486,13 +513,13 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
   `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
   `parent_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '上级id',
   `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:目录;2:页面;3:按钮;)',
-  `name` varchar(30) NOT NULL COMMENT '名称',
-  `icon` varchar(50) NOT NULL COMMENT '图标',
-  `path` varchar(50) DEFAULT NULL COMMENT '路径',
+  `name` VARCHAR(30) NOT NULL COMMENT '名称',
+  `icon` VARCHAR(50) NOT NULL COMMENT '图标',
+  `path` VARCHAR(50) DEFAULT NULL COMMENT '路径',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态(1:启用;2:禁用;)',
   `sort` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '排序',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单';
 
@@ -502,8 +529,8 @@ CREATE TABLE IF NOT EXISTS `sys_message`  (
     `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)',
     `from_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(来自)',
     `to_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(给谁)',
-    `title` varchar(50) NOT NULL COMMENT '标题',
-    `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型',
+    `title` VARCHAR(50) NOT NULL COMMENT '标题',
+    `business_type` VARCHAR(50) DEFAULT NULL COMMENT '业务类型',
     `business_key` BIGINT UNSIGNED DEFAULT NULL COMMENT '业务key',
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态(0:未读;1:已读;)',
     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
@@ -517,10 +544,10 @@ CREATE TABLE IF NOT EXISTS `sys_message`  (
 CREATE TABLE IF NOT EXISTS `sys_role`  (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
-  `name` varchar(30) NOT NULL COMMENT '名称',
-  `path` text NOT NULL COMMENT '菜单权限(以,隔开)',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `name` VARCHAR(30) NOT NULL COMMENT '名称',
+  `path` TEXT NOT NULL COMMENT '菜单权限(以,隔开)',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统角色';
 
@@ -529,8 +556,8 @@ CREATE TABLE IF NOT EXISTS `user_role` (
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
     `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id',
     `role_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '角色id',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户角色';
 

@@ -1,5 +1,6 @@
 package com.seagox.lowcode.business.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,8 +26,9 @@ public class Inspection {
     private Long stageId;
 
     /**
-     * 项目阶段条目
+     * 验收项
      */
+    @TableField(exist = false)
     private String inspectionItems;
 
     /**
@@ -44,11 +46,13 @@ public class Inspection {
     /**
      * 参与人员
      */
+    @TableField(exist = false)
     private String participants;
 
     /**
      * 签字信息
      */
+    @TableField(exist = false)
     private String signatures;
 
     /**

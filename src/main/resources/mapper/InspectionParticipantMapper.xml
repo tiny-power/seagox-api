@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.InspectionParticipantMapper">
+    <select id="queryByInspectionId" resultType="camelKeyMap">
+        SELECT a.id,
+               a.user_id AS "userId",
+               a.user_id AS "accountId",
+               a.user_id AS "backendUserId",
+               a.project_member_id AS "projectMemberId",
+               a.role_name AS "roleName",
+               a.role_name AS "role",
+               u.name,
+               u.name AS "userName",
+               u.avatar,
+               u.phone,
+               a.signature_url AS "signatureUrl",
+               a.signature_url AS "url",
+               a.signature_url AS "filePath",
+               CASE WHEN a.signature_url IS NULL OR a.signature_url = '' THEN false ELSE true END AS "signed",
+               a.signed_at AS "signedAt",
+               a.created_at AS "createdAt",
+               a.updated_at AS "updatedAt"
+        FROM inspection_participant a
+        LEFT JOIN sys_account u ON u.id = a.user_id
+        WHERE a.inspection_id = #{inspectionId}
+        ORDER BY a.id ASC
+    </select>
+</mapper>

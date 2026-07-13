@@ -6,14 +6,10 @@
         SELECT a.id,
                a.project_id AS "projectId",
                a.stage_id AS "stageId",
-               a.inspection_items AS "inspectionItems",
-               a.inspection_items AS "items",
                a.plan_inspection_time AS "planInspectionTime",
                a.plan_inspection_time AS "inspectionTime",
                a.site_photos AS "sitePhotos",
                a.site_photos AS "photos",
-               a.participants,
-               a.signatures,
                a.passed_at AS "passedAt",
                a.acceptance_comments AS "acceptanceComments",
                a.acceptance_comments AS "comments",
@@ -66,20 +62,24 @@
                         AND (
                             a.created_by = #{params.viewerUserId}
                             OR a.inspector_id = #{params.viewerUserId}
-                            OR a.participants LIKE CONCAT('%"userId":', #{params.viewerUserId}, '%')
-                            OR a.participants LIKE CONCAT('%"userId":"', #{params.viewerUserId}, '"%')
-                            OR a.participants LIKE CONCAT('%"userId"%', #{params.viewerUserId}, '%')
-                            OR a.participants LIKE CONCAT('%"accountId"%', #{params.viewerUserId}, '%')
+                            OR EXISTS (
+                                SELECT 1
+                                FROM inspection_participant ip
+                                WHERE ip.inspection_id = a.id
+                                  AND ip.user_id = #{params.viewerUserId}
+                            )
                         )
                     </when>
                     <otherwise>
                         AND (
                             a.created_by = #{params.viewerUserId}
                             OR a.inspector_id = #{params.viewerUserId}
-                            OR a.participants LIKE '%"userId":' || #{params.viewerUserId} || '%'
-                            OR a.participants LIKE '%"userId":"' || #{params.viewerUserId} || '"%'
-                            OR a.participants LIKE '%"userId"%' || #{params.viewerUserId} || '%'
-                            OR a.participants LIKE '%"accountId"%' || #{params.viewerUserId} || '%'
+                            OR EXISTS (
+                                SELECT 1
+                                FROM inspection_participant ip
+                                WHERE ip.inspection_id = a.id
+                                  AND ip.user_id = #{params.viewerUserId}
+                            )
                         )
                     </otherwise>
                 </choose>
@@ -111,14 +111,10 @@
         SELECT a.id,
                a.project_id AS "projectId",
                a.stage_id AS "stageId",
-               a.inspection_items AS "inspectionItems",
-               a.inspection_items AS "items",
                a.plan_inspection_time AS "planInspectionTime",
                a.plan_inspection_time AS "inspectionTime",
                a.site_photos AS "sitePhotos",
                a.site_photos AS "photos",
-               a.participants,
-               a.signatures,
                a.passed_at AS "passedAt",
                a.acceptance_comments AS "acceptanceComments",
                a.acceptance_comments AS "comments",
