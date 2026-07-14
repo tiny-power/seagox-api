@@ -133,17 +133,16 @@
     <select id="queryReadyItem" resultType="camelKeyMap">
         SELECT
             id,
-            title AS name,
+            business_title AS name,
             business_type AS businessType,
-            business_key AS businessKey,
+            business_id AS businessKey,
             DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createTime
-        FROM sys_message
+        FROM sys_process_draft
         <where>
-            type = 1
-            AND company_id = #{companyId}
-            AND to_user_id = #{userId}
+            company_id = #{companyId}
+            AND user_id = #{userId}
             <if test="name != null and name != ''">
-                AND title LIKE CONCAT('%', #{name}, '%')
+                AND business_title LIKE CONCAT('%', #{name}, '%')
             </if>
             <if test="businessTypeStr != null and businessTypeStr != ''">
                 AND FIND_IN_SET(business_type, #{businessTypeStr})

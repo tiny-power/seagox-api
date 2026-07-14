@@ -185,7 +185,7 @@ public class ConstructionLogService implements IConstructionLogService {
             }
             SysMessage message = new SysMessage();
             message.setCompanyId(companyId);
-            message.setType(11);
+            message.setType(10);
             message.setFromUserId(userId);
             message.setToUserId(toUserId);
             message.setTitle("您有一条新的施工日记");

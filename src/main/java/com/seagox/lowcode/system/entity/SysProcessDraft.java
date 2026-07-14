@@ -1,17 +1,16 @@
 package com.seagox.lowcode.system.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
-
 /**
- * 消息表
+ * 流程待发事项
  */
-public class SysMessage {
+public class SysProcessDraft {
 
     /**
-     * id
+     * 主键
      */
     private Long id;
 
@@ -21,24 +20,9 @@ public class SysMessage {
     private Long companyId;
 
     /**
-     * 类型(1:系统通知;2:管家提醒;3:需求表;4:方案设计;5:施工图出图;6:验收单;7:请假单;8:请款单;9:交接单;10:实施日记;11:问题单;)
+     * 待发事项所属用户
      */
-    private Integer type;
-
-    /**
-     * 用户id(来自)
-     */
-    private Long fromUserId;
-
-    /**
-     * 用户id(给谁)
-     */
-    private Long toUserId;
-
-    /**
-     * 标题
-     */
-    private String title;
+    private Long userId;
 
     /**
      * 业务类型
@@ -46,14 +30,24 @@ public class SysMessage {
     private String businessType;
 
     /**
-     * 业务key
+     * 业务数据ID
      */
-    private Long businessKey;
+    private Long businessId;
 
     /**
-     * 状态(0:未读;1:已读;)
+     * 业务单号
      */
-    private Integer status;
+    private String businessNo;
+
+    /**
+     * 事项标题
+     */
+    private String businessTitle;
+
+    /**
+     * 摘要信息
+     */
+    private String summary;
 
     /**
      * 创建人
@@ -95,36 +89,12 @@ public class SysMessage {
         this.companyId = companyId;
     }
 
-    public Integer getType() {
-        return type;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Long getFromUserId() {
-        return fromUserId;
-    }
-
-    public void setFromUserId(Long fromUserId) {
-        this.fromUserId = fromUserId;
-    }
-
-    public Long getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(Long toUserId) {
-        this.toUserId = toUserId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getBusinessType() {
@@ -135,20 +105,36 @@ public class SysMessage {
         this.businessType = businessType;
     }
 
-    public Long getBusinessKey() {
-        return businessKey;
+    public Long getBusinessId() {
+        return businessId;
     }
 
-    public void setBusinessKey(Long businessKey) {
-        this.businessKey = businessKey;
+    public void setBusinessId(Long businessId) {
+        this.businessId = businessId;
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getBusinessNo() {
+        return businessNo;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setBusinessNo(String businessNo) {
+        this.businessNo = businessNo;
+    }
+
+    public String getBusinessTitle() {
+        return businessTitle;
+    }
+
+    public void setBusinessTitle(String businessTitle) {
+        this.businessTitle = businessTitle;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Long getCreatedBy() {
@@ -182,5 +168,4 @@ public class SysMessage {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

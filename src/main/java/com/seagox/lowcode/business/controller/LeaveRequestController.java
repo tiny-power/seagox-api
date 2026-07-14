@@ -48,80 +48,20 @@ public class LeaveRequestController {
     public ResultData queryByPage(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                   Long companyId, Long applicantId, String applicantName, Integer leaveType,
-                                  Integer status, String startTime, String endTime) {
+                                  Integer status, String startTime, String endTime, Long userId) {
+        if (applicantId == null && userId != null) {
+            applicantId = userId;
+        }
         return leaveRequestService.queryByPage(pageNo, pageSize, companyId, applicantId, applicantName, leaveType,
-                status, startTime, endTime);
+                status, startTime, endTime, userId);
     }
 
     /**
      * 查询详情
      */
     @GetMapping("/queryById/{id}")
-    public ResultData queryById(@PathVariable Long id) {
-        return leaveRequestService.queryById(id);
-    }
-
-    /**
-     * 小程序分页查询
-     */
-    @GetMapping("/mini/queryByPage")
-    public ResultData miniQueryByPage(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
-                                      @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                      Long companyId, Long userId, Integer status) {
-        return leaveRequestService.miniQueryByPage(pageNo, pageSize, companyId, userId, status);
-    }
-
-    /**
-     * 小程序查询详情
-     */
-    @GetMapping("/mini/queryById/{id}")
-    public ResultData miniQueryById(@PathVariable Long id, Long userId) {
-        return leaveRequestService.miniQueryById(id, userId);
-    }
-
-    /**
-     * 小程序保存草稿
-     */
-    @PostMapping("/mini/saveDraft")
-    @LogPoint("小程序保存请假单草稿")
-    public ResultData miniSaveDraft(@Valid LeaveRequest leaveRequest, Long userId) {
-        return leaveRequestService.miniSaveDraft(leaveRequest, userId);
-    }
-
-    /**
-     * 小程序修改草稿
-     */
-    @PostMapping("/mini/updateDraft")
-    @LogPoint("小程序修改请假单草稿")
-    public ResultData miniUpdateDraft(@Valid LeaveRequest leaveRequest, Long userId) {
-        return leaveRequestService.miniUpdateDraft(leaveRequest, userId);
-    }
-
-    /**
-     * 小程序提交
-     */
-    @PostMapping("/mini/submit")
-    @LogPoint("小程序提交请假单")
-    public ResultData miniSubmit(@Valid LeaveRequest leaveRequest, Long userId) {
-        return leaveRequestService.miniSubmit(leaveRequest, userId);
-    }
-
-    /**
-     * 小程序删除
-     */
-    @PostMapping("/mini/delete/{id}")
-    @LogPoint("小程序删除请假单")
-    public ResultData miniDelete(@PathVariable Long id, Long userId) {
-        return leaveRequestService.miniDelete(id, userId);
-    }
-
-    /**
-     * 小程序撤销
-     */
-    @PostMapping("/mini/cancel/{id}")
-    @LogPoint("小程序撤销请假单")
-    public ResultData miniCancel(@PathVariable Long id, Long userId) {
-        return leaveRequestService.miniCancel(id, userId);
+    public ResultData queryById(@PathVariable Long id, Long userId) {
+        return leaveRequestService.queryById(id, userId);
     }
 
     /**
@@ -129,8 +69,8 @@ public class LeaveRequestController {
      */
     @PostMapping("/insert")
     @LogPoint("新增请假单")
-    public ResultData insert(@Valid LeaveRequest leaveRequest) {
-        return leaveRequestService.insert(leaveRequest);
+    public ResultData insert(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.insert(leaveRequest, userId);
     }
 
     /**
@@ -138,8 +78,8 @@ public class LeaveRequestController {
      */
     @PostMapping("/update")
     @LogPoint("修改请假单")
-    public ResultData update(@Valid LeaveRequest leaveRequest) {
-        return leaveRequestService.update(leaveRequest);
+    public ResultData update(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.update(leaveRequest, userId);
     }
 
     /**
@@ -147,8 +87,8 @@ public class LeaveRequestController {
      */
     @PostMapping("/delete/{id}")
     @LogPoint("删除请假单")
-    public ResultData delete(@PathVariable Long id) {
-        return leaveRequestService.delete(id);
+    public ResultData delete(@PathVariable Long id, Long userId) {
+        return leaveRequestService.delete(id, userId);
     }
 
     /**
@@ -161,12 +101,21 @@ public class LeaveRequestController {
     }
 
     /**
+     * 提交
+     */
+    @PostMapping("/submit")
+    @LogPoint("提交请假单")
+    public ResultData submit(@Valid LeaveRequest leaveRequest, Long userId) {
+        return leaveRequestService.submit(leaveRequest, userId);
+    }
+
+    /**
      * 撤销
      */
     @PostMapping("/cancel/{id}")
     @LogPoint("撤销请假单")
-    public ResultData cancel(@PathVariable Long id) {
-        return leaveRequestService.cancel(id);
+    public ResultData cancel(@PathVariable Long id, Long userId) {
+        return leaveRequestService.cancel(id, userId);
     }
 
     /**

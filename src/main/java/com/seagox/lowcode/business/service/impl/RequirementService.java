@@ -50,7 +50,7 @@ public class RequirementService implements IRequirementService {
     /**
      * 需求表消息类型
      */
-    private static final int MESSAGE_TYPE_REQUIREMENT = 4;
+    private static final int MESSAGE_TYPE_REQUIREMENT = 3;
 
     /**
      * 业主项目角色编码

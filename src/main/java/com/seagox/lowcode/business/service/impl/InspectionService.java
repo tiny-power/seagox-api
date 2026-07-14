@@ -91,7 +91,7 @@ public class InspectionService implements IInspectionService {
     /**
      * 验收单消息类型
      */
-    private static final int MESSAGE_TYPE_INSPECTION = 7;
+    private static final int MESSAGE_TYPE_INSPECTION = 6;
 
     /**
      * 验收单数据访问对象

@@ -22,9 +22,8 @@ import com.seagox.lowcode.business.service.impl.LeaveRequestService;
 import com.seagox.lowcode.business.service.impl.PaymentRequestService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
-import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.mapper.FlowMapper;
-import com.seagox.lowcode.system.mapper.MessageMapper;
+import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 import com.seagox.lowcode.system.service.IFlowService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,6 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,7 +71,7 @@ public class FlowService implements IFlowService {
     private IPaymentRequestService paymentRequestService;
 
     @Autowired
-    private MessageMapper messageMapper;
+    private ProcessDraftMapper processDraftMapper;
 
     @Override
     public ResultData queryTodoItem(Integer pageNo, Integer pageSize, Long companyId, String userId, Long formId,
@@ -165,7 +163,7 @@ public class FlowService implements IFlowService {
                     throw new IllegalArgumentException(submitResult.getMessage());
                 }
                 if (item.getLong("id") != null) {
-                    messageMapper.deleteById(item.getLong("id"));
+                    processDraftMapper.deleteById(item.getLong("id"));
                 }
                 successNum++;
             } catch (Exception e) {
@@ -228,7 +226,6 @@ public class FlowService implements IFlowService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "当前流程已终止,不可以撤回");
         }
         runtimeService.terminateProcessInstance(processInstanceId, "流程撤回");
-        createReadyMessage(instance);
         return ResultData.success(null);
     }
 
@@ -389,29 +386,4 @@ public class FlowService implements IFlowService {
         }
     }
 
-    private void createReadyMessage(WeaveInstance instance) {
-        SysMessage message = new SysMessage();
-        message.setBusinessKey(Long.valueOf(instance.getBusinessKey()));
-        message.setBusinessType(instance.getBusinessType());
-        message.setCompanyId(instance.getCompanyId());
-        message.setFromUserId(instance.getUserId());
-        message.setTitle(instance.getName());
-        message.setToUserId(instance.getUserId());
-        message.setType(getMessageType(instance.getBusinessType()));
-        message.setCreatedBy(instance.getUserId());
-        message.setUpdatedBy(instance.getUserId());
-        message.setCreatedAt(new Date());
-        message.setUpdatedAt(new Date());
-        messageMapper.insert(message);
-    }
-
-    private Integer getMessageType(String businessType) {
-        if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
-            return 8;
-        }
-        if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
-            return 9;
-        }
-        return 1;
-    }
 }

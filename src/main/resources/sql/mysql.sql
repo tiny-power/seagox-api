@@ -526,7 +526,7 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
 CREATE TABLE IF NOT EXISTS `sys_message`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
-    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)',
+    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:系统通知;2:管家提醒;3:需求表;4:方案设计;5:施工图出图;6:验收单;7:请假单;8:请款单;9:交接单;10:实施日记;11:问题单;)',
     `from_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(来自)',
     `to_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(给谁)',
     `title` VARCHAR(50) NOT NULL COMMENT '标题',
@@ -539,6 +539,22 @@ CREATE TABLE IF NOT EXISTS `sys_message`  (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '消息表';
+
+CREATE TABLE IF NOT EXISTS `sys_process_draft` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '待发事项所属用户',
+  `business_type` VARCHAR(50) NOT NULL COMMENT '业务类型',
+  `business_id` BIGINT UNSIGNED NOT NULL COMMENT '业务数据ID',
+  `business_no` VARCHAR(64) DEFAULT NULL COMMENT '业务单号',
+  `business_title` VARCHAR(200) NOT NULL COMMENT '事项标题',
+  `summary` VARCHAR(500) DEFAULT NULL COMMENT '摘要信息',
+  `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '修改人',
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '流程待发事项';
 
 
 CREATE TABLE IF NOT EXISTS `sys_role`  (

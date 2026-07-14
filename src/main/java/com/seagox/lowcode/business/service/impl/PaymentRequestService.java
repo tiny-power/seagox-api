@@ -6,6 +6,7 @@ import app.tinybrief.weave.api.TaskService;
 import app.tinybrief.weave.api.dto.WeaveDefinition;
 import app.tinybrief.weave.api.dto.WeaveInstance;
 import app.tinybrief.weave.api.dto.WeaveTask;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.PaymentRequest;
@@ -15,7 +16,9 @@ import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysAccount;
+import com.seagox.lowcode.system.entity.SysProcessDraft;
 import com.seagox.lowcode.system.mapper.AccountMapper;
+import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,6 +76,12 @@ public class PaymentRequestService implements IPaymentRequestService {
     private AccountMapper accountMapper;
 
     /**
+     * 流程待发事项数据访问对象
+     */
+    @Autowired
+    private ProcessDraftMapper processDraftMapper;
+
+    /**
      * 流程定义服务
      */
     @Autowired
@@ -119,6 +128,7 @@ public class PaymentRequestService implements IPaymentRequestService {
     /**
      * 新增请款单
      */
+    @Transactional
     @Override
     public ResultData insert(PaymentRequest paymentRequest) {
         ResultData verifyResult = verify(paymentRequest);
@@ -131,12 +141,14 @@ public class PaymentRequestService implements IPaymentRequestService {
         paymentRequest.setCreatedAt(now);
         paymentRequest.setUpdatedAt(now);
         paymentRequestMapper.insert(paymentRequest);
+        saveProcessDraft(paymentRequest);
         return ResultData.success(paymentRequest.getId());
     }
 
     /**
      * 修改请款单
      */
+    @Transactional
     @Override
     public ResultData update(PaymentRequest paymentRequest) {
         PaymentRequest original = paymentRequestMapper.selectById(paymentRequest.getId());
@@ -159,6 +171,11 @@ public class PaymentRequestService implements IPaymentRequestService {
         paymentRequest.setCreatedAt(original.getCreatedAt());
         paymentRequest.setUpdatedAt(new Date());
         paymentRequestMapper.updateById(paymentRequest);
+        if (Integer.valueOf(STATUS_DRAFT).equals(paymentRequest.getStatus())) {
+            saveProcessDraft(paymentRequest);
+        } else {
+            deleteProcessDraft(paymentRequest);
+        }
         return ResultData.success(null);
     }
 
@@ -179,6 +196,7 @@ public class PaymentRequestService implements IPaymentRequestService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已通过的请款单不可以删除");
         }
         clearProcess(paymentRequest.getCompanyId(), BUSINESS_TYPE, String.valueOf(id));
+        deleteProcessDraft(paymentRequest);
         paymentRequestMapper.deleteById(id);
         return ResultData.success(null);
     }
@@ -217,6 +235,7 @@ public class PaymentRequestService implements IPaymentRequestService {
         paymentRequest.setSubmitTime(new Date());
         paymentRequest.setUpdatedAt(new Date());
         paymentRequestMapper.updateById(paymentRequest);
+        deleteProcessDraft(paymentRequest);
         return ResultData.success(null);
     }
 
@@ -311,6 +330,60 @@ public class PaymentRequestService implements IPaymentRequestService {
      */
     private void terminateProcess(Long companyId, String businessType, String businessKey) {
         runtimeService.terminateProcessInstanceByBusinessKey(businessType, businessKey, companyId, "流程撤销");
+    }
+
+    /**
+     * 保存流程待发事项
+     */
+    private void saveProcessDraft(PaymentRequest paymentRequest) {
+        if (paymentRequest == null || paymentRequest.getId() == null
+                || !Integer.valueOf(STATUS_DRAFT).equals(paymentRequest.getStatus())) {
+            return;
+        }
+        deleteProcessDraft(paymentRequest);
+        Date now = new Date();
+        SysProcessDraft draft = new SysProcessDraft();
+        draft.setCompanyId(paymentRequest.getCompanyId());
+        draft.setUserId(paymentRequest.getApplicantId());
+        draft.setBusinessType(BUSINESS_TYPE);
+        draft.setBusinessId(paymentRequest.getId());
+        draft.setBusinessTitle(buildFlowTitle(paymentRequest));
+        draft.setSummary(buildDraftSummary(paymentRequest));
+        draft.setCreatedBy(paymentRequest.getApplicantId());
+        draft.setCreatedAt(now);
+        draft.setUpdatedBy(paymentRequest.getApplicantId());
+        draft.setUpdatedAt(now);
+        processDraftMapper.insert(draft);
+    }
+
+    /**
+     * 删除流程待发事项
+     */
+    private void deleteProcessDraft(PaymentRequest paymentRequest) {
+        if (paymentRequest == null || paymentRequest.getId() == null || paymentRequest.getCompanyId() == null) {
+            return;
+        }
+        processDraftMapper.delete(new LambdaQueryWrapper<SysProcessDraft>()
+                .eq(SysProcessDraft::getCompanyId, paymentRequest.getCompanyId())
+                .eq(SysProcessDraft::getBusinessType, BUSINESS_TYPE)
+                .eq(SysProcessDraft::getBusinessId, paymentRequest.getId()));
+    }
+
+    /**
+     * 构建待发摘要
+     */
+    private String buildDraftSummary(PaymentRequest paymentRequest) {
+        return limitSummary("请款金额：" + paymentRequest.getAmount() + "，事由：" + paymentRequest.getReason());
+    }
+
+    /**
+     * 限制待发摘要长度
+     */
+    private String limitSummary(String summary) {
+        if (summary == null || summary.length() <= 500) {
+            return summary;
+        }
+        return summary.substring(0, 500);
     }
 
     /**

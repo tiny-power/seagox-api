@@ -38,7 +38,7 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
     public static final int STATUS_PENDING = 2;
     public static final int STATUS_ARCHIVED = 3;
     private static final String BUSINESS_TYPE = "construction_drawing";
-    private static final int MESSAGE_TYPE_CONSTRUCTION_DRAWING = 6;
+    private static final int MESSAGE_TYPE_CONSTRUCTION_DRAWING = 5;
 
     @Autowired
     private ConstructionDrawingMapper constructionDrawingMapper;

@@ -17,8 +17,10 @@ import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.Company;
 import com.seagox.lowcode.system.entity.SysAccount;
+import com.seagox.lowcode.system.entity.SysProcessDraft;
 import com.seagox.lowcode.system.mapper.AccountMapper;
 import com.seagox.lowcode.system.mapper.CompanyMapper;
+import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 import com.seagox.lowcode.util.ExportUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +89,12 @@ public class LeaveRequestService implements ILeaveRequestService {
     private CompanyMapper companyMapper;
 
     /**
+     * 流程待发事项数据访问对象
+     */
+    @Autowired
+    private ProcessDraftMapper processDraftMapper;
+
+    /**
      * 流程定义服务
      */
     @Autowired
@@ -110,161 +118,27 @@ public class LeaveRequestService implements ILeaveRequestService {
     @Override
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long applicantId,
                                   String applicantName, Integer leaveType, Integer status, String startTime,
-                                  String endTime) {
+                                  String endTime, Long userId) {
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = leaveRequestMapper.queryByPage(companyId, applicantId, applicantName,
                 leaveType, status, startTime, endTime);
+        if (userId != null) {
+            Map<String, String> todoNodeMap = queryTodoNodeMap(companyId, userId);
+            for (Map<String, Object> item : list) {
+                boolean pendingReviewer = todoNodeMap.containsKey(String.valueOf(item.get("id")));
+                item.put("role", pendingReviewer ? "reviewer" : "applicant");
+                item.put("pendingReviewer", pendingReviewer);
+            }
+        }
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
         return ResultData.success(pageInfo);
-    }
-
-    /**
-     * 小程序分页查询请假单
-     */
-    @Override
-    public ResultData miniQueryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status) {
-        if (userId == null) {
-            return ResultData.success(page(new ArrayList<>(), pageNo, pageSize));
-        }
-        List<Map<String, Object>> source = leaveRequestMapper.queryByPage(companyId, userId, null, null, status, null, null);
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Map<String, Object> item : source) {
-            item.put("role", "applicant");
-            item.put("pendingReviewer", false);
-            result.add(item);
-        }
-        return ResultData.success(page(result, pageNo, pageSize));
-    }
-
-    /**
-     * 小程序查询请假单详情
-     */
-    @Override
-    public ResultData miniQueryById(Long id, Long userId) {
-        ResultData result = queryById(id);
-        if (result.getCode() != ResultCode.SUCCESS.getCode()) {
-            return result;
-        }
-        Map<String, Object> data = (Map<String, Object>) result.getData();
-        Long applicantId = toLong(data.get("applicantId"));
-        Map<String, String> todoNodeMap = queryTodoNodeMap(toLong(data.get("companyId")), userId);
-        boolean applicant = userId != null && userId.equals(applicantId);
-        boolean reviewer = todoNodeMap.containsKey(String.valueOf(id));
-        if (!applicant && !reviewer) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "无权查看请假单");
-        }
-        data.put("role", applicant ? "applicant" : "reviewer");
-        data.put("pendingReviewer", reviewer);
-        data.put("currentNode", todoNodeMap.get(String.valueOf(id)));
-        return ResultData.success(data);
-    }
-
-    /**
-     * 小程序保存草稿
-     */
-    @Override
-    public ResultData miniSaveDraft(LeaveRequest leaveRequest, Long userId) {
-        leaveRequest.setApplicantId(userId);
-        ResultData verifyResult = verify(leaveRequest);
-        if (verifyResult != null) {
-            return verifyResult;
-        }
-        leaveRequest.setStatus(STATUS_DRAFT);
-        leaveRequestMapper.insert(leaveRequest);
-        return ResultData.success(leaveRequest.getId());
-    }
-
-    /**
-     * 小程序修改草稿
-     */
-    @Override
-    public ResultData miniUpdateDraft(LeaveRequest leaveRequest, Long userId) {
-        LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
-        ResultData ownerResult = verifyOwner(original, userId);
-        if (ownerResult != null) {
-            return ownerResult;
-        }
-        if (!Integer.valueOf(STATUS_DRAFT).equals(original.getStatus())) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "只有草稿可以修改");
-        }
-        leaveRequest.setCompanyId(original.getCompanyId());
-        leaveRequest.setApplicantId(userId);
-        leaveRequest.setStatus(original.getStatus());
-        ResultData verifyResult = verify(leaveRequest);
-        if (verifyResult != null) {
-            return verifyResult;
-        }
-        leaveRequestMapper.updateById(leaveRequest);
-        return ResultData.success(leaveRequest.getId());
-    }
-
-    /**
-     * 小程序提交请假单
-     */
-    @Transactional
-    @Override
-    public ResultData miniSubmit(LeaveRequest leaveRequest, Long userId) {
-        if (leaveRequest.getId() == null) {
-            ResultData saveResult = miniSaveDraft(leaveRequest, userId);
-            if (saveResult.getCode() != ResultCode.SUCCESS.getCode()) {
-                return saveResult;
-            }
-            leaveRequest.setId((Long) saveResult.getData());
-        } else {
-            LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
-            ResultData ownerResult = verifyOwner(original, userId);
-            if (ownerResult != null) {
-                return ownerResult;
-            }
-            if (Integer.valueOf(STATUS_APPROVING).equals(original.getStatus())) {
-                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单正在审批中");
-            }
-            if (Integer.valueOf(STATUS_APPROVED).equals(original.getStatus())) {
-                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单已经审批通过");
-            }
-            leaveRequest.setCompanyId(original.getCompanyId());
-            leaveRequest.setApplicantId(userId);
-            leaveRequest.setStatus(original.getStatus());
-            ResultData verifyResult = verify(leaveRequest);
-            if (verifyResult != null) {
-                return verifyResult;
-            }
-            leaveRequestMapper.updateById(leaveRequest);
-        }
-        return submit(leaveRequest.getId());
-    }
-
-    /**
-     * 小程序删除草稿
-     */
-    @Override
-    public ResultData miniDelete(Long id, Long userId) {
-        LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
-        ResultData ownerResult = verifyOwner(leaveRequest, userId);
-        if (ownerResult != null) {
-            return ownerResult;
-        }
-        return delete(id);
-    }
-
-    /**
-     * 小程序撤销审批
-     */
-    @Override
-    public ResultData miniCancel(Long id, Long userId) {
-        LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
-        ResultData ownerResult = verifyOwner(leaveRequest, userId);
-        if (ownerResult != null) {
-            return ownerResult;
-        }
-        return cancel(id);
     }
 
     /**
      * 查询请假单详情
      */
     @Override
-    public ResultData queryById(Long id) {
+    public ResultData queryById(Long id, Long userId) {
         LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
         if (leaveRequest == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
@@ -284,31 +158,54 @@ public class LeaveRequestService implements ILeaveRequestService {
         data.put("status", leaveRequest.getStatus());
         data.put("submitTime", formatDate(leaveRequest.getSubmitTime()));
         data.put("createdAt", formatDate(leaveRequest.getCreatedAt()));
+        if (userId != null) {
+            Map<String, String> todoNodeMap = queryTodoNodeMap(leaveRequest.getCompanyId(), userId);
+            boolean applicantRole = userId.equals(leaveRequest.getApplicantId());
+            boolean reviewer = todoNodeMap.containsKey(String.valueOf(id));
+            if (!applicantRole && !reviewer) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "无权查看请假单");
+            }
+            data.put("role", applicantRole ? "applicant" : "reviewer");
+            data.put("pendingReviewer", reviewer);
+            data.put("currentNode", todoNodeMap.get(String.valueOf(id)));
+        }
         return ResultData.success(data);
     }
 
     /**
      * 新增请假单
      */
+    @Transactional
     @Override
-    public ResultData insert(LeaveRequest leaveRequest) {
+    public ResultData insert(LeaveRequest leaveRequest, Long userId) {
+        if (leaveRequest.getApplicantId() == null) {
+            leaveRequest.setApplicantId(userId);
+        }
         ResultData verifyResult = verify(leaveRequest);
         if (verifyResult != null) {
             return verifyResult;
         }
         leaveRequest.setStatus(STATUS_DRAFT);
         leaveRequestMapper.insert(leaveRequest);
-        return ResultData.success(null);
+        saveProcessDraft(leaveRequest);
+        return ResultData.success(leaveRequest.getId());
     }
 
     /**
      * 修改请假单
      */
+    @Transactional
     @Override
-    public ResultData update(LeaveRequest leaveRequest) {
+    public ResultData update(LeaveRequest leaveRequest, Long userId) {
         LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
         if (original == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+        }
+        if (userId != null) {
+            ResultData ownerResult = verifyOwner(original, userId);
+            if (ownerResult != null) {
+                return ownerResult;
+            }
         }
         if (Integer.valueOf(STATUS_APPROVING).equals(original.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "审批中的请假单不可以修改");
@@ -316,13 +213,65 @@ public class LeaveRequestService implements ILeaveRequestService {
         if (Integer.valueOf(STATUS_APPROVED).equals(original.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已通过的请假单不可以修改");
         }
+        if (userId != null) {
+            leaveRequest.setCompanyId(original.getCompanyId());
+            leaveRequest.setApplicantId(userId);
+        }
         ResultData verifyResult = verify(leaveRequest);
         if (verifyResult != null) {
             return verifyResult;
         }
         leaveRequest.setStatus(original.getStatus());
         leaveRequestMapper.updateById(leaveRequest);
+        if (Integer.valueOf(STATUS_DRAFT).equals(leaveRequest.getStatus())) {
+            saveProcessDraft(leaveRequest);
+        } else {
+            deleteProcessDraft(leaveRequest);
+        }
         return ResultData.success(null);
+    }
+
+    /**
+     * 提交请假单审批
+     */
+    @Transactional
+    @Override
+    public ResultData submit(LeaveRequest leaveRequest, Long userId) {
+        if (leaveRequest.getId() == null) {
+            if (leaveRequest.getApplicantId() == null) {
+                leaveRequest.setApplicantId(userId);
+            }
+            ResultData insertResult = insert(leaveRequest, userId);
+            if (insertResult.getCode() != ResultCode.SUCCESS.getCode()) {
+                return insertResult;
+            }
+            leaveRequest.setId((Long) insertResult.getData());
+        } else {
+            LeaveRequest original = leaveRequestMapper.selectById(leaveRequest.getId());
+            if (userId != null) {
+                ResultData ownerResult = verifyOwner(original, userId);
+                if (ownerResult != null) {
+                    return ownerResult;
+                }
+            }
+            if (original == null) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+            }
+            if (Integer.valueOf(STATUS_APPROVING).equals(original.getStatus())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单正在审批中");
+            }
+            if (Integer.valueOf(STATUS_APPROVED).equals(original.getStatus())) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "请假单已经审批通过");
+            }
+            leaveRequest.setCompanyId(original.getCompanyId());
+            leaveRequest.setApplicantId(userId == null ? original.getApplicantId() : userId);
+            leaveRequest.setStatus(original.getStatus());
+            ResultData updateResult = update(leaveRequest, userId);
+            if (updateResult.getCode() != ResultCode.SUCCESS.getCode()) {
+                return updateResult;
+            }
+        }
+        return submit(leaveRequest.getId());
     }
 
     /**
@@ -330,10 +279,16 @@ public class LeaveRequestService implements ILeaveRequestService {
      */
     @Transactional
     @Override
-    public ResultData delete(Long id) {
+    public ResultData delete(Long id, Long userId) {
         LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
         if (leaveRequest == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+        }
+        if (userId != null) {
+            ResultData ownerResult = verifyOwner(leaveRequest, userId);
+            if (ownerResult != null) {
+                return ownerResult;
+            }
         }
         if (Integer.valueOf(STATUS_APPROVING).equals(leaveRequest.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "审批中的请假单不可以删除");
@@ -342,6 +297,7 @@ public class LeaveRequestService implements ILeaveRequestService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已通过的请假单不可以删除");
         }
         clearProcess(leaveRequest.getCompanyId(), BUSINESS_TYPE, String.valueOf(id));
+        deleteProcessDraft(leaveRequest);
         leaveRequestMapper.deleteById(id);
         return ResultData.success(null);
     }
@@ -378,6 +334,7 @@ public class LeaveRequestService implements ILeaveRequestService {
         leaveRequest.setStatus(processStatus == 1 ? STATUS_APPROVED : STATUS_APPROVING);
         leaveRequest.setSubmitTime(new Date());
         leaveRequestMapper.updateById(leaveRequest);
+        deleteProcessDraft(leaveRequest);
         return ResultData.success(null);
     }
 
@@ -386,10 +343,16 @@ public class LeaveRequestService implements ILeaveRequestService {
      */
     @Transactional
     @Override
-    public ResultData cancel(Long id) {
+    public ResultData cancel(Long id, Long userId) {
         LeaveRequest leaveRequest = leaveRequestMapper.selectById(id);
         if (leaveRequest == null) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "请假单不存在");
+        }
+        if (userId != null) {
+            ResultData ownerResult = verifyOwner(leaveRequest, userId);
+            if (ownerResult != null) {
+                return ownerResult;
+            }
         }
         if (!Integer.valueOf(STATUS_APPROVING).equals(leaveRequest.getStatus())) {
             return ResultData.warn(ResultCode.OTHER_ERROR, "只有审批中的请假单可以撤销");
@@ -419,7 +382,62 @@ public class LeaveRequestService implements ILeaveRequestService {
             leaveRequest.setReason(model.getReason());
             leaveRequest.setStatus(STATUS_DRAFT);
             leaveRequestMapper.insert(leaveRequest);
+            saveProcessDraft(leaveRequest);
         }
+    }
+
+    /**
+     * 保存流程待发事项
+     */
+    private void saveProcessDraft(LeaveRequest leaveRequest) {
+        if (leaveRequest == null || leaveRequest.getId() == null
+                || !Integer.valueOf(STATUS_DRAFT).equals(leaveRequest.getStatus())) {
+            return;
+        }
+        deleteProcessDraft(leaveRequest);
+        Date now = new Date();
+        SysProcessDraft draft = new SysProcessDraft();
+        draft.setCompanyId(leaveRequest.getCompanyId());
+        draft.setUserId(leaveRequest.getApplicantId());
+        draft.setBusinessType(BUSINESS_TYPE);
+        draft.setBusinessId(leaveRequest.getId());
+        draft.setBusinessTitle(buildFlowTitle(leaveRequest));
+        draft.setSummary(buildDraftSummary(leaveRequest));
+        draft.setCreatedBy(leaveRequest.getApplicantId());
+        draft.setCreatedAt(now);
+        draft.setUpdatedBy(leaveRequest.getApplicantId());
+        draft.setUpdatedAt(now);
+        processDraftMapper.insert(draft);
+    }
+
+    /**
+     * 删除流程待发事项
+     */
+    private void deleteProcessDraft(LeaveRequest leaveRequest) {
+        if (leaveRequest == null || leaveRequest.getId() == null || leaveRequest.getCompanyId() == null) {
+            return;
+        }
+        processDraftMapper.delete(new LambdaQueryWrapper<SysProcessDraft>()
+                .eq(SysProcessDraft::getCompanyId, leaveRequest.getCompanyId())
+                .eq(SysProcessDraft::getBusinessType, BUSINESS_TYPE)
+                .eq(SysProcessDraft::getBusinessId, leaveRequest.getId()));
+    }
+
+    /**
+     * 构建待发摘要
+     */
+    private String buildDraftSummary(LeaveRequest leaveRequest) {
+        return limitSummary("请假时长：" + leaveRequest.getDuration() + "，事由：" + leaveRequest.getReason());
+    }
+
+    /**
+     * 限制待发摘要长度
+     */
+    private String limitSummary(String summary) {
+        if (summary == null || summary.length() <= 500) {
+            return summary;
+        }
+        return summary.substring(0, 500);
     }
 
     /**

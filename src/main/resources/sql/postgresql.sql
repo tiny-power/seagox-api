@@ -866,7 +866,7 @@ CREATE TABLE IF NOT EXISTS "public"."sys_message" (
 );
 COMMENT ON COLUMN "public"."sys_message"."id" IS '主键';
 COMMENT ON COLUMN "public"."sys_message"."company_id" IS '公司id';
-COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:暂存数据;2:系统通知;3:管家提醒;4:需求表;5:方案设计;6:施工图出图;7:验收单;8:请假单;9:请款单;10:交接单;11:实施日记;12:问题单;)';
+COMMENT ON COLUMN "public"."sys_message"."type" IS '类型(1:系统通知;2:管家提醒;3:需求表;4:方案设计;5:施工图出图;6:验收单;7:请假单;8:请款单;9:交接单;10:实施日记;11:问题单;)';
 COMMENT ON COLUMN "public"."sys_message"."from_user_id" IS '用户id(来自)';
 COMMENT ON COLUMN "public"."sys_message"."to_user_id" IS '用户id(给谁)';
 COMMENT ON COLUMN "public"."sys_message"."title" IS '标题';
@@ -878,6 +878,34 @@ COMMENT ON COLUMN "public"."sys_message"."created_at" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_message"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."sys_message"."updated_at" IS '修改时间';
 COMMENT ON TABLE "public"."sys_message" IS '消息表';
+
+CREATE TABLE IF NOT EXISTS "public"."sys_process_draft" (
+	"id" BIGSERIAL PRIMARY KEY NOT NULL,
+	"company_id" BIGINT NOT NULL,
+	"user_id" BIGINT NOT NULL,
+	"business_type" VARCHAR(50) NOT NULL,
+	"business_id" BIGINT NOT NULL,
+	"business_no" VARCHAR(64),
+	"business_title" VARCHAR(200) NOT NULL,
+	"summary" VARCHAR(500),
+	"created_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"updated_by" BIGINT,
+	"updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN "public"."sys_process_draft"."id" IS '主键';
+COMMENT ON COLUMN "public"."sys_process_draft"."company_id" IS '公司id';
+COMMENT ON COLUMN "public"."sys_process_draft"."user_id" IS '待发事项所属用户';
+COMMENT ON COLUMN "public"."sys_process_draft"."business_type" IS '业务类型';
+COMMENT ON COLUMN "public"."sys_process_draft"."business_id" IS '业务数据ID';
+COMMENT ON COLUMN "public"."sys_process_draft"."business_no" IS '业务单号';
+COMMENT ON COLUMN "public"."sys_process_draft"."business_title" IS '事项标题';
+COMMENT ON COLUMN "public"."sys_process_draft"."summary" IS '摘要信息';
+COMMENT ON COLUMN "public"."sys_process_draft"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."sys_process_draft"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_process_draft"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."sys_process_draft"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."sys_process_draft" IS '流程待发事项';
 
 CREATE TABLE IF NOT EXISTS "public"."sys_role" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,

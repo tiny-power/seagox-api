@@ -37,7 +37,7 @@ public class SolutionDesignService implements ISolutionDesignService {
     public static final int STATUS_DEFROSTING = 5;
     public static final int STATUS_COMPLETED = 6;
     private static final String BUSINESS_TYPE = "solution_design";
-    private static final int MESSAGE_TYPE_SOLUTION_DESIGN = 5;
+    private static final int MESSAGE_TYPE_SOLUTION_DESIGN = 4;
     private static final int ROLE_OWNER = 10;
 
     @Autowired

@@ -36,7 +36,7 @@ public class RepairService implements IRepairService {
     public static final int STATUS_CANCELED = 5;
 
     private static final String BUSINESS_TYPE = "repair";
-    private static final int MESSAGE_TYPE_REPAIR_ASSIGN = 3;
+    private static final int MESSAGE_TYPE_REPAIR_ASSIGN = 2;
 
     @Autowired
     private RepairMapper repairMapper;

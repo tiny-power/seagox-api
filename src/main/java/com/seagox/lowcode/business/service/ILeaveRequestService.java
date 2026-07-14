@@ -19,62 +19,27 @@ public interface ILeaveRequestService {
      */
     public ResultData queryByPage(Integer pageNo, Integer pageSize, Long companyId, Long applicantId,
                                   String applicantName, Integer leaveType, Integer status, String startTime,
-                                  String endTime);
-
-    /**
-     * 小程序分页查询
-     */
-    public ResultData miniQueryByPage(Integer pageNo, Integer pageSize, Long companyId, Long userId, Integer status);
-
-    /**
-     * 小程序查询详情
-     */
-    public ResultData miniQueryById(Long id, Long userId);
-
-    /**
-     * 小程序保存草稿
-     */
-    public ResultData miniSaveDraft(LeaveRequest leaveRequest, Long userId);
-
-    /**
-     * 小程序修改草稿
-     */
-    public ResultData miniUpdateDraft(LeaveRequest leaveRequest, Long userId);
-
-    /**
-     * 小程序提交
-     */
-    public ResultData miniSubmit(LeaveRequest leaveRequest, Long userId);
-
-    /**
-     * 小程序删除草稿
-     */
-    public ResultData miniDelete(Long id, Long userId);
-
-    /**
-     * 小程序撤销审批
-     */
-    public ResultData miniCancel(Long id, Long userId);
+                                  String endTime, Long userId);
 
     /**
      * 查询详情
      */
-    public ResultData queryById(Long id);
+    public ResultData queryById(Long id, Long userId);
 
     /**
      * 新增
      */
-    public ResultData insert(LeaveRequest leaveRequest);
+    public ResultData insert(LeaveRequest leaveRequest, Long userId);
 
     /**
      * 修改
      */
-    public ResultData update(LeaveRequest leaveRequest);
+    public ResultData update(LeaveRequest leaveRequest, Long userId);
 
     /**
      * 删除
      */
-    public ResultData delete(Long id);
+    public ResultData delete(Long id, Long userId);
 
     /**
      * 提交
@@ -82,9 +47,14 @@ public interface ILeaveRequestService {
     public ResultData submit(Long id);
 
     /**
+     * 提交
+     */
+    public ResultData submit(LeaveRequest leaveRequest, Long userId);
+
+    /**
      * 撤销
      */
-    public ResultData cancel(Long id);
+    public ResultData cancel(Long id, Long userId);
 
     /**
      * 导入
