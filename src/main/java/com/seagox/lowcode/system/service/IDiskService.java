@@ -19,6 +19,11 @@ public interface IDiskService {
     public ResultData previewArchive(Long companyId, Long id);
 
     /**
+     * 通过文件地址预览压缩包目录
+     */
+    public ResultData previewArchiveUrl(Long companyId, String url, String name);
+
+    /**
      * 新增文件夹
      */
     public ResultData insertFolder(Long companyId, Long userId, Disk disk);

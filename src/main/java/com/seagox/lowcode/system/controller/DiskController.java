@@ -34,6 +34,14 @@ public class DiskController {
     }
 
     /**
+     * 通过文件地址预览压缩包目录
+     */
+    @GetMapping("/previewArchiveUrl")
+    public ResultData previewArchiveUrl(Long companyId, String url, String name) {
+        return diskService.previewArchiveUrl(companyId, url, name);
+    }
+
+    /**
      * 新增文件夹
      */
     @PostMapping("/insertFolder")

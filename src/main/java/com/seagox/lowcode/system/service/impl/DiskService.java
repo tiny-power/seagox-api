@@ -125,6 +125,53 @@ public class DiskService implements IDiskService {
         }
     }
 
+    @Override
+    public ResultData previewArchiveUrl(Long companyId, String url, String name) {
+        if (StringUtils.isEmpty(url)) {
+            return ResultData.warn(ResultCode.PARAMETER_ERROR, "文件地址不能为空");
+        }
+        String archiveName = StringUtils.isEmpty(name) ? fileNameOf(url) : name;
+        String archiveType = getFileType(archiveName);
+        if (StringUtils.isEmpty(archiveType)) {
+            archiveType = getFileType(url);
+        }
+        if (!isSupportedArchive(archiveType)) {
+            return ResultData.warn(ResultCode.PARAMETER_ERROR, "仅支持zip、rar、7z压缩文件预览");
+        }
+
+        Disk disk = new Disk();
+        disk.setId(Math.abs((long) (url + archiveName).hashCode()));
+        disk.setCompanyId(companyId);
+        disk.setName(archiveName);
+        disk.setUrl(url);
+        disk.setType(archiveType);
+        disk.setSize(0L);
+
+        String cacheKey = buildArchiveUrlCacheKey(disk);
+        Object cached = ARCHIVE_PREVIEW_CACHE.get(cacheKey);
+        if (cached != null) {
+            return ResultData.success(cached);
+        }
+
+        File archiveFile = null;
+        try {
+            archiveFile = downloadArchive(disk);
+            Object preview = extractArchive(disk, archiveFile);
+            ARCHIVE_PREVIEW_CACHE.put(cacheKey, preview);
+            return ResultData.success(preview);
+        } catch (ArchivePreviewException e) {
+            e.printStackTrace();
+            return ResultData.warn(ResultCode.OTHER_ERROR, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultData.warn(ResultCode.OTHER_ERROR, "压缩包解析失败");
+        } finally {
+            if (archiveFile != null && archiveFile.exists()) {
+                archiveFile.delete();
+            }
+        }
+    }
+
     @Transactional
     @Override
     public ResultData insertFolder(Long companyId, Long userId, Disk disk) {
@@ -300,8 +347,16 @@ public class DiskService implements IDiskService {
         return disk.getId() + "_" + updatedTime + "_" + (disk.getSize() == null ? 0L : disk.getSize());
     }
 
+    private String buildArchiveUrlCacheKey(Disk disk) {
+        return "url_" + disk.getName() + "_" + disk.getUrl() + "_" + (disk.getSize() == null ? 0L : disk.getSize());
+    }
+
     private File downloadArchive(Disk disk) throws Exception {
-        File archiveFile = File.createTempFile("disk-archive-" + disk.getId() + "-", "." + getSuffix(disk.getName()));
+        String suffix = getSuffix(disk.getName());
+        if (StringUtils.isEmpty(suffix)) {
+            suffix = disk.getType();
+        }
+        File archiveFile = File.createTempFile("disk-archive-" + disk.getId() + "-", "." + suffix);
         URLConnection connection = new URL(buildDownloadUrl(disk.getUrl())).openConnection();
         connection.setConnectTimeout(10000);
         connection.setReadTimeout(30000);
@@ -329,6 +384,9 @@ public class DiskService implements IDiskService {
         long[] totalSize = new long[]{0L};
         int[] fileCount = new int[]{0};
         String suffix = getSuffix(disk.getName());
+        if (StringUtils.isEmpty(suffix)) {
+            suffix = disk.getType();
+        }
 
         if ("zip".equals(suffix)) {
             extractZip(archiveFile, rootChildren, nodeMap, totalSize, fileCount);
