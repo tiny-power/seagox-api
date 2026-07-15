@@ -14,6 +14,11 @@ public interface IDiskService {
     public ResultData queryChildren(Long companyId, Long parentId, String keyword);
 
     /**
+     * 预览压缩包目录
+     */
+    public ResultData previewArchive(Long companyId, Long id);
+
+    /**
      * 新增文件夹
      */
     public ResultData insertFolder(Long companyId, Long userId, Disk disk);

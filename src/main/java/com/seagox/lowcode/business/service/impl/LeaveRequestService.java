@@ -12,26 +12,19 @@ import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.LeaveRequest;
 import com.seagox.lowcode.business.mapper.LeaveRequestMapper;
 import com.seagox.lowcode.business.service.ILeaveRequestService;
-import com.seagox.lowcode.business.template.LeaveRequestModel;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
-import com.seagox.lowcode.system.entity.Company;
 import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.entity.SysProcessDraft;
 import com.seagox.lowcode.system.mapper.AccountMapper;
-import com.seagox.lowcode.system.mapper.CompanyMapper;
 import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
-import com.seagox.lowcode.util.ExportUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,12 +74,6 @@ public class LeaveRequestService implements ILeaveRequestService {
      */
     @Autowired
     private AccountMapper accountMapper;
-
-    /**
-     * 公司数据访问对象
-     */
-    @Autowired
-    private CompanyMapper companyMapper;
 
     /**
      * 流程待发事项数据访问对象
@@ -364,29 +351,6 @@ public class LeaveRequestService implements ILeaveRequestService {
     }
 
     /**
-     * 导入请假单
-     */
-    @Transactional
-    @Override
-    public void importHandle(List<LeaveRequestModel> resultList) {
-        for (LeaveRequestModel model : resultList) {
-            Company company = queryCompany(model.getCompanyName());
-            SysAccount applicant = queryApplicant(model.getApplicantAccount());
-            LeaveRequest leaveRequest = new LeaveRequest();
-            leaveRequest.setCompanyId(company.getId());
-            leaveRequest.setApplicantId(applicant.getId());
-            leaveRequest.setLeaveType(model.getLeaveType());
-            leaveRequest.setStartTime(parseDate(model.getStartTime()));
-            leaveRequest.setEndTime(parseDate(model.getEndTime()));
-            leaveRequest.setDuration(model.getDuration());
-            leaveRequest.setReason(model.getReason());
-            leaveRequest.setStatus(STATUS_DRAFT);
-            leaveRequestMapper.insert(leaveRequest);
-            saveProcessDraft(leaveRequest);
-        }
-    }
-
-    /**
      * 保存流程待发事项
      */
     private void saveProcessDraft(LeaveRequest leaveRequest) {
@@ -438,20 +402,6 @@ public class LeaveRequestService implements ILeaveRequestService {
             return summary;
         }
         return summary.substring(0, 500);
-    }
-
-    /**
-     * 导出请假单
-     */
-    @Override
-    public void export(HttpServletRequest request, HttpServletResponse response, Long exportCompanyId,
-                       String exportApplicantName, Integer exportLeaveType, Integer exportStatus,
-                       String exportStartTime, String exportEndTime) {
-        List<Map<String, Object>> list = leaveRequestMapper.exportList(exportCompanyId, exportApplicantName,
-                exportLeaveType, exportStatus, exportStartTime, exportEndTime);
-        Map<String, Object> resultData = new HashMap<>();
-        resultData.put("list", list);
-        ExportUtils.exportExcelTemplate("leaveExport.xlsx", "请假单列表", resultData, request, response);
     }
 
     /**
@@ -579,37 +529,6 @@ public class LeaveRequestService implements ILeaveRequestService {
             return "";
         }
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-    }
-
-    /**
-     * 解析日期时间
-     */
-    private Date parseDate(String value) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        simpleDateFormat.setLenient(false);
-        try {
-            return simpleDateFormat.parse(value);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("时间格式应为yyyy-MM-dd HH:mm:ss");
-        }
-    }
-
-    /**
-     * 根据名称查询公司
-     */
-    private Company queryCompany(String companyName) {
-        LambdaQueryWrapper<Company> companyQw = new LambdaQueryWrapper<>();
-        companyQw.eq(Company::getName, companyName);
-        return companyMapper.selectOne(companyQw);
-    }
-
-    /**
-     * 根据账号查询申请人
-     */
-    private SysAccount queryApplicant(String applicantAccount) {
-        LambdaQueryWrapper<SysAccount> accountQw = new LambdaQueryWrapper<>();
-        accountQw.eq(SysAccount::getAccount, applicantAccount);
-        return accountMapper.selectOne(accountQw);
     }
 
     /**

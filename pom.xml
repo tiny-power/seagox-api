@@ -134,6 +134,17 @@
 		    <artifactId>minio</artifactId>
 		    <version>8.0.3</version>
 		</dependency>
+		<!-- 压缩包预览，纯 Java 支持 zip/rar/7z -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <version>1.21</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.github.junrar</groupId>
+		    <artifactId>junrar</artifactId>
+		    <version>7.5.5</version>
+		</dependency>
 		<!-- aws s3 -->
 		<dependency>
 		    <groupId>com.amazonaws</groupId>

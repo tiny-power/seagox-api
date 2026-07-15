@@ -54,9 +54,9 @@ public class Disk {
     private Long size;
 
     /**
-     * 类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)
+     * 文件格式类型(folder/pdf/docx/zip等)
      */
-    private Integer type;
+    private String type;
 
     /**
      * 创建人
@@ -146,11 +146,11 @@ public class Disk {
         this.size = size;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 

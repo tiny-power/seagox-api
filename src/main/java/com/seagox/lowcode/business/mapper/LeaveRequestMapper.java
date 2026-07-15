@@ -24,14 +24,4 @@ public interface LeaveRequestMapper extends BaseMapper<LeaveRequest> {
                                                  @Param("startTime") String startTime,
                                                  @Param("endTime") String endTime);
 
-    /**
-     * 导出列表
-     */
-    public List<Map<String, Object>> exportList(@Param("exportCompanyId") Long exportCompanyId,
-                                                @Param("exportApplicantName") String exportApplicantName,
-                                                @Param("exportLeaveType") Integer exportLeaveType,
-                                                @Param("exportStatus") Integer exportStatus,
-                                                @Param("exportStartTime") String exportStartTime,
-                                                @Param("exportEndTime") String exportEndTime);
-
 }

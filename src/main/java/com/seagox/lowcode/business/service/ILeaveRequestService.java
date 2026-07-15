@@ -1,13 +1,7 @@
 package com.seagox.lowcode.business.service;
 
-import java.util.List;
-
 import com.seagox.lowcode.business.entity.LeaveRequest;
-import com.seagox.lowcode.business.template.LeaveRequestModel;
 import com.seagox.lowcode.common.ResultData;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 请假单服务
@@ -55,17 +49,5 @@ public interface ILeaveRequestService {
      * 撤销
      */
     public ResultData cancel(Long id, Long userId);
-
-    /**
-     * 导入
-     */
-    public void importHandle(List<LeaveRequestModel> resultList);
-
-    /**
-     * 导出
-     */
-    public void export(HttpServletRequest request, HttpServletResponse response, Long exportCompanyId,
-                       String exportApplicantName, Integer exportLeaveType, Integer exportStatus,
-                       String exportStartTime, String exportEndTime);
 
 }

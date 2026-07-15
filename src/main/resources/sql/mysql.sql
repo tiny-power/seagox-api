@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `disk`  (
     `path` VARCHAR(1000) NOT NULL COMMENT '完整节点路径，例如 /1/5/12/',
     `level` INT NOT NULL DEFAULT 1 COMMENT '目录层级',
     `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '大小',
-    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)',
+    `type` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '文件格式类型(folder/pdf/docx/zip等)',
     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -617,9 +617,6 @@ INSERT INTO sys_menu VALUES (29,1,27, 3, '编辑', 'iconfont icon-xihuan', 'leav
 INSERT INTO sys_menu VALUES (30,1,27, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
 INSERT INTO sys_menu VALUES (31,1,27, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
 INSERT INTO sys_menu VALUES (32,1,27, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
-INSERT INTO sys_menu VALUES (33,1,27, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
-INSERT INTO sys_menu VALUES (34,1,27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
-INSERT INTO sys_menu VALUES (35,1,27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
 INSERT INTO sys_menu VALUES (36,1,NULL,1,'工程管理','iconfont icon-xihuan','engineering',1,4,now(),now());
 INSERT INTO sys_menu VALUES (37,1,36,2,'项目管理','iconfont icon-xihuan','project',1,1,now(),now());
 INSERT INTO sys_menu VALUES (38,1,37,3,'新增','iconfont icon-xihuan','project:add',1,1,now(),now());

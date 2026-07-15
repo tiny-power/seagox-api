@@ -3,23 +3,10 @@ package com.seagox.lowcode.business.controller;
 import com.seagox.lowcode.annotation.LogPoint;
 import com.seagox.lowcode.business.entity.LeaveRequest;
 import com.seagox.lowcode.business.service.ILeaveRequestService;
-import com.seagox.lowcode.business.template.LeaveRequestModel;
-import com.seagox.lowcode.business.verify.LeaveRequestExcelVerifyHandler;
-import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
-
-import cn.afterturn.easypoi.excel.ExcelImportUtil;
-import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -34,12 +21,6 @@ public class LeaveRequestController {
      */
     @Autowired
     private ILeaveRequestService leaveRequestService;
-
-    /**
-     * 请假单导入校验器
-     */
-    @Autowired
-    private LeaveRequestExcelVerifyHandler leaveRequestExcelVerifyHandler;
 
     /**
      * 分页查询
@@ -116,45 +97,6 @@ public class LeaveRequestController {
     @LogPoint("撤销请假单")
     public ResultData cancel(@PathVariable Long id, Long userId) {
         return leaveRequestService.cancel(id, userId);
-    }
-
-    /**
-     * 导入
-     */
-    @PostMapping("/import")
-    public ResultData importHandle(@RequestParam("file") MultipartFile file) {
-        ImportParams params = new ImportParams();
-        params.setHeadRows(1);
-        params.setNeedVerify(true);
-        params.setVerifyHandler(leaveRequestExcelVerifyHandler);
-        try {
-            ExcelImportResult<LeaveRequestModel> result = ExcelImportUtil.importExcelMore(file.getInputStream(),
-                    LeaveRequestModel.class, params);
-            if (result.isVerifyFail()) {
-                for (LeaveRequestModel entity : result.getFailList()) {
-                    return ResultData.warn(ResultCode.OTHER_ERROR,
-                            "第" + entity.getRowNum() + "行的错误是：" + entity.getErrorMsg());
-                }
-            } else {
-                List<LeaveRequestModel> resultList = result.getList();
-                leaveRequestService.importHandle(resultList);
-            }
-            return ResultData.success(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResultData.warn(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-
-    /**
-     * 导出
-     */
-    @PostMapping("/export")
-    public void export(HttpServletRequest request, HttpServletResponse response, Long exportCompanyId,
-                       String exportApplicantName, Integer exportLeaveType, Integer exportStatus,
-                       String exportStartTime, String exportEndTime) {
-        leaveRequestService.export(request, response, exportCompanyId, exportApplicantName, exportLeaveType,
-                exportStatus, exportStartTime, exportEndTime);
     }
 
 }

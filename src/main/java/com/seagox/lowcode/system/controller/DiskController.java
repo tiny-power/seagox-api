@@ -26,6 +26,14 @@ public class DiskController {
     }
 
     /**
+     * 预览压缩包目录
+     */
+    @GetMapping("/previewArchive")
+    public ResultData previewArchive(Long companyId, Long id) {
+        return diskService.previewArchive(companyId, id);
+    }
+
+    /**
      * 新增文件夹
      */
     @PostMapping("/insertFolder")

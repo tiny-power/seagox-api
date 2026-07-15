@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "public"."disk" (
 	"path" VARCHAR(1000) NOT NULL,
 	"level" INTEGER DEFAULT 1 NOT NULL,
 	"size" BIGINT DEFAULT 0 NOT NULL,
-	"type" INTEGER DEFAULT 1,
+	"type" VARCHAR(32) DEFAULT '',
 	"created_by" BIGINT NOT NULL,
 	"updated_by" BIGINT NOT NULL,
 	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -21,7 +21,7 @@ COMMENT ON COLUMN "public"."disk"."url" IS '链接';
 COMMENT ON COLUMN "public"."disk"."path" IS '完整节点路径，例如 /1/5/12/';
 COMMENT ON COLUMN "public"."disk"."level" IS '目录层级';
 COMMENT ON COLUMN "public"."disk"."size" IS '大小';
-COMMENT ON COLUMN "public"."disk"."type" IS '类型(1:文件夹;2:图片;3:word;4:excel;5:ppt;6:pdf;7:压缩文件;8:txt;9:文档;10:视频;11:其他;)';
+COMMENT ON COLUMN "public"."disk"."type" IS '文件格式类型(folder/pdf/docx/zip等)';
 COMMENT ON COLUMN "public"."disk"."created_by" IS '创建人';
 COMMENT ON COLUMN "public"."disk"."updated_by" IS '修改人';
 COMMENT ON COLUMN "public"."disk"."created_at" IS '创建时间';
@@ -987,9 +987,6 @@ INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name"
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (30, 1, 27, 3, '删除', 'iconfont icon-xihuan', 'leave:delete', 1, 3, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (31, 1, 27, 3, '提交', 'iconfont icon-xihuan', 'leave:submit', 1, 4, now(), now());
 INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (32, 1, 27, 3, '撤销', 'iconfont icon-xihuan', 'leave:cancel', 1, 5, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (33, 1, 27, 3, '导入', 'iconfont icon-xihuan', 'leave:import', 1, 6, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (34, 1, 27, 3, '下载模板', 'iconfont icon-xihuan', 'leave:download', 1, 7, now(), now());
-INSERT INTO "public"."sys_menu" ("id", "company_id", "parent_id", "type", "name", "icon", "path", "status", "sort", "created_at", "updated_at") VALUES (35, 1, 27, 3, '导出', 'iconfont icon-xihuan', 'leave:export', 1, 8, now(), now());
 SELECT setval('sys_menu_id_seq',(SELECT max(id) FROM "public"."sys_menu"));
 INSERT INTO "public"."sys_menu" VALUES (36,1,NULL,1,'工程管理','iconfont icon-xihuan','engineering',1,4,now(),now()),(37,1,36,2,'项目管理','iconfont icon-xihuan','project',1,1,now(),now()),(38,1,37,3,'新增','iconfont icon-xihuan','project:add',1,1,now(),now()),(39,1,37,3,'编辑','iconfont icon-xihuan','project:edit',1,2,now(),now()),(40,1,37,3,'删除','iconfont icon-xihuan','project:delete',1,3,now(),now());
 INSERT INTO "public"."sys_menu" VALUES (41,1,26,2,'知识库','iconfont icon-xihuan','disk',1,2,now(),now()),(42,1,41,3,'新增文件夹','iconfont icon-xihuan','disk:addFolder',1,1,now(),now()),(43,1,41,3,'上传文件','iconfont icon-xihuan','disk:upload',1,2,now(),now()),(44,1,41,3,'重命名','iconfont icon-xihuan','disk:edit',1,3,now(),now()),(45,1,41,3,'删除','iconfont icon-xihuan','disk:delete',1,4,now(),now());
