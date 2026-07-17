@@ -60,13 +60,13 @@ oss:
 
 sms:
   tencent:
-    secret-id: AKIDv6RksoiaMMEMUfqz7JVizHYn4EJH6nOt
-    secret-key: Rl2EJGF5nU3Qjy74oLchZHm6D7oKdlhY
+    secret-id: 123
+    secret-key: 123
     endpoint: sms.tencentcloudapi.com
     region: ap-guangzhou
-    sdk-app-id: 1401156357
-    sign-name: 福建泉州正初建筑装饰
-    template-id: 2680083
+    sdk-app-id: 123
+    sign-name: 123
+    template-id: 123
 
 jodconverter:
   working-dir: /Users/X/Downloads
