@@ -34,7 +34,7 @@ public class PhoneCodeService implements IPhoneCodeService {
 				phoneCode.setCode(code);
 				phoneCode.setPhone(phone);
 				Date now = new Date();
-				phoneCode.setExpireTime(new Date(now .getTime() + 1000 * 60 * 5));
+				phoneCode.setExpireAt(new Date(now .getTime() + 1000 * 60 * 5));
 				phoneCodeMapper.insert(phoneCode);
 				return ResultData.success(null);
 			} else {

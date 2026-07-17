@@ -64,8 +64,8 @@ sms:
     secret-key: Rl2EJGF5nU3Qjy74oLchZHm6D7oKdlhY
     endpoint: sms.tencentcloudapi.com
     region: ap-guangzhou
-    sdk-app-id: 1299853
-    sign-name: 福建泉州正初建筑装饰有限
+    sdk-app-id: 1401156357
+    sign-name: 福建泉州正初建筑装饰
     template-id: 2680083
 
 jodconverter:

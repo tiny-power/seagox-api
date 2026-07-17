@@ -38,7 +38,7 @@ public class PhoneCode {
 	 */
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date expireTime;
+	private Date expireAt;
 	
 	public Long getId() {
 		return id;
@@ -64,10 +64,10 @@ public class PhoneCode {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	public Date getExpireTime() {
-		return expireTime;
+	public Date getExpireAt() {
+		return expireAt;
 	}
-	public void setExpireTime(Date expireTime) {
-		this.expireTime = expireTime;
+	public void setExpireAt(Date expireAt) {
+		this.expireAt = expireAt;
 	}
 }

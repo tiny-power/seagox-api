@@ -252,7 +252,7 @@ public class AuthService implements IAuthService {
 			if (phoneCode == null || !credential.equals(phoneCode.getCode())) {
 				return ResultData.warn(ResultCode.PARAMETER_ERROR, "验证码错误");
 			}
-			if (phoneCode.getExpireTime() == null || phoneCode.getExpireTime().before(new Date())) {
+			if (phoneCode.getExpireAt() == null || phoneCode.getExpireAt().before(new Date())) {
 				return ResultData.warn(ResultCode.PARAMETER_ERROR, "验证码已过期");
 			}
 		}
