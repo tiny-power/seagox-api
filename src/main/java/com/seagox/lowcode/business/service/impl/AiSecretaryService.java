@@ -22,6 +22,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -30,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class AiSecretaryService implements IAiSecretaryService {
 
-    private static final String SYSTEM_PROMPT = "你是工程项目数字化管控平台的AI小秘书。"
+    private static final String SYSTEM_PROMPT = "你是工程项目数字化管控平台的智能小助手。"
             + "请使用简洁、专业、可执行的中文回答，优先围绕施工进度、质量问题、材料到场、付款申请、日志和待办事项提供建议。"
             + "当用户咨询材料到场记录时，优先通过MCP工具query_material_arrivals查询真实业务数据，再基于查询结果回答。"
             + "如果用户说“我的记录”，将mine参数设为true。"
@@ -90,9 +91,12 @@ public class AiSecretaryService implements IAiSecretaryService {
             data.put("usage", result.getJSONObject("usage"));
             return ResultData.success(data);
         } catch (RestClientException e) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "DeepSeek服务请求失败，请稍后重试");
+            if (isInsufficientBalance(e)) {
+                return ResultData.warn(ResultCode.OTHER_ERROR, "余额不足，请充值后重试");
+            }
+            return ResultData.warn(ResultCode.OTHER_ERROR, "服务请求失败，请稍后重试");
         } catch (Exception e) {
-            return ResultData.warn(ResultCode.OTHER_ERROR, "AI小秘书暂时不可用，请稍后重试");
+            return ResultData.warn(ResultCode.OTHER_ERROR, "智能小助手暂时不可用，请稍后重试");
         }
     }
 
@@ -203,7 +207,7 @@ public class AiSecretaryService implements IAiSecretaryService {
         JSONObject message = extractMessage(result);
         String content = message == null ? "" : message.getString("content");
         if (!StringUtils.hasText(content)) {
-            throw new RestClientException("DeepSeek message is empty");
+            throw new RestClientException("message is empty");
         }
         return content;
     }
@@ -211,7 +215,7 @@ public class AiSecretaryService implements IAiSecretaryService {
     private JSONObject extractMessage(JSONObject result) {
         JSONArray choices = result == null ? null : result.getJSONArray("choices");
         if (choices == null || choices.isEmpty()) {
-            throw new RestClientException("DeepSeek response is empty");
+            throw new RestClientException("response is empty");
         }
         JSONObject choice = choices.getJSONObject(0);
         return choice.getJSONObject("message");
@@ -220,6 +224,21 @@ public class AiSecretaryService implements IAiSecretaryService {
     private JSONArray extractToolCalls(JSONObject result) {
         JSONObject message = extractMessage(result);
         return message == null ? null : message.getJSONArray("tool_calls");
+    }
+
+    /**
+     * 判断DeepSeek是否返回余额不足。
+     */
+    private boolean isInsufficientBalance(RestClientException e) {
+        String message = e.getMessage();
+        if (e instanceof RestClientResponseException) {
+            RestClientResponseException responseException = (RestClientResponseException) e;
+            if (responseException.getRawStatusCode() == 402) {
+                return true;
+            }
+            message = message + " " + responseException.getResponseBodyAsString();
+        }
+        return message != null && message.toLowerCase().contains("insufficient balance");
     }
 
     private RestTemplate createRestTemplate() {

@@ -53,20 +53,27 @@ logging:
 # minio、aliyun、ecloud、aws
 oss:
   type: minio
-  endpoint: http://192.168.1.69:9000
-  access-key: admin
-  secret-key: Tiny_minio_4512
-  url: http://192.168.1.69:9000
+  endpoint: https://oss.zcjzdesign.com
+  access-key: seagox
+  secret-key: seagox_1234
+  url: https://oss.zcjzdesign.com
 
 sms:
   tencent:
-    secret-id: 123
-    secret-key: 123
+    secret-id: 
+    secret-key: 
     endpoint: sms.tencentcloudapi.com
     region: ap-guangzhou
-    sdk-app-id: 123
-    sign-name: 123
-    template-id: 123
+    sdk-app-id: 
+    sign-name: 
+    template-id: 
+
+ai:
+  deepseek:
+    api-key: 
+    base-url: https://api.deepseek.com
+    model: deepseek-v4-flash
+    timeout: 30000
 
 jodconverter:
   working-dir: /Users/X/Downloads
@@ -78,13 +85,6 @@ third-party:
   official-account:
     appid: wx976a6670942e1223
     sercret: 6ebabe703319a499b40fd275f37cb896
-
-ai:
-  deepseek:
-    api-key: sk-bcbd97a02cd145298b40721baf80ddc4
-    base-url: https://api.deepseek.com
-    model: deepseek-v4-flash
-    timeout: 30000
 
 ignore:
   token: /auth

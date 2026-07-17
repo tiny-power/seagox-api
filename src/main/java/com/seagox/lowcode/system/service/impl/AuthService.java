@@ -1,6 +1,7 @@
 package com.seagox.lowcode.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.seagox.lowcode.business.entity.Project;
 import com.seagox.lowcode.business.entity.ProjectMember;
 import com.seagox.lowcode.business.entity.ProjectStage;
@@ -25,6 +26,10 @@ import com.seagox.lowcode.util.EncryptUtils;
 import com.seagox.lowcode.util.TreeUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +37,16 @@ import java.util.*;
 
 @Service
 public class AuthService implements IAuthService {
+
+	/**
+	 * 服务号事件类型：订阅
+	 */
+	private static final String MP_EVENT_SUBSCRIBE = "subscribe";
+
+	/**
+	 * 微信回调成功响应
+	 */
+	private static final String WECHAT_SUCCESS = "success";
 	
 	@Autowired
 	private AccountMapper userMapper;
@@ -85,6 +100,82 @@ public class AuthService implements IAuthService {
 			put(11, "业主家属");
 		}
 	};
+
+	@Override
+	public String mpCallback(String requestBody) {
+		if (StringUtils.isEmpty(requestBody)) {
+			return WECHAT_SUCCESS;
+		}
+		try {
+			Map<String, String> message = parseWechatXml(requestBody);
+			if ("event".equalsIgnoreCase(message.get("MsgType"))) {
+				handleMpEvent(message);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return WECHAT_SUCCESS;
+	}
+
+	/**
+	 * 处理服务号事件推送
+	 */
+	private void handleMpEvent(Map<String, String> message) {
+		String event = message.get("Event");
+		if (MP_EVENT_SUBSCRIBE.equalsIgnoreCase(event)) {
+			updateMpOpenidByUnionid(message);
+		}
+	}
+
+	/**
+	 * 用户订阅服务号时，根据unionid回填服务号openid
+	 */
+	private void updateMpOpenidByUnionid(Map<String, String> message) {
+		String unionid = getWechatValue(message, "UnionID", "unionid");
+		String mpOpenid = getWechatValue(message, "FromUserName", "openid");
+		if (StringUtils.isEmpty(unionid) || StringUtils.isEmpty(mpOpenid)) {
+			return;
+		}
+
+		LambdaUpdateWrapper<SysAccount> updateWrapper = new LambdaUpdateWrapper<SysAccount>();
+		updateWrapper.eq(SysAccount::getUnionid, unionid).set(SysAccount::getMpOpenid, mpOpenid);
+		userMapper.update(null, updateWrapper);
+	}
+
+	/**
+	 * 解析微信XML报文
+	 */
+	private Map<String, String> parseWechatXml(String requestBody) throws DocumentException {
+		if (requestBody.contains("<!DOCTYPE")) {
+			throw new DocumentException("非法XML报文");
+		}
+		Document document = DocumentHelper.parseText(requestBody);
+		Element root = document.getRootElement();
+		Map<String, String> message = new HashMap<String, String>();
+		for (Object item : root.elements()) {
+			Element element = (Element) item;
+			message.put(element.getName(), element.getTextTrim());
+		}
+		return message;
+	}
+
+	/**
+	 * 获取微信报文字段，兼容不同大小写
+	 */
+	private String getWechatValue(Map<String, String> message, String... keys) {
+		for (String key : keys) {
+			String value = message.get(key);
+			if (!StringUtils.isEmpty(value)) {
+				return value;
+			}
+			for (Map.Entry<String, String> entry : message.entrySet()) {
+				if (key.equalsIgnoreCase(entry.getKey()) && !StringUtils.isEmpty(entry.getValue())) {
+					return entry.getValue();
+				}
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public ResultData login(String account, String password, String openid, String avatar) {

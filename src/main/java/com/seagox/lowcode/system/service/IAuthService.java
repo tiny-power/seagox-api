@@ -69,4 +69,11 @@ public interface IAuthService {
 	 */
 	public ResultData loginByOpenid(String openid);
 
+	/**
+	 * 接收服务号普通消息和事件推送
+	 *
+	 * @param requestBody 微信推送XML报文
+	 */
+	public String mpCallback(String requestBody);
+
 }

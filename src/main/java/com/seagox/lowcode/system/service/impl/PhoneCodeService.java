@@ -38,7 +38,7 @@ public class PhoneCodeService implements IPhoneCodeService {
 				phoneCodeMapper.insert(phoneCode);
 				return ResultData.success(null);
 			} else {
-				return ResultData.warn(ResultCode.OTHER_ERROR, smsResult.getMessage() == null ? "请求太频繁，请稍后再试!" : smsResult.getMessage());
+				return ResultData.warn(ResultCode.OTHER_ERROR, "验证码发送过于频繁，请稍后再试");
 			}
 		}
 	}

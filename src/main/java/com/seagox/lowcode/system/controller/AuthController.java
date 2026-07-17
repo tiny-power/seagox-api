@@ -31,18 +31,17 @@ public class AuthController {
 	private WeiChatUtils weiChatUtils;
 
 	@Autowired
-    private IUploadService uploadService;
-	
+	private IUploadService uploadService;
+
 	@Autowired
-    private DicDetailMapper dicDetailMapper;
-	
+	private DicDetailMapper dicDetailMapper;
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	private IPhoneCodeService phoneCodeService;
-	
-	
+
 	/**
 	 * 登陆
 	 *
@@ -138,28 +137,48 @@ public class AuthController {
 	}
 
 	/**
-     * 在线预览
-     */
-    @GetMapping("/preview")
-    public void preview(String url, String fileName, HttpServletResponse response) {
-        uploadService.preview(url, fileName, response);
-    }
-    
-    /**
-     * 发送手机验证码
-     */
-    @GetMapping("/sendTextCode/{phone}")
-    public ResultData sendTextCode(@PathVariable String phone) {
-    	if (!ValidatorUtils.isMobile(phone)) {
-    		return ResultData.warn(ResultCode.PARAMETER_ERROR, "手机号格式不对");
-    	}
+	 * 在线预览
+	 */
+	@GetMapping("/preview")
+	public void preview(String url, String fileName, HttpServletResponse response) {
+		uploadService.preview(url, fileName, response);
+	}
 
-    	ResultData validateResult = authService.validateMiniTextCodePhone(phone);
-    	if (validateResult.getCode() != ResultCode.SUCCESS.getCode()) {
-    		return validateResult;
-    	}
+	/**
+	 * 发送手机验证码
+	 */
+	@GetMapping("/sendTextCode/{phone}")
+	public ResultData sendTextCode(@PathVariable String phone) {
+		if (!ValidatorUtils.isMobile(phone)) {
+			return ResultData.warn(ResultCode.PARAMETER_ERROR, "手机号格式不对");
+		}
 
-    	return phoneCodeService.sendTextCode(phone);
-    }
+		ResultData validateResult = authService.validateMiniTextCodePhone(phone);
+		if (validateResult.getCode() != ResultCode.SUCCESS.getCode()) {
+			return validateResult;
+		}
+
+		return phoneCodeService.sendTextCode(phone);
+	}
+
+	/**
+	 * 验证消息的确来自微信服务器
+	 */
+	@GetMapping("/mpCallback")
+	public String verify(@RequestParam String signature, @RequestParam String timestamp, @RequestParam String nonce,
+			@RequestParam String echostr) {
+		return echostr;
+	}
+
+	/**
+	 * 接收普通消息和事件推送。
+	 */
+	@PostMapping("/mpCallback")
+	public String callback(@RequestBody String requestBody, @RequestParam String signature,
+			@RequestParam String timestamp, @RequestParam String nonce,
+			@RequestParam(name = "encrypt_type", required = false) String encryptType,
+			@RequestParam(name = "msg_signature", required = false) String msgSignature) {
+		return authService.mpCallback(requestBody);
+	}
 
 }
