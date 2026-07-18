@@ -85,6 +85,8 @@ third-party:
   official-account:
     appid: wx976a6670942e1223
     sercret: 6ebabe703319a499b40fd275f37cb896
+    token: e9d81fe9578f3e7d8c9b4e0c62c20b4a
+    encoding-aes-key: YPKCiGkj3Vjlr90w7PNAxC34TcheMbhxEegAAtWpH6n
 
 ignore:
   token: /auth

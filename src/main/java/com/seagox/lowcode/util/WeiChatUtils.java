@@ -13,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -32,6 +33,11 @@ public class WeiChatUtils {
 	 * 获取小程序及服务号access_token地址
 	 */
 	public static final String ACCESS_TOKEN = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=SECRET";
+
+	/**
+	 * 服务号用户信息地址
+	 */
+	public static final String SERVICE_USER_INFO = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
 
 	/**
 	 * 小程序发送模板消息地址
@@ -68,6 +74,11 @@ public class WeiChatUtils {
 	private String servicesSercret;
 
 	/**
+	 * 服务号access_token缓存
+	 */
+	private volatile String serviceAccessToken;
+
+	/**
 	 * 获取小程序登录凭证
 	 */
 	public JSONObject getAppletsLoginCertificate(String code) {
@@ -83,13 +94,67 @@ public class WeiChatUtils {
 	}
 
 	/**
-	 * 获取access_token
+	 * 获取小程序access_token
 	 */
 	public JSONObject getAccessToken() {
 		try {
 			String url = ACCESS_TOKEN.replace("APPID", appletsAppid).replace("SECRET", appletsSercret);
 			RestTemplate restTemplate = new RestTemplate();
 			return parseJson(restTemplate.getForObject(url, String.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 定时刷新服务号access_token，微信有效期为7200秒。
+	 */
+	@Scheduled(fixedRate = 7200 * 1000, initialDelay = 1000)
+	public void refreshServiceAccessToken() {
+		JSONObject jsonObject = getServiceAccessToken();
+		if (jsonObject != null && !StringUtils.isEmpty(jsonObject.getString("access_token"))) {
+			serviceAccessToken = jsonObject.getString("access_token");
+		}
+	}
+
+	/**
+	 * 获取服务号access_token。
+	 */
+	public JSONObject getServiceAccessToken() {
+		try {
+			String url = ACCESS_TOKEN.replace("APPID", servicesAppid).replace("SECRET", servicesSercret);
+			RestTemplate restTemplate = new RestTemplate();
+			return parseJson(restTemplate.getForObject(url, String.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 获取服务号用户信息。
+	 */
+	public JSONObject getServiceUserInfo(String openid) {
+		if (StringUtils.isEmpty(openid)) {
+			return null;
+		}
+		if (StringUtils.isEmpty(serviceAccessToken)) {
+			refreshServiceAccessToken();
+		}
+		if (StringUtils.isEmpty(serviceAccessToken)) {
+			return null;
+		}
+		try {
+			String url = SERVICE_USER_INFO.replace("ACCESS_TOKEN", serviceAccessToken).replace("OPENID", openid);
+			RestTemplate restTemplate = new RestTemplate();
+			JSONObject result = parseJson(restTemplate.getForObject(url, String.class));
+			if (result != null && Integer.valueOf(40001).equals(result.getInteger("errcode"))) {
+				refreshServiceAccessToken();
+				url = SERVICE_USER_INFO.replace("ACCESS_TOKEN", serviceAccessToken).replace("OPENID", openid);
+				result = parseJson(restTemplate.getForObject(url, String.class));
+			}
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

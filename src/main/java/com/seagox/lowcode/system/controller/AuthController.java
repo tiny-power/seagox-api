@@ -178,7 +178,7 @@ public class AuthController {
 			@RequestParam String timestamp, @RequestParam String nonce,
 			@RequestParam(name = "encrypt_type", required = false) String encryptType,
 			@RequestParam(name = "msg_signature", required = false) String msgSignature) {
-		return authService.mpCallback(requestBody);
+		return authService.mpCallback(requestBody, encryptType, msgSignature, timestamp, nonce);
 	}
 
 }

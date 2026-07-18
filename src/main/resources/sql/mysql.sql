@@ -1,3 +1,25 @@
+CREATE TABLE IF NOT EXISTS `design_case` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `title` VARCHAR(200) NOT NULL COMMENT '案例标题',
+    `cover_url` VARCHAR(1000) NOT NULL COMMENT '封面图片地址',
+    `summary` JSON NOT NULL COMMENT '案例简介富文本',
+    `style_list` JSON NOT NULL COMMENT '风格列表，如["简约","轻奢"]',
+    `region_text` VARCHAR(50) NOT NULL COMMENT '地区(东北、华北、华东、华中、西北、西南、华南)',
+    `province_name` VARCHAR(50) NOT NULL COMMENT '省名称',
+    `city_name` VARCHAR(50) NOT NULL COMMENT '城市名称',
+    `building_area` DECIMAL(10, 2) DEFAULT NULL COMMENT '建筑面积，单位平方米',
+    `floor_count` TINYINT UNSIGNED DEFAULT NULL COMMENT '层数',
+    `roof_type` VARCHAR(50) NOT NULL COMMENT '屋顶类型，如平顶、坡顶',
+    `special_list` JSON DEFAULT NULL COMMENT '特殊列表，如["坡地","紧贴邻居"]',
+    `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态：0草稿，1已发布，2已下架',
+    `sort` INT NOT NULL DEFAULT 0 COMMENT '排序值，越大越靠前',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '修改人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '案例库';
+
 CREATE TABLE IF NOT EXISTS `disk`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
@@ -638,5 +660,9 @@ INSERT INTO sys_menu VALUES (53,1,36,2,'问题单','iconfont icon-xihuan','issue
 INSERT INTO sys_menu VALUES (54,1,36,2,'材料到场','iconfont icon-xihuan','materialArrival',1,9,now(),now());
 INSERT INTO sys_menu VALUES (55,1,36,2,'交接单','iconfont icon-xihuan','projectHandover',1,10,now(),now());
 INSERT INTO sys_menu VALUES (56,1,36,2,'报修单','iconfont icon-xihuan','repair',1,11,now(),now());
-UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56' WHERE id=1;
+INSERT INTO sys_menu VALUES (57,1,36,2,'案例库','iconfont icon-xihuan','designCase',1,12,now(),now());
+INSERT INTO sys_menu VALUES (58,1,57,3,'新增','iconfont icon-xihuan','designCase:add',1,1,now(),now());
+INSERT INTO sys_menu VALUES (59,1,57,3,'编辑','iconfont icon-xihuan','designCase:edit',1,2,now(),now());
+INSERT INTO sys_menu VALUES (60,1,57,3,'删除','iconfont icon-xihuan','designCase:delete',1,3,now(),now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60' WHERE id=1;
 COMMIT;

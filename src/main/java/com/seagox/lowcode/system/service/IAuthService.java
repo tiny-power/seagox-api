@@ -72,8 +72,13 @@ public interface IAuthService {
 	/**
 	 * 接收服务号普通消息和事件推送
 	 *
-	 * @param requestBody 微信推送XML报文
+	 * @param requestBody  微信推送XML报文
+	 * @param encryptType  加密类型
+	 * @param msgSignature 消息签名
+	 * @param timestamp    时间戳
+	 * @param nonce        随机数
 	 */
-	public String mpCallback(String requestBody);
+	public String mpCallback(String requestBody, String encryptType, String msgSignature, String timestamp,
+			String nonce);
 
 }

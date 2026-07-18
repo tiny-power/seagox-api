@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.DesignCaseMapper">
+    <!-- 查询案例库列表 -->
+    <select id="queryDesignCases" resultType="camelKeyMap">
+        SELECT c.id,
+               c.title,
+               c.cover_url AS "coverUrl",
+               c.summary,
+               c.style_list AS "styleList",
+               c.region_text AS "regionText",
+               c.province_name AS "provinceName",
+               c.city_name AS "cityName",
+               c.building_area AS "buildingArea",
+               c.floor_count AS "floorCount",
+               c.roof_type AS "roofType",
+               c.special_list AS "specialList",
+               c.status,
+               c.sort,
+               c.created_by AS "createdBy",
+               c.updated_by AS "updatedBy",
+               c.created_at AS "createdAt",
+               c.updated_at AS "updatedAt",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName"
+        FROM design_case c
+        LEFT JOIN sys_account creator ON creator.id = c.created_by
+        LEFT JOIN sys_account updater ON updater.id = c.updated_by
+        <where>
+            <if test="params.keyword != null and params.keyword != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">
+                        AND (c.title LIKE CONCAT('%', #{params.keyword}, '%')
+                        OR c.province_name LIKE CONCAT('%', #{params.keyword}, '%')
+                        OR c.city_name LIKE CONCAT('%', #{params.keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        AND (c.title LIKE '%' || #{params.keyword} || '%'
+                        OR c.province_name LIKE '%' || #{params.keyword} || '%'
+                        OR c.city_name LIKE '%' || #{params.keyword} || '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="params.status != null and params.status != ''">
+                AND c.status = #{params.status}
+            </if>
+            <if test="params.styles != null and params.styles != ''">
+                AND (
+                <foreach collection="params.styles.split(',')" item="style" separator=" OR ">
+                    <choose>
+                        <when test="_databaseId == 'mysql'">
+                            JSON_CONTAINS(c.style_list, JSON_QUOTE(#{style}))
+                        </when>
+                        <otherwise>
+                            c.style_list LIKE '%' || #{style} || '%'
+                        </otherwise>
+                    </choose>
+                </foreach>
+                )
+            </if>
+            <if test="params.regions != null and params.regions != ''">
+                AND c.region_text IN
+                <foreach collection="params.regions.split(',')" item="region" open="(" separator="," close=")">
+                    #{region}
+                </foreach>
+            </if>
+            <if test="params.roofs != null and params.roofs != ''">
+                AND c.roof_type IN
+                <foreach collection="params.roofs.split(',')" item="roof" open="(" separator="," close=")">
+                    #{roof}
+                </foreach>
+            </if>
+            <if test="params.areas != null and params.areas != ''">
+                AND (
+                <foreach collection="params.areas.split(',')" item="area" separator=" OR ">
+                    <choose>
+                        <when test="area == '50-90m²'">
+                            c.building_area BETWEEN 50 AND 90
+                        </when>
+                        <when test="area == '100-120m²'">
+                            c.building_area BETWEEN 100 AND 120
+                        </when>
+                        <when test="area == '130-140m²'">
+                            c.building_area BETWEEN 130 AND 140
+                        </when>
+                        <otherwise>
+                            c.building_area &gt;= 150
+                        </otherwise>
+                    </choose>
+                </foreach>
+                )
+            </if>
+            <if test="params.floors != null and params.floors != ''">
+                AND (
+                <foreach collection="params.floors.split(',')" item="floor" separator=" OR ">
+                    <choose>
+                        <when test="floor == '低层'">
+                            c.floor_count &lt;= 6
+                        </when>
+                        <when test="floor == '中层'">
+                            c.floor_count BETWEEN 7 AND 18
+                        </when>
+                        <otherwise>
+                            c.floor_count &gt;= 19
+                        </otherwise>
+                    </choose>
+                </foreach>
+                )
+            </if>
+        </where>
+        ORDER BY c.sort DESC, c.updated_at DESC, c.id DESC
+    </select>
+
+    <!-- 查询案例库详情 -->
+    <select id="queryDesignCaseById" resultType="camelKeyMap">
+        SELECT c.id,
+               c.title,
+               c.cover_url AS "coverUrl",
+               c.summary,
+               c.style_list AS "styleList",
+               c.region_text AS "regionText",
+               c.province_name AS "provinceName",
+               c.city_name AS "cityName",
+               c.building_area AS "buildingArea",
+               c.floor_count AS "floorCount",
+               c.roof_type AS "roofType",
+               c.special_list AS "specialList",
+               c.status,
+               c.sort,
+               c.created_by AS "createdBy",
+               c.updated_by AS "updatedBy",
+               c.created_at AS "createdAt",
+               c.updated_at AS "updatedAt",
+               creator.name AS "createdByName",
+               updater.name AS "updatedByName"
+        FROM design_case c
+        LEFT JOIN sys_account creator ON creator.id = c.created_by
+        LEFT JOIN sys_account updater ON updater.id = c.updated_by
+        <where>
+            AND c.id = #{id}
+        </where>
+    </select>
+</mapper>

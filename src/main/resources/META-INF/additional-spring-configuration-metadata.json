@@ -1,77 +1,143 @@
-{"properties": [{
-  "name": "oss.type",
-  "type": "java.lang.String",
-  "description": "A description for 'oss.type'"
-},{
-  "name": "oss.endpoint",
-  "type": "java.lang.String",
-  "description": "A description for 'oss.endpoint'"
-},{
-  "name": "oss.access-key",
-  "type": "java.lang.String",
-  "description": "A description for 'oss.access-key'"
-},{
-  "name": "oss.secret-key",
-  "type": "java.lang.String",
-  "description": "A description for 'oss.secret-key'"
-},{
-  "name": "oss.url",
-  "type": "java.lang.String",
-  "description": "A description for 'oss.url'"
-},{
-  "name": "oss.accept",
-  "type": "java.util.List",
-  "description": "A description for 'oss.accept'"
-},{
-  "name": "jodconverter.working-dir",
-  "type": "java.lang.String",
-  "description": "A description for 'jodconverter.working-dir'"
-},{
-  "name": "third-party.mini-program.appid",
-  "type": "java.lang.String",
-  "description": "A description for 'third-party.applets.appid'"
-},{
-  "name": "third-party.mini-program.sercret",
-  "type": "java.lang.String",
-  "description": "A description for 'third-party.applets.sercret'"
-},{
-  "name": "third-party.official-account.appid",
-  "type": "java.lang.String",
-  "description": "A description for 'third-party.services.appid'"
-},{
-  "name": "third-party.official-account.sercret",
-  "type": "java.lang.String",
-  "description": "A description for 'third-party.services.sercret'"
-},{
-  "name": "ai.deepseek.api-key",
-  "type": "java.lang.String",
-  "description": "DeepSeek API Key，未配置时可读取环境变量 DEEPSEEK_API_KEY。"
-},{
-  "name": "ai.deepseek.base-url",
-  "type": "java.lang.String",
-  "description": "DeepSeek API基础地址。",
-  "defaultValue": "https://api.deepseek.com"
-},{
-  "name": "ai.deepseek.model",
-  "type": "java.lang.String",
-  "description": "DeepSeek对话模型。",
-  "defaultValue": "deepseek-v4-flash"
-},{
-  "name": "ai.deepseek.timeout",
-  "type": "java.lang.Integer",
-  "description": "DeepSeek请求超时时间，单位毫秒。",
-  "defaultValue": 30000
-},{
-  "name": "ai.deepseek.mcp.enabled",
-  "type": "java.lang.Boolean",
-  "description": "是否启用AI小秘书MCP工具调用。",
-  "defaultValue": true
-},{
-  "name": "ignore.token",
-  "type": "java.lang.String",
-  "description": "A description for 'ignore.token'"
-},{
-  "name": "ignore.sign",
-  "type": "java.lang.String",
-  "description": "A description for 'ignore.sign'"
-}]}
+{
+  "properties": [
+    {
+      "name": "oss.type",
+      "type": "java.lang.String",
+      "description": "A description for 'oss.type'"
+    },
+    {
+      "name": "oss.endpoint",
+      "type": "java.lang.String",
+      "description": "A description for 'oss.endpoint'"
+    },
+    {
+      "name": "oss.access-key",
+      "type": "java.lang.String",
+      "description": "A description for 'oss.access-key'"
+    },
+    {
+      "name": "oss.secret-key",
+      "type": "java.lang.String",
+      "description": "A description for 'oss.secret-key'"
+    },
+    {
+      "name": "oss.url",
+      "type": "java.lang.String",
+      "description": "A description for 'oss.url'"
+    },
+    {
+      "name": "oss.accept",
+      "type": "java.util.List",
+      "description": "A description for 'oss.accept'"
+    },
+    {
+      "name": "jodconverter.working-dir",
+      "type": "java.lang.String",
+      "description": "A description for 'jodconverter.working-dir'"
+    },
+    {
+      "name": "sms.tencent.secret-id",
+      "type": "java.lang.String",
+      "description": "腾讯云短信SecretId。"
+    },
+    {
+      "name": "sms.tencent.secret-key",
+      "type": "java.lang.String",
+      "description": "腾讯云短信SecretKey。"
+    },
+    {
+      "name": "sms.tencent.endpoint",
+      "type": "java.lang.String",
+      "description": "腾讯云短信接口域名。"
+    },
+    {
+      "name": "sms.tencent.region",
+      "type": "java.lang.String",
+      "description": "腾讯云短信地域。"
+    },
+    {
+      "name": "sms.tencent.sdk-app-id",
+      "type": "java.lang.String",
+      "description": "腾讯云短信应用SDK AppID。"
+    },
+    {
+      "name": "sms.tencent.sign-name",
+      "type": "java.lang.String",
+      "description": "腾讯云短信签名名称。"
+    },
+    {
+      "name": "sms.tencent.template-id",
+      "type": "java.lang.String",
+      "description": "腾讯云短信模板ID。"
+    },
+    {
+      "name": "third-party.mini-program.appid",
+      "type": "java.lang.String",
+      "description": "A description for 'third-party.applets.appid'"
+    },
+    {
+      "name": "third-party.mini-program.sercret",
+      "type": "java.lang.String",
+      "description": "A description for 'third-party.applets.sercret'"
+    },
+    {
+      "name": "third-party.official-account.appid",
+      "type": "java.lang.String",
+      "description": "A description for 'third-party.services.appid'"
+    },
+    {
+      "name": "third-party.official-account.sercret",
+      "type": "java.lang.String",
+      "description": "A description for 'third-party.services.sercret'"
+    },
+    {
+      "name": "third-party.official-account.token",
+      "type": "java.lang.String",
+      "description": "微信服务号消息校验Token。"
+    },
+    {
+      "name": "third-party.official-account.encoding-aes-key",
+      "type": "java.lang.String",
+      "description": "微信服务号安全模式消息加解密EncodingAESKey。"
+    },
+    {
+      "name": "ai.deepseek.api-key",
+      "type": "java.lang.String",
+      "description": "DeepSeek API Key，未配置时可读取环境变量 DEEPSEEK_API_KEY。"
+    },
+    {
+      "name": "ai.deepseek.base-url",
+      "type": "java.lang.String",
+      "description": "DeepSeek API基础地址。",
+      "defaultValue": "https://api.deepseek.com"
+    },
+    {
+      "name": "ai.deepseek.model",
+      "type": "java.lang.String",
+      "description": "DeepSeek对话模型。",
+      "defaultValue": "deepseek-v4-flash"
+    },
+    {
+      "name": "ai.deepseek.timeout",
+      "type": "java.lang.Integer",
+      "description": "DeepSeek请求超时时间，单位毫秒。",
+      "defaultValue": 30000
+    },
+    {
+      "name": "ai.deepseek.mcp.enabled",
+      "type": "java.lang.Boolean",
+      "description": "是否启用AI小秘书MCP工具调用。",
+      "defaultValue": true
+    },
+    {
+      "name": "ignore.token",
+      "type": "java.lang.String",
+      "description": "A description for 'ignore.token'"
+    },
+    {
+      "name": "ignore.sign",
+      "type": "java.lang.String",
+      "description": "A description for 'ignore.sign'"
+    }
+  ]
+}

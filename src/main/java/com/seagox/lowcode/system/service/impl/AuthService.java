@@ -1,5 +1,6 @@
 package com.seagox.lowcode.system.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.seagox.lowcode.business.entity.Project;
@@ -24,6 +25,7 @@ import com.seagox.lowcode.system.entity.*;
 import com.seagox.lowcode.system.mapper.*;
 import com.seagox.lowcode.util.EncryptUtils;
 import com.seagox.lowcode.util.TreeUtils;
+import com.seagox.lowcode.util.WeiChatUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -31,8 +33,14 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.*;
 
 @Service
@@ -84,6 +92,27 @@ public class AuthService implements IAuthService {
 	@Autowired
 	private StageInspectionItemMapper stageInspectionItemMapper;
 
+	@Autowired
+	private WeiChatUtils weiChatUtils;
+
+	/**
+	 * 服务号APPID
+	 */
+	@Value("${third-party.official-account.appid:}")
+	private String servicesAppid;
+
+	/**
+	 * 服务号消息校验Token
+	 */
+	@Value("${third-party.official-account.token:}")
+	private String servicesToken;
+
+	/**
+	 * 服务号消息加解密EncodingAESKey
+	 */
+	@Value("${third-party.official-account.encoding-aes-key:}")
+	private String servicesEncodingAesKey;
+
 	private static final Map<Integer, String> PROJECT_ROLE_MAP = new HashMap<Integer, String>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -102,12 +131,17 @@ public class AuthService implements IAuthService {
 	};
 
 	@Override
-	public String mpCallback(String requestBody) {
+	public String mpCallback(String requestBody, String encryptType, String msgSignature, String timestamp,
+			String nonce) {
 		if (StringUtils.isEmpty(requestBody)) {
 			return WECHAT_SUCCESS;
 		}
 		try {
 			Map<String, String> message = parseWechatXml(requestBody);
+			if ("aes".equalsIgnoreCase(encryptType)) {
+				String encrypt = getWechatValue(message, "Encrypt");
+				message = parseWechatXml(decryptMpMessage(encrypt, msgSignature, timestamp, nonce));
+			}
 			if ("event".equalsIgnoreCase(message.get("MsgType"))) {
 				handleMpEvent(message);
 			}
@@ -115,6 +149,78 @@ public class AuthService implements IAuthService {
 			e.printStackTrace();
 		}
 		return WECHAT_SUCCESS;
+	}
+
+	/**
+	 * 解密服务号安全模式消息。
+	 */
+	private String decryptMpMessage(String encrypt, String msgSignature, String timestamp, String nonce) throws Exception {
+		if (StringUtils.isEmpty(encrypt) || StringUtils.isEmpty(servicesEncodingAesKey)) {
+			throw new IllegalArgumentException("服务号加密消息配置不完整");
+		}
+		if (!StringUtils.isEmpty(servicesToken)) {
+			String signature = buildWechatSignature(servicesToken, timestamp, nonce, encrypt);
+			if (!signature.equals(msgSignature)) {
+				throw new IllegalArgumentException("服务号消息签名错误");
+			}
+		}
+
+		byte[] aesKey = Base64.getDecoder().decode(servicesEncodingAesKey + "=");
+		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		SecretKeySpec keySpec = new SecretKeySpec(aesKey, "AES");
+		IvParameterSpec iv = new IvParameterSpec(Arrays.copyOfRange(aesKey, 0, 16));
+		cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
+		byte[] plainBytes = removePkcs7Padding(cipher.doFinal(Base64.getDecoder().decode(encrypt)));
+		int xmlLength = recoverNetworkBytesOrder(Arrays.copyOfRange(plainBytes, 16, 20));
+		String xml = new String(Arrays.copyOfRange(plainBytes, 20, 20 + xmlLength), StandardCharsets.UTF_8);
+		String appid = new String(Arrays.copyOfRange(plainBytes, 20 + xmlLength, plainBytes.length),
+				StandardCharsets.UTF_8);
+		if (!StringUtils.isEmpty(servicesAppid) && !servicesAppid.equals(appid)) {
+			throw new IllegalArgumentException("服务号APPID不匹配");
+		}
+		return xml;
+	}
+
+	/**
+	 * 生成微信消息签名。
+	 */
+	private String buildWechatSignature(String token, String timestamp, String nonce, String encrypt) throws Exception {
+		String[] values = new String[] { token, timestamp, nonce, encrypt };
+		Arrays.sort(values);
+		MessageDigest digest = MessageDigest.getInstance("SHA-1");
+		byte[] bytes = digest.digest(StringUtils.join(values).getBytes(StandardCharsets.UTF_8));
+		StringBuilder builder = new StringBuilder();
+		for (byte item : bytes) {
+			String hex = Integer.toHexString(item & 0xff);
+			if (hex.length() == 1) {
+				builder.append('0');
+			}
+			builder.append(hex);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * 去除PKCS#7补位。
+	 */
+	private byte[] removePkcs7Padding(byte[] bytes) {
+		int padding = bytes[bytes.length - 1] & 0xff;
+		if (padding < 1 || padding > 32) {
+			padding = 0;
+		}
+		return Arrays.copyOfRange(bytes, 0, bytes.length - padding);
+	}
+
+	/**
+	 * 还原微信网络字节序长度。
+	 */
+	private int recoverNetworkBytesOrder(byte[] bytes) {
+		int sourceNumber = 0;
+		for (int i = 0; i < 4; i++) {
+			sourceNumber <<= 8;
+			sourceNumber |= bytes[i] & 0xff;
+		}
+		return sourceNumber;
 	}
 
 	/**
@@ -131,9 +237,14 @@ public class AuthService implements IAuthService {
 	 * 用户订阅服务号时，根据unionid回填服务号openid
 	 */
 	private void updateMpOpenidByUnionid(Map<String, String> message) {
-		String unionid = getWechatValue(message, "UnionID", "unionid");
 		String mpOpenid = getWechatValue(message, "FromUserName", "openid");
-		if (StringUtils.isEmpty(unionid) || StringUtils.isEmpty(mpOpenid)) {
+		if (StringUtils.isEmpty(mpOpenid)) {
+			return;
+		}
+
+		JSONObject userInfo = weiChatUtils.getServiceUserInfo(mpOpenid);
+		String unionid = userInfo == null ? null : userInfo.getString("unionid");
+		if (StringUtils.isEmpty(unionid)) {
 			return;
 		}
 

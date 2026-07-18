@@ -1,3 +1,43 @@
+CREATE TABLE IF NOT EXISTS "public"."design_case" (
+	"id" BIGSERIAL PRIMARY KEY NOT NULL,
+	"title" VARCHAR(200) NOT NULL,
+	"cover_url" VARCHAR(1000) NOT NULL,
+	"summary" JSON NOT NULL,
+	"style_list" JSON NOT NULL,
+	"region_text" VARCHAR(50) NOT NULL,
+	"province_name" VARCHAR(50) NOT NULL,
+	"city_name" VARCHAR(50) NOT NULL,
+	"building_area" DECIMAL(10, 2),
+	"floor_count" INTEGER,
+	"roof_type" VARCHAR(50) NOT NULL,
+	"special_list" JSON,
+	"status" INTEGER DEFAULT 0 NOT NULL,
+	"sort" INTEGER DEFAULT 0 NOT NULL,
+	"created_by" BIGINT NOT NULL,
+	"updated_by" BIGINT NOT NULL,
+	"created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."design_case"."id" IS '主键';
+COMMENT ON COLUMN "public"."design_case"."title" IS '案例标题';
+COMMENT ON COLUMN "public"."design_case"."cover_url" IS '封面图片地址';
+COMMENT ON COLUMN "public"."design_case"."summary" IS '案例简介富文本';
+COMMENT ON COLUMN "public"."design_case"."style_list" IS '风格列表';
+COMMENT ON COLUMN "public"."design_case"."region_text" IS '地区(东北、华北、华东、华中、西北、西南、华南)';
+COMMENT ON COLUMN "public"."design_case"."province_name" IS '省名称';
+COMMENT ON COLUMN "public"."design_case"."city_name" IS '城市名称';
+COMMENT ON COLUMN "public"."design_case"."building_area" IS '建筑面积，单位平方米';
+COMMENT ON COLUMN "public"."design_case"."floor_count" IS '层数';
+COMMENT ON COLUMN "public"."design_case"."roof_type" IS '屋顶类型，如平顶、坡顶';
+COMMENT ON COLUMN "public"."design_case"."special_list" IS '特殊列表';
+COMMENT ON COLUMN "public"."design_case"."status" IS '状态：0草稿，1已发布，2已下架';
+COMMENT ON COLUMN "public"."design_case"."sort" IS '排序值，越大越靠前';
+COMMENT ON COLUMN "public"."design_case"."created_by" IS '创建人';
+COMMENT ON COLUMN "public"."design_case"."updated_by" IS '修改人';
+COMMENT ON COLUMN "public"."design_case"."created_at" IS '创建时间';
+COMMENT ON COLUMN "public"."design_case"."updated_at" IS '修改时间';
+COMMENT ON TABLE "public"."design_case" IS '案例库';
+
 CREATE TABLE IF NOT EXISTS "public"."disk" (
 	"id" BIGSERIAL PRIMARY KEY NOT NULL,
 	"company_id" BIGINT NOT NULL,
@@ -1004,6 +1044,7 @@ INSERT INTO "public"."sys_menu" VALUES (80,1,36,2,'问题单','iconfont icon-xih
 INSERT INTO "public"."sys_menu" VALUES (87,1,36,2,'材料到场','iconfont icon-xihuan','materialArrival',1,9,now(),now()),(88,1,87,3,'新增','iconfont icon-xihuan','materialArrival:add',1,1,now(),now()),(89,1,87,3,'删除','iconfont icon-xihuan','materialArrival:delete',1,2,now(),now());
 INSERT INTO "public"."sys_menu" VALUES (90,1,36,2,'交接单','iconfont icon-xihuan','projectHandover',1,10,now(),now()),(91,1,90,3,'新增','iconfont icon-xihuan','projectHandover:add',1,1,now(),now()),(92,1,90,3,'确认','iconfont icon-xihuan','projectHandover:confirm',1,2,now(),now());
 INSERT INTO "public"."sys_menu" VALUES (93,1,36,2,'报修单','iconfont icon-xihuan','repair',1,11,now(),now());
-UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93' WHERE "id"=1;
+INSERT INTO "public"."sys_menu" VALUES (94,1,36,2,'案例库','iconfont icon-xihuan','designCase',1,12,now(),now()),(95,1,94,3,'新增','iconfont icon-xihuan','designCase:add',1,1,now(),now()),(96,1,94,3,'编辑','iconfont icon-xihuan','designCase:edit',1,2,now(),now()),(97,1,94,3,'删除','iconfont icon-xihuan','designCase:delete',1,3,now(),now());
+UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97' WHERE "id"=1;
 SELECT setval('sys_menu_id_seq',(SELECT max(id) FROM "public"."sys_menu"));
 COMMIT;
