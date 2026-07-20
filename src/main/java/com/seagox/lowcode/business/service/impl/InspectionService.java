@@ -23,8 +23,12 @@ import com.seagox.lowcode.business.service.IInspectionService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.AccountMapper;
 import com.seagox.lowcode.system.mapper.MessageMapper;
+import com.seagox.lowcode.util.WeiChatUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +40,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * 验收单
@@ -140,6 +145,12 @@ public class InspectionService implements IInspectionService {
      */
     @Autowired
     private MessageMapper messageMapper;
+    
+    @Autowired
+    private WeiChatUtils weiChatUtils;
+    
+    @Autowired
+    private AccountMapper accountMapper;
 
     /**
      * 分页查询验收单
@@ -767,6 +778,17 @@ public class InspectionService implements IInspectionService {
         message.setCreatedAt(now);
         message.setUpdatedBy(fromUserId);
         message.setUpdatedAt(now);
+        SysAccount fromAccount = accountMapper.selectById(fromUserId);
+        if(fromAccount != null) {
+        	SysAccount toAccount = accountMapper.selectById(toUserId);
+        	if(!StringUtils.isEmpty(toAccount.getMpOpenid())) {
+        		JSONObject content = new JSONObject();
+        		content.put("thing6", "您有一条验收单待确认");
+        		content.put("thing3", fromAccount.getName());
+        		content.put("phone_number4", fromAccount.getPhone());
+        		weiChatUtils.sendServiceMsg("5FTU2ZmycYMeTEvypLrh7IPevOPCZeEA0l1qLg_jnCU", toAccount.getMpOpenid(), "pages/workbench/construction-drawing/construction-drawing", content);
+        	}
+        }
         messageMapper.insert(message);
     }
 

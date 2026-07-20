@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -205,9 +206,10 @@ public class WeiChatUtils {
 	}
 
 	/**
-	 * 发送服务号模版消息 AasTvAchpKA5ze5k_kOkQw
+	 * 发送服务号模版消息
 	 */
-	public JSONObject sendServiceMsg(String accessToken, String templateId, String openid, String pagepath) {
+	public JSONObject sendServiceMsg(String templateId, String openid, String pagepath, JSONObject content) {
+		JSONObject result = new JSONObject();
 		JSONObject body = new JSONObject();
 		body.put("touser", openid);
 		body.put("template_id", templateId);
@@ -218,33 +220,27 @@ public class WeiChatUtils {
 		body.put("miniprogram", miniprogram);
 
 		JSONObject data = new JSONObject();
-		JSONObject name = new JSONObject();
-		name.put("value", "hello");
-		data.put("name2", name);
-
-		JSONObject thing = new JSONObject();
-		thing.put("value", "hello");
-		data.put("thing11", thing);
-
-		JSONObject time = new JSONObject();
-		time.put("value", "2023-08-09 16:10:00");
-		data.put("time26", time);
-
+		for (Map.Entry<String, Object> entry : content.entrySet()) {
+		    String key = entry.getKey();
+		    Object value = entry.getValue();
+		    JSONObject item = new JSONObject();
+		    item.put("value", value);
+			data.put(key, item);
+		}
 		body.put("data", data);
-
-		String url = SEND_SERVICE_MSG.replace("ACCESS_TOKEN", accessToken);
+		String url = SEND_SERVICE_MSG.replace("ACCESS_TOKEN", serviceAccessToken);
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
 		httpPost.setEntity(new StringEntity(body.toJSONString(), ContentType.APPLICATION_JSON.withCharset("UTF-8")));
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			CloseableHttpResponse response = httpClient.execute(httpPost);
-			String result = EntityUtils.toString(response.getEntity(), "UTF-8");
-			System.out.println("微信返回：" + result);
+			String resultStr = EntityUtils.toString(response.getEntity(), "UTF-8");
+			result = JSONObject.parseObject(resultStr);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return result;
 	}
 
 }

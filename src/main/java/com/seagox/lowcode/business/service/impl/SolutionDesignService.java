@@ -1,5 +1,6 @@
 package com.seagox.lowcode.business.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -14,8 +15,12 @@ import com.seagox.lowcode.business.service.ISolutionDesignService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.AccountMapper;
 import com.seagox.lowcode.system.mapper.MessageMapper;
+import com.seagox.lowcode.util.WeiChatUtils;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +56,12 @@ public class SolutionDesignService implements ISolutionDesignService {
 
     @Autowired
     private MessageMapper messageMapper;
+    
+    @Autowired
+    private WeiChatUtils weiChatUtils;
+    
+    @Autowired
+    private AccountMapper accountMapper;
 
     /**
      * {@inheritDoc}
@@ -362,6 +373,17 @@ public class SolutionDesignService implements ISolutionDesignService {
         message.setCreatedAt(now);
         message.setUpdatedBy(userId);
         message.setUpdatedAt(now);
+        SysAccount fromAccount = accountMapper.selectById(userId);
+        if(fromAccount != null) {
+        	SysAccount toAccount = accountMapper.selectById(userId);
+        	if(!StringUtils.isEmpty(toAccount.getMpOpenid())) {
+        		JSONObject content = new JSONObject();
+        		content.put("thing6", "您有一条方案设计待确认");
+        		content.put("thing3", fromAccount.getName());
+        		content.put("phone_number4", fromAccount.getPhone());
+        		weiChatUtils.sendServiceMsg("5FTU2ZmycYMeTEvypLrh7IPevOPCZeEA0l1qLg_jnCU", toAccount.getMpOpenid(), "pages/message/message", content);
+        	}
+        }
         messageMapper.insert(message);
     }
 

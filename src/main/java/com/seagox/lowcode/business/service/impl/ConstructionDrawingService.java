@@ -1,7 +1,7 @@
 package com.seagox.lowcode.business.service.impl;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -14,8 +14,12 @@ import com.seagox.lowcode.business.service.IConstructionDrawingService;
 import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysAccount;
 import com.seagox.lowcode.system.entity.SysMessage;
+import com.seagox.lowcode.system.mapper.AccountMapper;
 import com.seagox.lowcode.system.mapper.MessageMapper;
+import com.seagox.lowcode.util.WeiChatUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
@@ -48,6 +52,12 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
 
     @Autowired
     private MessageMapper messageMapper;
+    
+    @Autowired
+    private WeiChatUtils weiChatUtils;
+    
+    @Autowired
+    private AccountMapper accountMapper;
 
     /**
      * {@inheritDoc}
@@ -330,6 +340,17 @@ public class ConstructionDrawingService implements IConstructionDrawingService {
         message.setCreatedAt(now);
         message.setUpdatedBy(fromUserId);
         message.setUpdatedAt(now);
+        SysAccount fromAccount = accountMapper.selectById(fromUserId);
+        if(fromAccount != null) {
+        	SysAccount toAccount = accountMapper.selectById(toUserId);
+        	if(!StringUtils.isEmpty(toAccount.getMpOpenid())) {
+        		JSONObject content = new JSONObject();
+        		content.put("thing6", "您有一条施工图出图待确认");
+        		content.put("thing3", fromAccount.getName());
+        		content.put("phone_number4", fromAccount.getPhone());
+        		weiChatUtils.sendServiceMsg("5FTU2ZmycYMeTEvypLrh7IPevOPCZeEA0l1qLg_jnCU", toAccount.getMpOpenid(), "pages/message/message", content);
+        	}
+        }
         messageMapper.insert(message);
     }
 
