@@ -1,3 +1,27 @@
+CREATE TABLE IF NOT EXISTS "public"."knowledge" (
+	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"category" VARCHAR(50) NOT NULL,
+	"title" VARCHAR(1000) NOT NULL,
+	"cover_url" TEXT NOT NULL,
+	"video_id" VARCHAR(255) NOT NULL,
+	"video_account_id" VARCHAR(100) NOT NULL,
+	"sort" INTEGER DEFAULT 0 NOT NULL,
+	"status" INTEGER DEFAULT 1 NOT NULL,
+	"create_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"update_time" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON COLUMN "public"."knowledge"."id" IS '主键';
+COMMENT ON COLUMN "public"."knowledge"."category" IS '分类名称';
+COMMENT ON COLUMN "public"."knowledge"."title" IS '标题';
+COMMENT ON COLUMN "public"."knowledge"."cover_url" IS '封面图片';
+COMMENT ON COLUMN "public"."knowledge"."video_id" IS '视频号视频ID';
+COMMENT ON COLUMN "public"."knowledge"."video_account_id" IS '视频号账号ID';
+COMMENT ON COLUMN "public"."knowledge"."sort" IS '排序';
+COMMENT ON COLUMN "public"."knowledge"."status" IS '状态(0:下架;1:上架)';
+COMMENT ON COLUMN "public"."knowledge"."create_time" IS '创建时间';
+COMMENT ON COLUMN "public"."knowledge"."update_time" IS '更新时间';
+COMMENT ON TABLE "public"."knowledge" IS '科普内容';
+
 CREATE TABLE IF NOT EXISTS "public"."design_case" (
 	"id" BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	"title" VARCHAR(200) NOT NULL,
@@ -1085,5 +1109,9 @@ INSERT INTO "public"."sys_menu" VALUES (94,1,36,2,'案例库','iconfont icon-xih
 INSERT INTO "public"."sys_menu" VALUES (95,1,94,3,'新增','iconfont icon-xihuan','designCase:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (96,1,94,3,'编辑','iconfont icon-xihuan','designCase:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO "public"."sys_menu" VALUES (97,1,94,3,'删除','iconfont icon-xihuan','designCase:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97' WHERE "id"=1;
+INSERT INTO "public"."sys_menu" VALUES (98,1,36,2,'科普管理','iconfont icon-xihuan','knowledge',1,13,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (99,1,98,3,'新增','iconfont icon-xihuan','knowledge:add',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (100,1,98,3,'编辑','iconfont icon-xihuan','knowledge:edit',1,2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO "public"."sys_menu" VALUES (101,1,98,3,'删除','iconfont icon-xihuan','knowledge:delete',1,3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+UPDATE "public"."sys_role" SET "path"='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101' WHERE "id"=1;
 COMMIT;

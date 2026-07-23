@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seagox.lowcode.business.mapper.KnowledgeMapper">
+    <!-- 查询科普内容列表 -->
+    <select id="queryKnowledgeList" resultType="camelKeyMap">
+        SELECT k.id,
+               k.category,
+               k.title,
+               k.cover_url AS "coverUrl",
+               k.video_id AS "videoId",
+               k.video_account_id AS "videoAccountId",
+               k.sort,
+               k.status,
+               k.create_time AS "createTime",
+               k.update_time AS "updateTime"
+        FROM knowledge k
+        <where>
+            <if test="params.keyword != null and params.keyword != ''">
+                <choose>
+                    <when test="_databaseId == 'mysql'">
+                        AND (k.title LIKE CONCAT('%', #{params.keyword}, '%')
+                        OR k.category LIKE CONCAT('%', #{params.keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        AND (k.title LIKE '%' || #{params.keyword} || '%'
+                        OR k.category LIKE '%' || #{params.keyword} || '%')
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="params.category != null and params.category != ''">
+                AND k.category = #{params.category}
+            </if>
+            <if test="params.status != null and params.status != ''">
+                AND k.status = #{params.status}
+            </if>
+        </where>
+        ORDER BY k.sort DESC, k.update_time DESC, k.id DESC
+    </select>
+
+    <!-- 查询科普内容详情 -->
+    <select id="queryKnowledgeById" resultType="camelKeyMap">
+        SELECT k.id,
+               k.category,
+               k.title,
+               k.cover_url AS "coverUrl",
+               k.video_id AS "videoId",
+               k.video_account_id AS "videoAccountId",
+               k.sort,
+               k.status,
+               k.create_time AS "createTime",
+               k.update_time AS "updateTime"
+        FROM knowledge k
+        WHERE k.id = #{id}
+    </select>
+</mapper>

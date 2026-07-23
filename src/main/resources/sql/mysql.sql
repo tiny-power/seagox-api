@@ -1,3 +1,17 @@
+CREATE TABLE IF NOT EXISTS `knowledge` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `category` varchar(50) NOT NULL COMMENT '分类名称',
+  `title` varchar(1000) NOT NULL COMMENT '标题',
+  `cover_url` text NOT NULL COMMENT '封面图片',
+  `video_id` varchar(255) NOT NULL COMMENT '视频号视频ID',
+  `video_account_id` varchar(100) NOT NULL COMMENT '视频号账号ID',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+  `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态(0:下架;1:上架)',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '科普内容';
+
 CREATE TABLE IF NOT EXISTS `design_case` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `title` VARCHAR(200) NOT NULL COMMENT '案例标题',
@@ -664,5 +678,9 @@ INSERT INTO sys_menu VALUES (57,1,36,2,'案例库','iconfont icon-xihuan','desig
 INSERT INTO sys_menu VALUES (58,1,57,3,'新增','iconfont icon-xihuan','designCase:add',1,1,now(),now());
 INSERT INTO sys_menu VALUES (59,1,57,3,'编辑','iconfont icon-xihuan','designCase:edit',1,2,now(),now());
 INSERT INTO sys_menu VALUES (60,1,57,3,'删除','iconfont icon-xihuan','designCase:delete',1,3,now(),now());
-UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60' WHERE id=1;
+INSERT INTO sys_menu VALUES (61,1,36,2,'科普管理','iconfont icon-xihuan','knowledge',1,13,now(),now());
+INSERT INTO sys_menu VALUES (62,1,61,3,'新增','iconfont icon-xihuan','knowledge:add',1,1,now(),now());
+INSERT INTO sys_menu VALUES (63,1,61,3,'编辑','iconfont icon-xihuan','knowledge:edit',1,2,now(),now());
+INSERT INTO sys_menu VALUES (64,1,61,3,'删除','iconfont icon-xihuan','knowledge:delete',1,3,now(),now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64' WHERE id=1;
 COMMIT;
