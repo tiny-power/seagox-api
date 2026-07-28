@@ -456,6 +456,43 @@ CREATE TABLE IF NOT EXISTS `payment_request` (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='请款单';
 
+CREATE TABLE IF NOT EXISTS `project_change_order` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
+    `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
+    `order_no` VARCHAR(50) NOT NULL COMMENT '签证编号',
+    `order_type` TINYINT NOT NULL DEFAULT 1 COMMENT '签证类型(1:现场签证 2:设计变更 3:甲方指令 4:其他)',
+    `amount` DECIMAL(18,2) NOT NULL COMMENT '签证金额',
+    `reason` VARCHAR(500) DEFAULT NULL COMMENT '签证原因',
+    `content` TEXT COMMENT '签证内容',
+    `remark` VARCHAR(500) DEFAULT NULL COMMENT '备注',
+    `attachments` JSON COMMENT '附件',
+    `applicant_id` BIGINT UNSIGNED NOT NULL COMMENT '申请人id',
+    `order_date` DATE NOT NULL COMMENT '签证日期',
+    `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态(0:草稿;1:审批中;2:已撤销;3:已通过;4:已驳回;)',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED DEFAULT NULL COMMENT '修改人',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='签证单';
+
+CREATE TABLE IF NOT EXISTS `project_change_order_item` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `order_id` BIGINT UNSIGNED NOT NULL COMMENT '签证单ID',
+    `item_name` VARCHAR(200) NOT NULL COMMENT '工程量名称',
+    `unit` VARCHAR(50) NOT NULL COMMENT '单位',
+    `quantity` DECIMAL(18,4) NOT NULL COMMENT '数量',
+    `unit_price` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '单价',
+    `amount` DECIMAL(18,2) NOT NULL DEFAULT 0 COMMENT '金额',
+    `remark` VARCHAR(1000) DEFAULT NULL COMMENT '备注',
+    `sort` INT UNSIGNED DEFAULT 1 COMMENT '排序',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_project_change_order_item_order` (`order_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT='签证单工程量明细';
+
 CREATE TABLE IF NOT EXISTS `material_arrival` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `project_id` BIGINT UNSIGNED NOT NULL COMMENT '所属项目ID',
@@ -562,7 +599,7 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
 CREATE TABLE IF NOT EXISTS `sys_message`  (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     `company_id` BIGINT UNSIGNED NOT NULL COMMENT '公司id',
-    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:系统通知;2:管家提醒;3:需求表;4:方案设计;5:施工图出图;6:验收单;7:请假单;8:请款单;9:交接单;10:实施日记;11:问题单;)',
+    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '类型(1:系统通知;2:管家提醒;3:需求表;4:方案设计;5:施工图出图;6:验收单;7:请假单;8:请款单;9:交接单;10:实施日记;11:问题单;12:签证单;)',
     `from_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(来自)',
     `to_user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户id(给谁)',
     `title` VARCHAR(50) NOT NULL COMMENT '标题',
@@ -682,5 +719,6 @@ INSERT INTO sys_menu VALUES (61,1,36,2,'科普管理','iconfont icon-xihuan','kn
 INSERT INTO sys_menu VALUES (62,1,61,3,'新增','iconfont icon-xihuan','knowledge:add',1,1,now(),now());
 INSERT INTO sys_menu VALUES (63,1,61,3,'编辑','iconfont icon-xihuan','knowledge:edit',1,2,now(),now());
 INSERT INTO sys_menu VALUES (64,1,61,3,'删除','iconfont icon-xihuan','knowledge:delete',1,3,now(),now());
-UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64' WHERE id=1;
+INSERT INTO sys_menu VALUES (65,1,36,2,'签证单','iconfont icon-xihuan','projectChangeOrder',1,14,now(),now());
+UPDATE sys_role SET path='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65' WHERE id=1;
 COMMIT;

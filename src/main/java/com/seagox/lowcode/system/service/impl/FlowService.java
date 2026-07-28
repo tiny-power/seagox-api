@@ -14,12 +14,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.seagox.lowcode.business.entity.PaymentRequest;
 import com.seagox.lowcode.business.entity.LeaveRequest;
+import com.seagox.lowcode.business.entity.ProjectChangeOrder;
 import com.seagox.lowcode.business.mapper.LeaveRequestMapper;
 import com.seagox.lowcode.business.mapper.PaymentRequestMapper;
+import com.seagox.lowcode.business.mapper.ProjectChangeOrderMapper;
 import com.seagox.lowcode.business.service.ILeaveRequestService;
 import com.seagox.lowcode.business.service.IPaymentRequestService;
+import com.seagox.lowcode.business.service.IProjectChangeOrderService;
 import com.seagox.lowcode.business.service.impl.LeaveRequestService;
 import com.seagox.lowcode.business.service.impl.PaymentRequestService;
+import com.seagox.lowcode.business.service.impl.ProjectChangeOrderService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.mapper.FlowMapper;
@@ -31,8 +35,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,10 +71,16 @@ public class FlowService implements IFlowService {
     private PaymentRequestMapper paymentRequestMapper;
 
     @Autowired
+    private ProjectChangeOrderMapper projectChangeOrderMapper;
+
+    @Autowired
     private ILeaveRequestService leaveRequestService;
 
     @Autowired
     private IPaymentRequestService paymentRequestService;
+
+    @Autowired
+    private IProjectChangeOrderService projectChangeOrderService;
 
     @Autowired
     private ProcessDraftMapper processDraftMapper;
@@ -153,12 +165,18 @@ public class FlowService implements IFlowService {
             String businessKey = item.getString("businessKey");
             try {
                 if (!LeaveRequestService.BUSINESS_TYPE.equals(businessType)
-                        && !PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+                        && !PaymentRequestService.BUSINESS_TYPE.equals(businessType)
+                        && !ProjectChangeOrderService.BUSINESS_TYPE.equals(businessType)) {
                     throw new IllegalArgumentException("暂不支持该类别提交");
                 }
-                ResultData submitResult = LeaveRequestService.BUSINESS_TYPE.equals(businessType)
-                        ? leaveRequestService.submit(Long.valueOf(businessKey))
-                        : paymentRequestService.submit(Long.valueOf(businessKey));
+                ResultData submitResult;
+                if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+                    submitResult = leaveRequestService.submit(Long.valueOf(businessKey));
+                } else if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+                    submitResult = paymentRequestService.submit(Long.valueOf(businessKey));
+                } else {
+                    submitResult = projectChangeOrderService.submit(Long.valueOf(businessKey));
+                }
                 if (submitResult.getCode() != ResultCode.SUCCESS.getCode()) {
                     throw new IllegalArgumentException(submitResult.getMessage());
                 }
@@ -323,6 +341,22 @@ public class FlowService implements IFlowService {
                 variables.put("reason", paymentRequest.getReason());
                 variables.put("attachments", paymentRequest.getAttachments());
             }
+        } else if (ProjectChangeOrderService.BUSINESS_TYPE.equals(businessType)) {
+            ProjectChangeOrder projectChangeOrder = projectChangeOrderMapper.selectById(Long.valueOf(businessKey));
+            if (projectChangeOrder != null) {
+                variables.put("id", projectChangeOrder.getId());
+                variables.put("projectId", projectChangeOrder.getProjectId());
+                variables.put("companyId", projectChangeOrder.getCompanyId());
+                variables.put("applicantId", projectChangeOrder.getApplicantId());
+                variables.put("orderNo", projectChangeOrder.getOrderNo());
+                variables.put("orderType", projectChangeOrder.getOrderType());
+                variables.put("orderDate", formatDateOnly(projectChangeOrder.getOrderDate()));
+                variables.put("amount", projectChangeOrder.getAmount());
+                variables.put("reason", projectChangeOrder.getReason());
+                variables.put("content", projectChangeOrder.getContent());
+                variables.put("remark", projectChangeOrder.getRemark());
+                variables.put("attachments", projectChangeOrder.getAttachments());
+            }
         }
         return variables;
     }
@@ -360,6 +394,10 @@ public class FlowService implements IFlowService {
         return time == null ? null : FLOW_TIME_FORMATTER.format(time);
     }
 
+    private String formatDateOnly(Date date) {
+        return date == null ? "" : new SimpleDateFormat("yyyy-MM-dd").format(date);
+    }
+
     private void syncBusinessStatus(String businessType, String businessKey, Boolean approved, int processStatus) {
         if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
             LeaveRequest leaveRequest = new LeaveRequest();
@@ -383,6 +421,17 @@ public class FlowService implements IFlowService {
                 return;
             }
             paymentRequestMapper.updateById(paymentRequest);
+        } else if (ProjectChangeOrderService.BUSINESS_TYPE.equals(businessType)) {
+            ProjectChangeOrder projectChangeOrder = new ProjectChangeOrder();
+            projectChangeOrder.setId(Long.valueOf(businessKey));
+            if (processStatus == INSTANCE_COMPLETED) {
+                projectChangeOrder.setStatus(ProjectChangeOrderService.STATUS_APPROVED);
+            } else if (!approved && processStatus == INSTANCE_TERMINATED) {
+                projectChangeOrder.setStatus(ProjectChangeOrderService.STATUS_REJECTED);
+            } else {
+                return;
+            }
+            projectChangeOrderMapper.updateById(projectChangeOrder);
         }
     }
 
