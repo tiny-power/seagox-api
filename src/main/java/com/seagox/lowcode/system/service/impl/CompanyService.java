@@ -470,7 +470,7 @@ public class CompanyService implements ICompanyService {
 		Company company = companyMapper.selectById(companyId);
 		List<Map<String, Object>> companyList = companyMapper.queryByPrefix(company.getCode().substring(0, 4));
 		for (Map<String, Object> map : companyList) {
-			List<Map<String, Object>> roleList = roleMapper.queryByCompanyId((Long) map.get("id"));
+			List<Map<String, Object>> roleList = roleMapper.queryByCompanyId(Long.valueOf(map.get("id").toString()));
 			map.put("children", roleList);
 			map.put("type", "company");
 		}
