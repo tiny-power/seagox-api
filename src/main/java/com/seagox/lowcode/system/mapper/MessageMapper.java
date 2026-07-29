@@ -27,4 +27,11 @@ public interface MessageMapper extends BaseMapper<SysMessage> {
      */
     public void deleteMessage(@Param("businessType") String businessType, @Param("businessKey") Long businessKey);
 
+    /**
+     * 查询当前审批节点人员
+     */
+    public List<String> queryCurrentTaskAssignees(@Param("companyId") Long companyId,
+                                                  @Param("businessType") String businessType,
+                                                  @Param("businessKey") String businessKey);
+
 }

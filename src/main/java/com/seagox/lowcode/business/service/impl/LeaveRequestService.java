@@ -15,8 +15,10 @@ import com.seagox.lowcode.business.service.ILeaveRequestService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysAccount;
+import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.entity.SysProcessDraft;
 import com.seagox.lowcode.system.mapper.AccountMapper;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +31,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 请假单服务实现
@@ -80,6 +84,12 @@ public class LeaveRequestService implements ILeaveRequestService {
      */
     @Autowired
     private ProcessDraftMapper processDraftMapper;
+
+    /**
+     * 系统消息数据访问对象
+     */
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 流程定义服务
@@ -284,6 +294,7 @@ public class LeaveRequestService implements ILeaveRequestService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已通过的请假单不可以删除");
         }
         clearProcess(leaveRequest.getCompanyId(), BUSINESS_TYPE, String.valueOf(id));
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         deleteProcessDraft(leaveRequest);
         leaveRequestMapper.deleteById(id);
         return ResultData.success(null);
@@ -322,6 +333,7 @@ public class LeaveRequestService implements ILeaveRequestService {
         leaveRequest.setSubmitTime(new Date());
         leaveRequestMapper.updateById(leaveRequest);
         deleteProcessDraft(leaveRequest);
+        refreshApprovalMessages(leaveRequest);
         return ResultData.success(null);
     }
 
@@ -347,7 +359,68 @@ public class LeaveRequestService implements ILeaveRequestService {
         terminateProcess(leaveRequest.getCompanyId(), BUSINESS_TYPE, String.valueOf(id));
         leaveRequest.setStatus(STATUS_CANCELED);
         leaveRequestMapper.updateById(leaveRequest);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 刷新请假单审批消息
+     */
+    private void refreshApprovalMessages(LeaveRequest leaveRequest) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, leaveRequest.getId());
+        if (!Integer.valueOf(STATUS_APPROVING).equals(leaveRequest.getStatus())) {
+            return;
+        }
+        Date now = new Date();
+        Set<Long> toUserIds = queryCurrentTaskUserIds(leaveRequest.getCompanyId(), leaveRequest.getId());
+        for (Long toUserId : toUserIds) {
+            SysMessage message = new SysMessage();
+            message.setCompanyId(leaveRequest.getCompanyId());
+            message.setType(7);
+            message.setFromUserId(leaveRequest.getApplicantId());
+            message.setToUserId(toUserId);
+            message.setTitle("您有一条请假单待审批");
+            message.setBusinessType(BUSINESS_TYPE);
+            message.setBusinessKey(leaveRequest.getId());
+            message.setStatus(0);
+            message.setCreatedBy(leaveRequest.getApplicantId());
+            message.setCreatedAt(now);
+            message.setUpdatedBy(leaveRequest.getApplicantId());
+            message.setUpdatedAt(now);
+            messageMapper.insert(message);
+        }
+    }
+
+    /**
+     * 查询当前审批节点人员
+     */
+    private Set<Long> queryCurrentTaskUserIds(Long companyId, Long id) {
+        Set<Long> result = new HashSet<>();
+        if (companyId == null || id == null) {
+            return result;
+        }
+        List<String> assignees = messageMapper.queryCurrentTaskAssignees(companyId, BUSINESS_TYPE, String.valueOf(id));
+        for (String assignee : assignees) {
+            addAssigneeUserIds(result, assignee);
+        }
+        return result;
+    }
+
+    /**
+     * 添加审批人
+     */
+    private void addAssigneeUserIds(Set<Long> result, String assignee) {
+        if (StringUtils.isEmpty(assignee)) {
+            return;
+        }
+        String[] userIds = assignee.split(",");
+        for (String userId : userIds) {
+            String text = userId == null ? "" : userId.trim();
+            if (StringUtils.isEmpty(text)) {
+                continue;
+            }
+            result.add(Long.valueOf(text));
+        }
     }
 
     /**

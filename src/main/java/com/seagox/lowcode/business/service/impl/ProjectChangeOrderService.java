@@ -19,8 +19,10 @@ import com.seagox.lowcode.business.util.MapDateFormatUtils;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
 import com.seagox.lowcode.system.entity.SysAccount;
+import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.entity.SysProcessDraft;
 import com.seagox.lowcode.system.mapper.AccountMapper;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -89,6 +91,12 @@ public class ProjectChangeOrderService implements IProjectChangeOrderService {
      */
     @Autowired
     private ProcessDraftMapper processDraftMapper;
+
+    /**
+     * 系统消息数据访问对象
+     */
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 流程定义服务
@@ -214,6 +222,7 @@ public class ProjectChangeOrderService implements IProjectChangeOrderService {
             return ResultData.warn(ResultCode.OTHER_ERROR, "已通过的签证单不可以删除");
         }
         clearProcess(projectChangeOrder.getCompanyId(), BUSINESS_TYPE, String.valueOf(id));
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         deleteProcessDraft(projectChangeOrder);
         deleteItems(id);
         projectChangeOrderMapper.deleteById(id);
@@ -254,6 +263,7 @@ public class ProjectChangeOrderService implements IProjectChangeOrderService {
         projectChangeOrder.setUpdatedAt(new Date());
         projectChangeOrderMapper.updateById(projectChangeOrder);
         deleteProcessDraft(projectChangeOrder);
+        refreshApprovalMessages(projectChangeOrder);
         return ResultData.success(null);
     }
 
@@ -274,7 +284,68 @@ public class ProjectChangeOrderService implements IProjectChangeOrderService {
         projectChangeOrder.setStatus(STATUS_CANCELED);
         projectChangeOrder.setUpdatedAt(new Date());
         projectChangeOrderMapper.updateById(projectChangeOrder);
+        messageMapper.deleteMessage(BUSINESS_TYPE, id);
         return ResultData.success(null);
+    }
+
+    /**
+     * 刷新签证单审批消息
+     */
+    private void refreshApprovalMessages(ProjectChangeOrder projectChangeOrder) {
+        messageMapper.deleteMessage(BUSINESS_TYPE, projectChangeOrder.getId());
+        if (!Integer.valueOf(STATUS_APPROVING).equals(projectChangeOrder.getStatus())) {
+            return;
+        }
+        Date now = new Date();
+        Set<Long> toUserIds = queryCurrentTaskUserIds(projectChangeOrder.getCompanyId(), projectChangeOrder.getId());
+        for (Long toUserId : toUserIds) {
+            SysMessage message = new SysMessage();
+            message.setCompanyId(projectChangeOrder.getCompanyId());
+            message.setType(12);
+            message.setFromUserId(projectChangeOrder.getApplicantId());
+            message.setToUserId(toUserId);
+            message.setTitle("您有一条签证单待审批");
+            message.setBusinessType(BUSINESS_TYPE);
+            message.setBusinessKey(projectChangeOrder.getId());
+            message.setStatus(0);
+            message.setCreatedBy(projectChangeOrder.getApplicantId());
+            message.setCreatedAt(now);
+            message.setUpdatedBy(projectChangeOrder.getApplicantId());
+            message.setUpdatedAt(now);
+            messageMapper.insert(message);
+        }
+    }
+
+    /**
+     * 查询当前审批节点人员
+     */
+    private Set<Long> queryCurrentTaskUserIds(Long companyId, Long id) {
+        Set<Long> result = new HashSet<>();
+        if (companyId == null || id == null) {
+            return result;
+        }
+        List<String> assignees = messageMapper.queryCurrentTaskAssignees(companyId, BUSINESS_TYPE, String.valueOf(id));
+        for (String assignee : assignees) {
+            addAssigneeUserIds(result, assignee);
+        }
+        return result;
+    }
+
+    /**
+     * 添加审批人
+     */
+    private void addAssigneeUserIds(Set<Long> result, String assignee) {
+        if (StringUtils.isEmpty(assignee)) {
+            return;
+        }
+        String[] userIds = assignee.split(",");
+        for (String userId : userIds) {
+            String text = userId == null ? "" : userId.trim();
+            if (StringUtils.isEmpty(text)) {
+                continue;
+            }
+            result.add(Long.valueOf(text));
+        }
     }
 
     /**

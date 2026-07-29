@@ -26,7 +26,9 @@ import com.seagox.lowcode.business.service.impl.PaymentRequestService;
 import com.seagox.lowcode.business.service.impl.ProjectChangeOrderService;
 import com.seagox.lowcode.common.ResultCode;
 import com.seagox.lowcode.common.ResultData;
+import com.seagox.lowcode.system.entity.SysMessage;
 import com.seagox.lowcode.system.mapper.FlowMapper;
+import com.seagox.lowcode.system.mapper.MessageMapper;
 import com.seagox.lowcode.system.mapper.ProcessDraftMapper;
 import com.seagox.lowcode.system.service.IFlowService;
 
@@ -41,9 +43,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class FlowService implements IFlowService {
@@ -84,6 +88,9 @@ public class FlowService implements IFlowService {
 
     @Autowired
     private ProcessDraftMapper processDraftMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Override
     public ResultData queryTodoItem(Integer pageNo, Integer pageSize, Long companyId, String userId, Long formId,
@@ -218,6 +225,7 @@ public class FlowService implements IFlowService {
                 WeaveInstance instance = runtimeService.getProcessInstance(task.getInstanceId());
                 int processStatus = instance == null || instance.getStatus() == null ? 0 : instance.getStatus();
                 syncBusinessStatus(businessType, businessKey, Boolean.TRUE.equals(approved), processStatus);
+                refreshApprovalMessages(companyId, businessType, businessKey, userId);
                 successNum++;
             } catch (Exception e) {
                 errorNum++;
@@ -432,6 +440,79 @@ public class FlowService implements IFlowService {
                 return;
             }
             projectChangeOrderMapper.updateById(projectChangeOrder);
+        }
+    }
+
+    private void refreshApprovalMessages(Long companyId, String businessType, String businessKey, Long userId) {
+        Long id = Long.valueOf(businessKey);
+        messageMapper.deleteMessage(businessType, id);
+        MessageMeta meta = buildMessageMeta(businessType);
+        if (meta == null) {
+            return;
+        }
+        Date now = new Date();
+        Set<Long> toUserIds = queryCurrentTaskUserIds(companyId, businessType, businessKey);
+        for (Long toUserId : toUserIds) {
+            SysMessage message = new SysMessage();
+            message.setCompanyId(companyId);
+            message.setType(meta.type);
+            message.setFromUserId(userId);
+            message.setToUserId(toUserId);
+            message.setTitle(meta.title);
+            message.setBusinessType(businessType);
+            message.setBusinessKey(id);
+            message.setStatus(0);
+            message.setCreatedBy(userId);
+            message.setCreatedAt(now);
+            message.setUpdatedBy(userId);
+            message.setUpdatedAt(now);
+            messageMapper.insert(message);
+        }
+    }
+
+    private Set<Long> queryCurrentTaskUserIds(Long companyId, String businessType, String businessKey) {
+        Set<Long> result = new HashSet<>();
+        List<String> assignees = messageMapper.queryCurrentTaskAssignees(companyId, businessType, businessKey);
+        for (String assignee : assignees) {
+            addAssigneeUserIds(result, assignee);
+        }
+        return result;
+    }
+
+    private void addAssigneeUserIds(Set<Long> result, String assignee) {
+        if (StringUtils.isEmpty(assignee)) {
+            return;
+        }
+        String[] userIds = assignee.split(",");
+        for (String userId : userIds) {
+            String text = userId == null ? "" : userId.trim();
+            if (StringUtils.isEmpty(text)) {
+                continue;
+            }
+            result.add(Long.valueOf(text));
+        }
+    }
+
+    private MessageMeta buildMessageMeta(String businessType) {
+        if (LeaveRequestService.BUSINESS_TYPE.equals(businessType)) {
+            return new MessageMeta(7, "您有一条请假单待审批");
+        }
+        if (PaymentRequestService.BUSINESS_TYPE.equals(businessType)) {
+            return new MessageMeta(8, "您有一条请款单待审批");
+        }
+        if (ProjectChangeOrderService.BUSINESS_TYPE.equals(businessType)) {
+            return new MessageMeta(12, "您有一条签证单待审批");
+        }
+        return null;
+    }
+
+    private static class MessageMeta {
+        private final Integer type;
+        private final String title;
+
+        private MessageMeta(Integer type, String title) {
+            this.type = type;
+            this.title = title;
         }
     }
 

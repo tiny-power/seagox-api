@@ -85,4 +85,20 @@
 		</where> 
     </delete>
 
+	<!-- 查询当前审批节点人员 -->
+	<select id="queryCurrentTaskAssignees" resultType="string">
+		SELECT d.assignee
+		FROM sea_node_detail d
+		JOIN sea_node n ON n.id = d.node_id
+		JOIN sea_instance i ON i.id = n.instance_id
+		<where>
+			d.company_id = #{companyId}
+			AND i.business_type = #{businessType}
+			AND i.business_key = #{businessKey}
+			AND d.status = 0
+			AND i.status = 0
+		</where>
+		ORDER BY d.start_time ASC, d.id ASC
+	</select>
+
 </mapper>
